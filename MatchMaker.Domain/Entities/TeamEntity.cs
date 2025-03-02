@@ -1,5 +1,4 @@
 ﻿using MongoDB.Entities;
-using System.ComponentModel.DataAnnotations;
 
 namespace MatchMaker.Domain.Entities;
 
