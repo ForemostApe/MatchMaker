@@ -4,5 +4,5 @@ namespace MatchMaker.Core.Interfaces;
 
 public interface IUserService
 {
-    Task<UserResultDTO> CreateUserAsync(UserDTO newUser);
+    Task<UserResultDTO> CreateUserAsync(CreateUserDTO newUser);
 }
