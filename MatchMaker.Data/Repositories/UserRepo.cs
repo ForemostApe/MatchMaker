@@ -1,10 +1,11 @@
-﻿using MatchMaker.Domain.Entities;
+﻿using MatchMaker.Data.Interfaces;
+using MatchMaker.Domain.Entities;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 
 namespace MatchMaker.Data.Repositories;
 
-public class UserRepo(ILogger<UserRepo> logger, IMongoDatabase database)
+public class UserRepo(ILogger<UserRepo> logger, IMongoDatabase database) : IUserRepo
 {
     private readonly ILogger<UserRepo> _logger = logger;
     private readonly IMongoCollection<UserEntity> _userCollection = database.GetCollection<UserEntity>("users");
