@@ -9,7 +9,7 @@ public enum GameStatus
     Cancelled
 }
 
-public class Game : Entity, SchemaBase
+public class Game : Entity
 {
     public DateTime StartTime { get; set; }
     public DateTime EndTime { get; set; }

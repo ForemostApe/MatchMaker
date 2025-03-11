@@ -12,21 +12,15 @@ public class UserService(ILogger<UserService> logger, IMapper mapper, IUserRepo 
     private readonly IMapper _mapper = mapper;
     private readonly IUserRepo _userRepo = userRepo;
 
-    public async Task<UserResultDTO> CreateUserAsync(UserDTO newUser)
+    public async Task<Result<UserDTO>> CreateUserAsync(CreateUserDTO newUser)
     {
         try
         {
             var user = _mapper.Map<User>(newUser);
 
             bool result = await _userRepo.CreateUserAsync(user);
-            if (!result)
-            {
-                return new UserResultDTO()
-                {
-                    IsSuccess = false,
-                    Message = "Couldn't create user."
-                };
-            }
+
+            if (!result) return Result<UserDTO>.Failure("Couldn't create user");
 
             var createdUser = await _userRepo.GetUserByEmailAsync(user.Email);
 
@@ -35,12 +29,10 @@ public class UserService(ILogger<UserService> logger, IMapper mapper, IUserRepo 
                 _logger.LogError("Couldn't fetch newly created user {email} from database after writing to database.", newUser.Email);
                 throw new Exception("Unexpected error when trying to fetch newly created user after writing to database");
             }
-            return new UserResultDTO()
-            {
-                IsSuccess = true,
-                Message = "User successfully created.",
-                UserDTO = _mapper.Map<UserDTO>(createdUser)
-            };
+
+            UserDTO userDTO = _mapper.Map<UserDTO>(createdUser);
+
+            return Result<UserDTO>.Success(userDTO, "User successfully created.");
         }
         catch (Exception ex)
         {
@@ -49,28 +41,17 @@ public class UserService(ILogger<UserService> logger, IMapper mapper, IUserRepo 
         }
     }
 
-    public async Task<UserResultDTO> GetUserByIdAsync(string userId)
+    public async Task<Result<UserDTO>> GetUserByIdAsync(string userId)
     {
         try
         {
-            var user = await _userRepo.GetUserByIdAsync(userId);
+            var existingUser = await _userRepo.GetUserByIdAsync(userId);
 
-            if (user == null)
-            {
-                return new UserResultDTO()
-                {
-                    IsSuccess = false,
-                    Message = "User couldn't be found."
-                };
-            }
+            if (existingUser == null) return Result<UserDTO>.Failure("Couldn't find user");
 
-            return new UserResultDTO()
-            {
-                IsSuccess = true,
-                Message = "User found.",
-                UserDTO = _mapper.Map<UserDTO>(user)
-            };
+            var fetchedUser = _mapper.Map<UserDTO>(existingUser);
 
+            return Result<UserDTO>.Success(fetchedUser, "User successfully found.");
         }
         catch (Exception ex)
         {

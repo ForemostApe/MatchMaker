@@ -18,29 +18,39 @@ public class UserController(ILogger<UserController> logger, IUserService userSer
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return ValidationProblem(ModelState);
             }
 
             var result = await _userService.CreateUserAsync(newUser);
             if (result.IsSuccess)
             {
                 var baseUrl = $"{Request.Scheme}://{Request.Host}";
-                var manualUri = $"{baseUrl}/api/User/{result.UserDTO!.UserId}";
+                var manualUri = $"{baseUrl}/api/User/{result.Data!.UserId}";
 
-                _logger.LogInformation("User successfully created with user-Id: {result.User.UserId}", result.UserDTO!.UserId);
+                _logger.LogInformation("User successfully created with user-Id: {result.User.UserId}", result.Data!.UserId);
 
-                return Created(manualUri, result.UserDTO.UserId);
+                return Created(manualUri, result.Data.UserId);
             }
             else
             {
-                _logger.LogWarning("User with user-Id: {result.User.UserId} couldn't be found.", result.UserDTO!.UserId);
-                return Conflict(result.Message);
+                _logger.LogWarning("User with user-Id: {result.User.UserId} couldn't be found.", result.Data!.UserId);
+                return Conflict(new ProblemDetails
+                {
+                    Title = "User creation failed",
+                    Detail = result.Message,
+                    Status = StatusCodes.Status409Conflict
+                });
             }
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "An unexpected error occured while creating user.");
-            return StatusCode(500, "An unexpected error occurred while creating user.");
+            return StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetails
+            {
+                Title = "An unexpected error occurred",
+                Detail = "An unexpected error occurred while creating the user. Please try again later.",
+                Status = StatusCodes.Status500InternalServerError
+            });
         }
     }
 
@@ -49,24 +59,28 @@ public class UserController(ILogger<UserController> logger, IUserService userSer
     {
         try
         {
-            if (string.IsNullOrEmpty(userId))
-            {
-                return BadRequest();
-            }
+            if (string.IsNullOrEmpty(userId)) return BadRequest();
 
-            UserResultDTO user = await _userService.GetUserByIdAsync(userId);
+            var result = await _userService.GetUserByIdAsync(userId);
         
-            if (!user.IsSuccess)
-                {
-                    return NotFound();
-                }
+            if (!result.IsSuccess || result.Data == null) return NotFound(new ProblemDetails
+            {
+                Title = "User not found",
+                Detail = result.Message ?? "The specified user was not found.",
+                Status = StatusCodes.Status404NotFound
+            });
 
-            return Ok(user);
+            return Ok(result.Data);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "An unexpected error occured while trying to get user {userId}.", userId);
-            return StatusCode(500, "An unexpected error occurred while trying to get user.");
+            _logger.LogError(ex, "An unexpected error occured while trying to get user {UserId}.", userId);
+            return StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetails
+            {
+                Title = "An unexpected error occurred",
+                Detail = "An unexpected error occurred while trying to fetch the user. Please try again later.",
+                Status = StatusCodes.Status500InternalServerError
+            });
         }
     }
 }
