@@ -39,7 +39,7 @@ public class UserServiceTests
 
         // Assert
         Assert.True(result.IsSuccess);
-        Assert.Equal("123", result.userDTO.UserId);
+        Assert.Equal("123", result.UserDTO.UserId);
     }
 
     [Fact]
