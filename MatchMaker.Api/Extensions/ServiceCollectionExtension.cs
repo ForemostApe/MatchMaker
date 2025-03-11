@@ -1,5 +1,4 @@
 ﻿using Mapster;
-using MapsterMapper;
 using MatchMaker.Core.Profiles;
 using MatchMaker.Data.Interfaces;
 using MatchMaker.Data.Repositories;

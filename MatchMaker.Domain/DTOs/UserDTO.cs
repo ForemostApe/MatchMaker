@@ -23,5 +23,5 @@ public class UserResultDTO
 {
     public bool IsSuccess { get; set; }
     public string? Message { get; set; }
-    public UserDTO? userDTO{ get; set; }
+    public UserDTO? UserDTO{ get; set; }
 }
