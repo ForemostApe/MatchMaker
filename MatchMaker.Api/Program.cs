@@ -1,4 +1,3 @@
-using Mapster;
 using MatchMaker.Api.Extensions;
 
 namespace MatchMaker.Api

@@ -25,22 +25,48 @@ public class UserController(ILogger<UserController> logger, IUserService userSer
             if (result.IsSuccess)
             {
                 var baseUrl = $"{Request.Scheme}://{Request.Host}";
-                var manualUri = $"{baseUrl}/api/User/{result.userDTO!.UserId}";
+                var manualUri = $"{baseUrl}/api/User/{result.UserDTO!.UserId}";
 
-                _logger.LogInformation("User successfully created with user-Id: {result.User.UserId}", result.userDTO!.UserId);
+                _logger.LogInformation("User successfully created with user-Id: {result.User.UserId}", result.UserDTO!.UserId);
 
-                return Created(manualUri, result.userDTO.UserId);
+                return Created(manualUri, result.UserDTO.UserId);
             }
             else
             {
-                _logger.LogWarning("User with user-Id: {result.User.UserId} couldn't be found.", result.userDTO!.UserId);
+                _logger.LogWarning("User with user-Id: {result.User.UserId} couldn't be found.", result.UserDTO!.UserId);
                 return Conflict(result.Message);
             }
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "An error occured while creating user.");
-            return StatusCode(500, "An error occurred while creating user.");
+            _logger.LogError(ex, "An unexpected error occured while creating user.");
+            return StatusCode(500, "An unexpected error occurred while creating user.");
+        }
+    }
+
+    [HttpGet("{userId}")]
+    public async Task<IActionResult> GetUserByIdAsync(string userId)
+    {
+        try
+        {
+            if (string.IsNullOrEmpty(userId))
+            {
+                return BadRequest();
+            }
+
+            UserResultDTO user = await _userService.GetUserByIdAsync(userId);
+        
+            if (!user.IsSuccess)
+                {
+                    return NotFound();
+                }
+
+            return Ok(user);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An unexpected error occured while trying to get user {userId}.", userId);
+            return StatusCode(500, "An unexpected error occurred while trying to get user.");
         }
     }
 }

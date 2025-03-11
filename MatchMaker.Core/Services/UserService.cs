@@ -30,16 +30,51 @@ public class UserService(ILogger<UserService> logger, IMapper mapper, IUserRepo 
 
             var createdUser = await _userRepo.GetUserByEmailAsync(user.Email);
 
+            if (createdUser == null)
+            {
+                _logger.LogError("Couldn't fetch newly created user {email} from database after writing to database.", newUser.Email);
+                throw new Exception("Unexpected error when trying to fetch newly created user after writing to database");
+            }
             return new UserResultDTO()
             {
                 IsSuccess = true,
                 Message = "User successfully created.",
-                userDTO = _mapper.Map<UserDTO>(createdUser)
+                UserDTO = _mapper.Map<UserDTO>(createdUser)
             };
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "An unexpected error occurred while trying to apply logic when creating account for {email}", newUser.Email);
+            throw;
+        }
+    }
+
+    public async Task<UserResultDTO> GetUserByIdAsync(string userId)
+    {
+        try
+        {
+            var user = await _userRepo.GetUserByIdAsync(userId);
+
+            if (user == null)
+            {
+                return new UserResultDTO()
+                {
+                    IsSuccess = false,
+                    Message = "User couldn't be found."
+                };
+            }
+
+            return new UserResultDTO()
+            {
+                IsSuccess = true,
+                Message = "User found.",
+                UserDTO = _mapper.Map<UserDTO>(user)
+            };
+
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An unexpected error occurred while trying to get user {userId}", userId);
             throw;
         }
     }
