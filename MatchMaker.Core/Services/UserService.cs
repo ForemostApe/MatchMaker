@@ -16,7 +16,7 @@ public class UserService(ILogger<UserService> logger, IMapper mapper, IUserRepo 
     {
         try
         {
-            var user = _mapper.Map<UserEntity>(newUser);
+            var user = _mapper.Map<User>(newUser);
 
             bool result = await _userRepo.CreateUserAsync(user);
             if (!result)

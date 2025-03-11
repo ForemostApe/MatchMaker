@@ -1,7 +1,7 @@
 ﻿using MongoDB.Entities;
 
 namespace MatchMaker.Domain.Entities;
-public class UserEntity : Entity
+public class User : Entity
 {
     public string Password { get; set; } = null!;
     public string Email { get; set; } = null!;

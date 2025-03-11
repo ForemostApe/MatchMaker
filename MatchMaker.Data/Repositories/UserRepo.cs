@@ -8,9 +8,9 @@ namespace MatchMaker.Data.Repositories;
 public class UserRepo(ILogger<UserRepo> logger, IMongoDatabase database) : IUserRepo
 {
     private readonly ILogger<UserRepo> _logger = logger;
-    private readonly IMongoCollection<UserEntity> _userCollection = database.GetCollection<UserEntity>("users");
+    private readonly IMongoCollection<User> _userCollection = database.GetCollection<User>("users");
 
-    public async Task<bool> CreateUserAsync(UserEntity newUser)
+    public async Task<bool> CreateUserAsync(User newUser)
     {
         try
         {
@@ -24,7 +24,7 @@ public class UserRepo(ILogger<UserRepo> logger, IMongoDatabase database) : IUser
         }
     }
 
-    public async Task<UserEntity?> GetUserByEmailAsync(string email)
+    public async Task<User?> GetUserByEmailAsync(string email)
     {
         try
         {
@@ -39,7 +39,7 @@ public class UserRepo(ILogger<UserRepo> logger, IMongoDatabase database) : IUser
         }
     }
 
-    public async Task<UserEntity?> GetUserByIdAsync(string userId)
+    public async Task<User?> GetUserByIdAsync(string userId)
     {
         try
         {
@@ -53,12 +53,12 @@ public class UserRepo(ILogger<UserRepo> logger, IMongoDatabase database) : IUser
         }
     }
 
-    public async Task<bool> UpdateUserAsync(UserEntity updatedUser)
+    public async Task<bool> UpdateUserAsync(User updatedUser)
     {
         try
         {
-            var filter = Builders<UserEntity>.Filter.Eq(u => u.ID, updatedUser.ID);
-            var update = Builders<UserEntity>.Update
+            var filter = Builders<User>.Filter.Eq(u => u.ID, updatedUser.ID);
+            var update = Builders<User>.Update
                 .Set(u => u.Password, updatedUser.Password)
                 .Set(u => u.Email, updatedUser.Email)
                 .Set(u => u.FirstName, updatedUser.FirstName)

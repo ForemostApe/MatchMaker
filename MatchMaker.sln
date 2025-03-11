@@ -11,6 +11,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MatchMaker.Data", "MatchMak
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MatchMaker.Domain", "MatchMaker.Domain\MatchMaker.Domain.csproj", "{4D3BDF58-17E3-41C7-B5CB-27754F942AFA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MatchMaker.Api.Tests", "MatchMaker.Api.Tests\MatchMaker.Api.Tests.csproj", "{8940C418-851C-4526-B322-A5E668D4E27B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MatchMaker.Core.Tests", "MatchMaker.Core.Tests\MatchMaker.Core.Tests.csproj", "{FDEC2B7F-1368-4984-981B-CC848CF669D2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MatchMaker.Data.Tests", "MatchMaker.Data.Tests\MatchMaker.Data.Tests.csproj", "{3D7ED9F8-78F1-4479-8C95-4A790FFE5728}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +39,18 @@ Global
 		{4D3BDF58-17E3-41C7-B5CB-27754F942AFA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4D3BDF58-17E3-41C7-B5CB-27754F942AFA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4D3BDF58-17E3-41C7-B5CB-27754F942AFA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8940C418-851C-4526-B322-A5E668D4E27B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8940C418-851C-4526-B322-A5E668D4E27B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8940C418-851C-4526-B322-A5E668D4E27B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8940C418-851C-4526-B322-A5E668D4E27B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FDEC2B7F-1368-4984-981B-CC848CF669D2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FDEC2B7F-1368-4984-981B-CC848CF669D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FDEC2B7F-1368-4984-981B-CC848CF669D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FDEC2B7F-1368-4984-981B-CC848CF669D2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3D7ED9F8-78F1-4479-8C95-4A790FFE5728}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3D7ED9F8-78F1-4479-8C95-4A790FFE5728}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3D7ED9F8-78F1-4479-8C95-4A790FFE5728}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3D7ED9F8-78F1-4479-8C95-4A790FFE5728}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

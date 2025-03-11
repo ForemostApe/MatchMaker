@@ -8,11 +8,11 @@ public class UserMappingProfile : IRegister
 {
     public void Register(TypeAdapterConfig config)
     {
-        config.NewConfig<CreateUserDTO, UserEntity>()
+        config.NewConfig<CreateUserDTO, User>()
             .Map(dest => dest.CreatedDate, src => DateTime.UtcNow)
             .Map(dest => dest.Role, src => "Guest");
 
-        config.NewConfig<UserEntity, UserDTO>()
+        config.NewConfig<User, UserDTO>()
                 .Map(dest => dest.UserId, src => src.ID)
                 .Map(dest => dest.Email, src => src.Email)
                 .Map(dest => dest.FirstName, src => src.FirstName)
