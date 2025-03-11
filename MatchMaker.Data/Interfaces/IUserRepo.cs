@@ -4,10 +4,10 @@ namespace MatchMaker.Data.Interfaces
 {
     public interface IUserRepo
     {
-        Task<bool> CreateUserAsync(UserEntity newUser);
-        Task<UserEntity?> GetUserByEmailAsync(string email);
-        Task<UserEntity?> GetUserByIdAsync(string userId);
-        Task<bool> UpdateUserAsync(UserEntity updatedUser);
+        Task<bool> CreateUserAsync(User newUser);
+        Task<User?> GetUserByEmailAsync(string email);
+        Task<User?> GetUserByIdAsync(string userId);
+        Task<bool> UpdateUserAsync(User updatedUser);
         Task<bool> DeleteUserAsync(string userId);
     }
 }
