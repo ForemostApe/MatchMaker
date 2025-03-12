@@ -1,6 +1,11 @@
-﻿namespace MatchMaker.Domain.Entities;
+﻿using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 
-public abstract class SchemaBase
+namespace MatchMaker.Domain.Entities;
+
+public abstract class SchemaBase<T>
 {
-    public string? Id { get; set; } = null;
+    [BsonId]
+    [BsonRepresentation(BsonType.ObjectId)]
+    public string ID { get; set; } = null!;
 }

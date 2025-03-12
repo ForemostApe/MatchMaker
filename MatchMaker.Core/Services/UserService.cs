@@ -1,4 +1,5 @@
 ﻿using MapsterMapper;
+using MatchMaker.Core.Interfaces;
 using MatchMaker.Data.Interfaces;
 using MatchMaker.Domain.DTOs;
 using MatchMaker.Domain.Entities;
@@ -6,7 +7,7 @@ using Microsoft.Extensions.Logging;
 
 namespace MatchMaker.Core.Services;
 
-public class UserService(ILogger<UserService> logger, IMapper mapper, IUserRepo userRepo)
+public class UserService(ILogger<UserService> logger, IMapper mapper, IUserRepo userRepo) : IUserService
 {
     private readonly ILogger<UserService> _logger = logger;
     private readonly IMapper _mapper = mapper;

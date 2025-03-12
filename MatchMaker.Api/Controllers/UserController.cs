@@ -22,6 +22,7 @@ public class UserController(ILogger<UserController> logger, IUserService userSer
             }
 
             var result = await _userService.CreateUserAsync(newUser);
+
             if (result.IsSuccess)
             {
                 var baseUrl = $"{Request.Scheme}://{Request.Host}";

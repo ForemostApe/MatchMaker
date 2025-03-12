@@ -1,6 +1,4 @@
-﻿using MongoDB.Entities;
-
-namespace MatchMaker.Domain.Entities;
+﻿namespace MatchMaker.Domain.Entities;
 public enum GameStatus
 {
     Planned,
@@ -9,7 +7,7 @@ public enum GameStatus
     Cancelled
 }
 
-public class Game : Entity
+public class Game : SchemaBase<Game>
 {
     public DateTime StartTime { get; set; }
     public DateTime EndTime { get; set; }
