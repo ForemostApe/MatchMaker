@@ -41,6 +41,24 @@ public class UserService(ILogger<UserService> logger, IMapper mapper, IUserRepo 
             throw;
         }
     }
+    public async Task<Result<UserDTO>> GetUserByEmailAsync(string email)
+    {
+        try
+        {
+            var existingUser = await _userRepo.GetUserByEmailAsync(email);
+
+            if (existingUser == null) return Result<UserDTO>.Failure("Couldn't find user");
+
+            var fetchedUser = _mapper.Map<UserDTO>(existingUser);
+
+            return Result<UserDTO>.Success(fetchedUser, "User successfully found.");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An unexpected error occurred while trying to get user with {email}", email);
+            throw;
+        }
+    }
 
     public async Task<Result<UserDTO>> GetUserByIdAsync(string userId)
     {
