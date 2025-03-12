@@ -55,7 +55,38 @@ public class UserController(ILogger<UserController> logger, IUserService userSer
         }
     }
 
-    [HttpGet("{userId}")]
+    [HttpGet("by-email/{email}")]
+    public async Task<IActionResult> GetUserByEmailAsync(string email)
+    {
+        try
+        {
+            if (string.IsNullOrEmpty(email)) return BadRequest();
+
+            var result = await _userService.GetUserByEmailAsync(email);
+
+            if (!result.IsSuccess || result.Data == null) return NotFound(new ProblemDetails
+            {
+                Title = "User not found",
+                Detail = result.Message ?? "The specified user was not found.",
+                Status = StatusCodes.Status404NotFound
+            });
+
+            return Ok(result.Data);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An unexpected error occured while trying to get user with email {Email}.", email);
+            return StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetails
+            {
+                Title = "An unexpected error occurred",
+                Detail = "An unexpected error occurred while trying to fetch the user. Please try again later.",
+                Status = StatusCodes.Status500InternalServerError
+            });
+        }
+    }
+
+
+    [HttpGet("by-id/{userId}")]
     public async Task<IActionResult> GetUserByIdAsync(string userId)
     {
         try
