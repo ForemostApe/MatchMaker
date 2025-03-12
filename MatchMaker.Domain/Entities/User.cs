@@ -1,7 +1,5 @@
-﻿using MongoDB.Entities;
-
-namespace MatchMaker.Domain.Entities;
-public class User : Entity
+﻿namespace MatchMaker.Domain.Entities;
+public class User : SchemaBase<User>
 {
     public string Password { get; set; } = null!;
     public string Email { get; set; } = null!;
