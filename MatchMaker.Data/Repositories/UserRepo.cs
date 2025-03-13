@@ -10,12 +10,11 @@ public class UserRepo(ILogger<UserRepo> logger, IMongoDatabase database) : IUser
     private readonly ILogger<UserRepo> _logger = logger;
     private readonly IMongoCollection<User> _userCollection = database.GetCollection<User>("users");
 
-    public async Task<bool> CreateUserAsync(User newUser)
+    public async Task CreateUserAsync(User newUser)
     {
         try
         {
             await _userCollection.InsertOneAsync(newUser);
-            return true;
         }
         catch (MongoWriteException ex)
         {
@@ -53,7 +52,7 @@ public class UserRepo(ILogger<UserRepo> logger, IMongoDatabase database) : IUser
         }
     }
 
-    public async Task<bool> UpdateUserAsync(User updatedUser)
+    public async Task UpdateUserAsync(User updatedUser)
     {
         try
         {
@@ -62,12 +61,10 @@ public class UserRepo(ILogger<UserRepo> logger, IMongoDatabase database) : IUser
                 .Set(u => u.Password, updatedUser.Password)
                 .Set(u => u.Email, updatedUser.Email)
                 .Set(u => u.FirstName, updatedUser.FirstName)
-                .Set(u => u.LastName, updatedUser.LastName);
+                .Set(u => u.LastName, updatedUser.LastName)
+                .Set(u => u.UserRole, updatedUser.UserRole);
 
-            var result = await _userCollection.UpdateOneAsync(filter, update);
-
-            return result.ModifiedCount > 0;
-
+            await _userCollection.UpdateOneAsync(filter, update);
         }
         catch (MongoWriteException ex)
         {

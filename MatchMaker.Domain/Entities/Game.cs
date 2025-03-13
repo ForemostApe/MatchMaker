@@ -16,5 +16,5 @@ public class Game : SchemaBase<Game>
     public GameStatus GameStatus { get; set; } = GameStatus.Planned;
     public int HomeTeamId { get; set; }
     public int AwayTeamId { get; set; }
-    public int RefereeId { get; set; }
+    public string RefereeId { get; set; } = null!;
 }

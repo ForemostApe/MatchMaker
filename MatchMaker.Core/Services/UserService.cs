@@ -19,9 +19,7 @@ public class UserService(ILogger<UserService> logger, IMapper mapper, IUserRepo 
         {
             var user = _mapper.Map<User>(newUser);
 
-            bool result = await _userRepo.CreateUserAsync(user);
-
-            if (!result) return Result<UserDTO>.Failure("Couldn't create user");
+            await _userRepo.CreateUserAsync(user);
 
             var createdUser = await _userRepo.GetUserByEmailAsync(user.Email);
 
@@ -75,6 +73,34 @@ public class UserService(ILogger<UserService> logger, IMapper mapper, IUserRepo 
         catch (Exception ex)
         {
             _logger.LogError(ex, "An unexpected error occurred while trying to get user {userId}", userId);
+            throw;
+        }
+    }
+
+    public async Task<Result<UserDTO>> UpdateUserAsync(UpdateUserDTO userUpdate)
+    {
+        try
+        {
+            var user = _mapper.Map<User>(userUpdate);
+
+            await _userRepo.UpdateUserAsync(user);
+
+            var updatedUser = await _userRepo.GetUserByEmailAsync(user.Email);
+
+            if (updatedUser == null)
+            {
+                _logger.LogError("Couldn't fetch newly created user {UserId} from database after writing to database.", user.ID);
+                throw new Exception("Unexpected error when trying to fetch newly created user after writing to database");
+            }
+
+            var result = _mapper.Map<UserDTO>(updatedUser);
+
+            return Result<UserDTO>.Success(result, "User successfully updated.");
+
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An unexpected error occurred while trying to update user {userId}", userUpdate.UserId);
             throw;
         }
     }

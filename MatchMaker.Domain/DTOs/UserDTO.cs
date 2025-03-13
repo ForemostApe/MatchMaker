@@ -3,12 +3,12 @@
 public class UserDTO
 {
     public string? UserId { get; set; }
-    //public string? Password { get; set; }
+    public string? Password { get; set; }
     public string? Email { get; set; }
     public string? FirstName { get; set; }
     public string? LastName { get; set; }
     public DateTime? CreatedDate { get; set; }
-    public string? Role { get; set; }
+    public string? UserRole { get; set; }
 }
 
 public class CreateUserDTO
@@ -17,6 +17,16 @@ public class CreateUserDTO
     public string Email { get; set; } = null!;
     public string FirstName { get; set; } = null!;
     public string LastName { get; set; } = null!;
+}
+
+public class UpdateUserDTO
+{
+    public string UserId { get; set; } = null!;
+    public string? Password { get; set; }
+    public string? Email { get; set; }
+    public string? FirstName { get; set; }
+    public string? LastName { get; set; }
+    public string? UserRole { get; set; }
 }
 
 public class UserResultDTO

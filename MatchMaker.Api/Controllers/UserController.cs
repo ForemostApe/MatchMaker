@@ -94,7 +94,7 @@ public class UserController(ILogger<UserController> logger, IUserService userSer
             if (string.IsNullOrEmpty(userId)) return BadRequest();
 
             var result = await _userService.GetUserByIdAsync(userId);
-        
+
             if (!result.IsSuccess || result.Data == null) return NotFound(new ProblemDetails
             {
                 Title = "User not found",
@@ -111,6 +111,39 @@ public class UserController(ILogger<UserController> logger, IUserService userSer
             {
                 Title = "An unexpected error occurred",
                 Detail = "An unexpected error occurred while trying to fetch the user. Please try again later.",
+                Status = StatusCodes.Status500InternalServerError
+            });
+        }
+    }
+    [HttpPatch]
+    public async Task<IActionResult> UpdateUserAsync(UpdateUserDTO updatedUser)
+    {
+        try
+        {
+            if (!ModelState.IsValid)
+            {
+                return ValidationProblem(ModelState);
+            }
+
+            var result = await _userService.UpdateUserAsync(updatedUser);
+
+            if (!result.IsSuccess || result.Data == null) return NotFound(new ProblemDetails()
+            {
+                Title = "User not found",
+                Detail = result.Message ?? "The specified user was not found.",
+                Status = StatusCodes.Status404NotFound
+            });
+
+            return Ok(result.Data);
+
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An unexpected error occured while trying to update user {UserId}.", updatedUser.UserId);
+            return StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetails
+            {
+                Title = "An unexpected error occurred",
+                Detail = "An unexpected error occurred while trying to update the user. Please try again later.",
                 Status = StatusCodes.Status500InternalServerError
             });
         }
