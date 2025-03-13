@@ -20,18 +20,8 @@ public class UserController(ILogger<UserController> logger, IUserService userSer
 
             var result = await _userService.CreateUserAsync(newUser);
 
-            if (result.IsSuccess)
+            if (!result.IsSuccess)
             {
-                var baseUrl = $"{Request.Scheme}://{Request.Host}";
-                var manualUri = $"{baseUrl}/api/User/{result.Data!.UserId}";
-
-                _logger.LogInformation("User successfully created with user-Id: {result.User.UserId}", result.Data!.UserId);
-
-                return Created(manualUri, result.Data.UserId);
-            }
-            else
-            {
-                _logger.LogWarning("User with user-Id: {result.User.UserId} couldn't be found.", result.Data!.UserId);
                 return Conflict(new ProblemDetails
                 {
                     Title = "User creation failed",
@@ -39,6 +29,12 @@ public class UserController(ILogger<UserController> logger, IUserService userSer
                     Status = StatusCodes.Status409Conflict
                 });
             }
+
+            var baseUrl = $"{Request.Scheme}://{Request.Host}";
+            var manualUri = $"{baseUrl}/api/User/{result.Data!.UserId}";
+
+            return Created(manualUri, result.Data.UserId);
+            
         }
         catch (Exception ex)
         {

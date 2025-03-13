@@ -17,6 +17,13 @@ public class UserService(ILogger<UserService> logger, IMapper mapper, IUserRepo 
     {
         try
         {
+            var existingUser = await _userRepo.GetUserByEmailAsync(newUser.Email);
+            if (existingUser != null)
+            {
+                _logger.LogWarning("User already exists.");
+                return Result<UserDTO>.Failure("User already exists.");
+            }
+
             var user = _mapper.Map<User>(newUser);
 
             await _userRepo.CreateUserAsync(user);
