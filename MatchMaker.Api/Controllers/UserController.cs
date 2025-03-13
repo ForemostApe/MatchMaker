@@ -16,10 +16,7 @@ public class UserController(ILogger<UserController> logger, IUserService userSer
     {
         try
         {
-            if (!ModelState.IsValid)
-            {
-                return ValidationProblem(ModelState);
-            }
+            if (!ModelState.IsValid) return ValidationProblem(ModelState);
 
             var result = await _userService.CreateUserAsync(newUser);
 
@@ -120,10 +117,7 @@ public class UserController(ILogger<UserController> logger, IUserService userSer
     {
         try
         {
-            if (!ModelState.IsValid)
-            {
-                return ValidationProblem(ModelState);
-            }
+            if (!ModelState.IsValid) return ValidationProblem(ModelState);
 
             var result = await _userService.UpdateUserAsync(updatedUser);
 
@@ -144,6 +138,43 @@ public class UserController(ILogger<UserController> logger, IUserService userSer
             {
                 Title = "An unexpected error occurred",
                 Detail = "An unexpected error occurred while trying to update the user. Please try again later.",
+                Status = StatusCodes.Status500InternalServerError
+            });
+        }
+    }
+
+    public async Task<IActionResult> DeleteUserAsync(string userId)
+    {
+        try
+        {
+            if (string.IsNullOrEmpty(userId))
+            {
+                return BadRequest(new ProblemDetails
+                {
+                    Title = "Invalid input",
+                    Detail = "User ID cannot be null or empty.",
+                    Status = StatusCodes.Status400BadRequest
+                });
+            }
+
+            var result = await _userService.DeleteUserAsync(userId);
+
+            if(!result.IsSuccess) return BadRequest(new ProblemDetails
+            {
+                Title = "Failed to delete user",
+                Detail = result.Message,
+                Status = StatusCodes.Status400BadRequest
+            });
+
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An unexpected error occured while trying to delete user {UserId}.", userId);
+            return StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetails
+            {
+                Title = "An unexpected error occurred",
+                Detail = "An unexpected error occurred while trying to delete the user. Please try again later.",
                 Status = StatusCodes.Status500InternalServerError
             });
         }

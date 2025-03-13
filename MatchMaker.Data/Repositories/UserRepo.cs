@@ -73,12 +73,11 @@ public class UserRepo(ILogger<UserRepo> logger, IMongoDatabase database) : IUser
         }
     }
 
-    public async Task<bool> DeleteUserAsync(string userId)
+    public async Task DeleteUserAsync(string userId)
     {
         try
         {
-            var result = await _userCollection.DeleteOneAsync(u => u.ID.Equals(userId));
-            return result.DeletedCount > 0;
+            await _userCollection.DeleteOneAsync(u => u.ID.Equals(userId));
         }
         catch (MongoWriteException ex)
         {
