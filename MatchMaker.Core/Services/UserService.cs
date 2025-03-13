@@ -104,4 +104,18 @@ public class UserService(ILogger<UserService> logger, IMapper mapper, IUserRepo 
             throw;
         }
     }
+
+    public async Task<Result<bool>> DeleteUserAsync(string userId)
+    {
+        try
+        {
+            await _userRepo.DeleteUserAsync(userId);
+            return Result<bool>.Success(true, "user successfully deleted.");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An unexpected error occurred while trying to delete user with Id {userId}", userId);
+            throw;
+        }
+    }
 }
