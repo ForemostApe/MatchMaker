@@ -4,9 +4,9 @@ public enum UserRole
 {
     Admin,
     Coach,
+    Referee,
     Functionary,
-    Guest,
-    Referee
+    Guest
 };
 
 public class User : SchemaBase<User>

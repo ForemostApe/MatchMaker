@@ -1,10 +1,11 @@
 ﻿namespace MatchMaker.Domain.Entities;
 public enum GameStatus
 {
+    Cancelled,
     Planned,
     Booked,
     Completed,
-    Cancelled
+    
 }
 
 public class Game : SchemaBase<Game>
