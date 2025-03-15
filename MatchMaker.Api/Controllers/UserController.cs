@@ -20,7 +20,7 @@ public class UserController(ILogger<UserController> logger, IUserService userSer
 
             var result = await _userService.CreateUserAsync(newUser);
 
-            if (result.IsSuccess)
+            if (!result.IsSuccess)
             {
                 var baseUrl = $"{Request.Scheme}://{Request.Host}";
                 var manualUri = $"{baseUrl}/api/User/{result.Data!.UserId}";
