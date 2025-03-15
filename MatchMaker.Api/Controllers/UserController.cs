@@ -25,13 +25,24 @@ public class UserController(ILogger<UserController> logger, IUserService userSer
                 var baseUrl = $"{Request.Scheme}://{Request.Host}";
                 var manualUri = $"{baseUrl}/api/User/{result.Data!.UserId}";
 
-                _logger.LogInformation("User successfully created with user-Id: {result.User.UserId}", result.Data!.UserId);
+                if (manualUri == null)
+                {
+                    _logger.LogError("Failed to generate URI for user with ID: {UserId}", result.Data!.UserId);
+                    return StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetails
+                    {
+                        Title = "Failed to generate URI",
+                        Detail = "Failed to generate the URI for the created user.",
+                        Status = StatusCodes.Status500InternalServerError
+                    });
+                }
+
+                _logger.LogInformation("User successfully created with user-Id: {UserId}", result.Data!.UserId);
 
                 return Created(manualUri, result.Data.UserId);
             }
             else
             {
-                _logger.LogWarning("User with user-Id: {result.User.UserId} couldn't be found.", result.Data!.UserId);
+                _logger.LogWarning("User with email {Email} already exists.", result.Data!.Email);
                 return Conflict(new ProblemDetails
                 {
                     Title = "User creation failed",
@@ -52,12 +63,17 @@ public class UserController(ILogger<UserController> logger, IUserService userSer
         }
     }
 
-    [HttpGet("by-email/{email}")]
+    [HttpGet("email/{email}")]
     public async Task<IActionResult> GetUserByEmailAsync(string email)
     {
         try
         {
-            if (string.IsNullOrEmpty(email)) return BadRequest();
+            if (string.IsNullOrEmpty(email)) return BadRequest(new ProblemDetails()
+            {
+                Title = "Invalid input.",
+                Detail = "Email cannot be empty.",
+                Status = StatusCodes.Status400BadRequest
+            });
 
             var result = await _userService.GetUserByEmailAsync(email);
 
@@ -82,8 +98,7 @@ public class UserController(ILogger<UserController> logger, IUserService userSer
         }
     }
 
-
-    [HttpGet("by-id/{userId}")]
+    [HttpGet("id/{userId}")]
     public async Task<IActionResult> GetUserByIdAsync(string userId)
     {
         try
@@ -112,6 +127,7 @@ public class UserController(ILogger<UserController> logger, IUserService userSer
             });
         }
     }
+
     [HttpPatch]
     public async Task<IActionResult> UpdateUserAsync(UpdateUserDTO updatedUser)
     {
@@ -143,6 +159,7 @@ public class UserController(ILogger<UserController> logger, IUserService userSer
         }
     }
 
+    [HttpDelete("{userId}")]
     public async Task<IActionResult> DeleteUserAsync(string userId)
     {
         try
