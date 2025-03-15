@@ -1,7 +1,4 @@
-using MatchMaker.Api.Configurations;
 using MatchMaker.Api.Extensions;
-using MongoDB.Driver.Core.Configuration;
-using MongoDB.Driver;
 
 namespace MatchMaker.Api
 {
