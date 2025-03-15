@@ -25,20 +25,11 @@ public class UserService(ILogger<UserService> logger, IMapper mapper, IUserRepo 
             }
 
             var user = _mapper.Map<User>(newUser);
-
             await _userRepo.CreateUserAsync(user);
 
-            var createdUser = await _userRepo.GetUserByEmailAsync(user.Email);
+            UserDTO createdUser = _mapper.Map<UserDTO>(user);
 
-            if (createdUser == null)
-            {
-                _logger.LogError("Couldn't fetch newly created user {email} from database after writing to database.", newUser.Email);
-                throw new Exception("Unexpected error when trying to fetch newly created user after writing to database");
-            }
-
-            UserDTO userDTO = _mapper.Map<UserDTO>(createdUser);
-
-            return Result<UserDTO>.Success(userDTO, "User successfully created.");
+            return Result<UserDTO>.Success(createdUser, "User successfully created.");
         }
         catch (Exception ex)
         {
@@ -92,18 +83,9 @@ public class UserService(ILogger<UserService> logger, IMapper mapper, IUserRepo 
 
             await _userRepo.UpdateUserAsync(user);
 
-            var updatedUser = await _userRepo.GetUserByEmailAsync(user.Email);
+            var updatedUser = _mapper.Map<UserDTO>(user);
 
-            if (updatedUser == null)
-            {
-                _logger.LogError("Couldn't fetch newly created user {UserId} from database after writing to database.", user.ID);
-                throw new Exception("Unexpected error when trying to fetch newly created user after writing to database");
-            }
-
-            var result = _mapper.Map<UserDTO>(updatedUser);
-
-            return Result<UserDTO>.Success(result, "User successfully updated.");
-
+            return Result<UserDTO>.Success(updatedUser, "User successfully updated.");
         }
         catch (Exception ex)
         {

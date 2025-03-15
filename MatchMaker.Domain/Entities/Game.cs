@@ -4,8 +4,7 @@ public enum GameStatus
     Cancelled,
     Planned,
     Booked,
-    Completed,
-    
+    Completed,  
 }
 
 public class Game : SchemaBase<Game>
