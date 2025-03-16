@@ -31,7 +31,7 @@ public static class AuthenticationServiceExtension
                 ValidateAudience = true,
                 ValidateIssuerSigningKey = true,
                 ValidateLifetime = true,
-                ClockSkew = TimeSpan.Zero,
+                ClockSkew = TimeSpan.FromMinutes(1),
                 ValidIssuer = jwtSettings.Issuer,
                 ValidAudience = jwtSettings.Audience,
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.SigningKey)),
@@ -39,10 +39,6 @@ public static class AuthenticationServiceExtension
                 RoleClaimType = ClaimTypes.Role
             };
         });
-
-        Console.WriteLine($"ValidIssuer: {jwtSettings.Issuer}");
-        Console.WriteLine($"ValidAudience: {jwtSettings.Audience}");
-
 
         services.AddAuthorization(options =>
         {
