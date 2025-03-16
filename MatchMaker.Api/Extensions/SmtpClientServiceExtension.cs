@@ -1,8 +1,4 @@
-﻿using MailKit.Net.Smtp;
-using MatchMaker.Core.Interfaces;
-using MatchMaker.Core.Services;
-using MatchMaker.Domain.Configurations;
-using Microsoft.Extensions.Options;
+﻿using MatchMaker.Domain.Configurations;
 
 namespace MatchMaker.Api.Extensions;
 
