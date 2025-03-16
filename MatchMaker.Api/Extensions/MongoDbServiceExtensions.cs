@@ -5,7 +5,7 @@ using MongoDB.Entities;
 
 namespace MatchMaker.Api.Extensions;
 
-public static class MongoDbServiceCollectionExtensions
+public static class MongoDbServiceExtensions
 {
     public static IServiceCollection AddMongoDb(this IServiceCollection services, IConfiguration configuration)
     {

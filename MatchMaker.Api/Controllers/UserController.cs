@@ -6,10 +6,10 @@ namespace MatchMaker.Api.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class UserController(ILogger<UserController> logger, IUserService userService) : ControllerBase
+public class UserController(ILogger<UserController> logger, IUserServiceFacade userServiceFacade) : ControllerBase
 {
     private readonly ILogger<UserController> _logger = logger;
-    private readonly IUserService _userService = userService;
+    private readonly IUserServiceFacade _userServiceFacade = userServiceFacade;
 
     [HttpPost]
     public async Task<IActionResult> CreateUserAsync(CreateUserDTO newUser)
@@ -18,7 +18,7 @@ public class UserController(ILogger<UserController> logger, IUserService userSer
         {
             if (!ModelState.IsValid) return ValidationProblem(ModelState);
 
-            var result = await _userService.CreateUserAsync(newUser);
+            var result = await _userServiceFacade.CreateUserAsync(newUser);
 
             if (!result.IsSuccess)
             {
@@ -73,7 +73,7 @@ public class UserController(ILogger<UserController> logger, IUserService userSer
                 Status = StatusCodes.Status400BadRequest
             });
 
-            var result = await _userService.GetUserByEmailAsync(email);
+            var result = await _userServiceFacade.GetUserByEmailAsync(email);
 
             if (!result.IsSuccess || result.Data == null) return NotFound(new ProblemDetails
             {
@@ -103,7 +103,7 @@ public class UserController(ILogger<UserController> logger, IUserService userSer
         {
             if (string.IsNullOrEmpty(userId)) return BadRequest();
 
-            var result = await _userService.GetUserByIdAsync(userId);
+            var result = await _userServiceFacade.GetUserByIdAsync(userId);
 
             if (!result.IsSuccess || result.Data == null) return NotFound(new ProblemDetails
             {
@@ -133,7 +133,7 @@ public class UserController(ILogger<UserController> logger, IUserService userSer
         {
             if (!ModelState.IsValid) return ValidationProblem(ModelState);
 
-            var result = await _userService.UpdateUserAsync(updatedUser);
+            var result = await _userServiceFacade.UpdateUserAsync(updatedUser);
 
             if (!result.IsSuccess || result.Data == null) return NotFound(new ProblemDetails()
             {
@@ -172,7 +172,7 @@ public class UserController(ILogger<UserController> logger, IUserService userSer
                 });
             }
 
-            var result = await _userService.DeleteUserAsync(userId);
+            var result = await _userServiceFacade.DeleteUserAsync(userId);
 
             if(!result.IsSuccess) return BadRequest(new ProblemDetails
             {

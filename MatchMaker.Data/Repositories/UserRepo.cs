@@ -28,7 +28,7 @@ public class UserRepo(ILogger<UserRepo> logger, IMongoDatabase database) : Repos
     {
         var filter = Builders<User>.Filter.Eq(u => u.ID, updatedUser.ID);
         var update = Builders<User>.Update
-            .Set(u => u.Password, updatedUser.Password)
+            .Set(u => u.PasswordHash, updatedUser.PasswordHash)
             .Set(u => u.Email, updatedUser.Email)
             .Set(u => u.FirstName, updatedUser.FirstName)
             .Set(u => u.LastName, updatedUser.LastName)
