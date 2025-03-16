@@ -58,7 +58,7 @@ namespace MatchMaker.Core.Facades
                 }
                     
                 var newAccessToken = await _tokenService.GenerateAccessToken(user);
-                _logger.LogInformation("Successfully generated new access token for user-ID {userId}", user.ID);
+                _logger.LogInformation("Successfully generated new access token for user-ID {userId}", user.Id);
 
                 return true;
 

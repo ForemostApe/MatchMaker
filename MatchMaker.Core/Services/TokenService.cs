@@ -27,7 +27,7 @@ namespace MatchMaker.Core.Services
 
             try
             {
-                _logger.LogInformation("Trying to generate access-token for user-ID: {userId}", user.ID);
+                _logger.LogInformation("Trying to generate access-token for user-ID: {userId}", user.Id);
 
                 var tokenHandler = new JwtSecurityTokenHandler();
                 var key = Encoding.UTF8.GetBytes(_tokenKey);
@@ -37,7 +37,7 @@ namespace MatchMaker.Core.Services
                     Subject = new ClaimsIdentity(new[]
                     {
                 new (JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim(ClaimTypes.NameIdentifier, user.ID.ToString()),
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Email, user.Email),
                 new Claim(ClaimTypes.Role, user.UserRole.ToString())
             }),
@@ -48,12 +48,12 @@ namespace MatchMaker.Core.Services
                 };
 
                 var accessToken = tokenHandler.CreateToken(tokenDescriptor);
-                _logger.LogInformation("Successfully generated access-token for user-ID {userId}", user.ID);
+                _logger.LogInformation("Successfully generated access-token for user-ID {userId}", user.Id);
                 return await Task.FromResult(tokenHandler.WriteToken(accessToken));
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error generating access-token for user-ID {userId}", user.ID);
+                _logger.LogError(ex, "Error generating access-token for user-ID {userId}", user.Id);
                 throw;
             }
         }
@@ -67,7 +67,7 @@ namespace MatchMaker.Core.Services
             }
             try
             {
-                _logger.LogInformation("Trying to generate JWT-token for user-ID: {userId}", user.ID);
+                _logger.LogInformation("Trying to generate JWT-token for user-ID: {userId}", user.Id);
 
                 var tokenHandler = new JwtSecurityTokenHandler();
                 var key = Encoding.UTF8.GetBytes(_tokenKey);
@@ -77,7 +77,7 @@ namespace MatchMaker.Core.Services
                     Subject = new ClaimsIdentity(new[]
                     {
                     new (JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                    new Claim(ClaimTypes.NameIdentifier, user.ID),
+                    new Claim(ClaimTypes.NameIdentifier, user.Id),
                     new Claim(ClaimTypes.Email, user.Email),
                     new Claim(ClaimTypes.Role, user.UserRole.ToString())
                 }),
@@ -88,12 +88,12 @@ namespace MatchMaker.Core.Services
                 };
 
                 var refreshToken = tokenHandler.CreateToken(tokenDescriptor);
-                _logger.LogInformation("Successfully generated refresh-token for user-ID {userId}", user.ID);
+                _logger.LogInformation("Successfully generated refresh-token for user-ID {userId}", user.Id);
                 return await Task.FromResult(tokenHandler.WriteToken(refreshToken));
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error generating access-token for user-ID {userId}", user.ID);
+                _logger.LogError(ex, "Error generating access-token for user-ID {userId}", user.Id);
                 throw;
             }
         }

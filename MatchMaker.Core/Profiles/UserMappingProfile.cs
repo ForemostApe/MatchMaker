@@ -14,7 +14,7 @@ public class UserMappingProfile : IRegister
             .Map(dest => dest.UserRole, src => "Guest");
 
         config.NewConfig<UpdateUserDTO, User>()
-                .Map(dest => dest.ID, src => src.UserId)
+                .Map(dest => dest.Id, src => src.UserId)
                 .Map(dest => dest.PasswordHash, src => src.PasswordHash)
                 .Map(dest => dest.Email, src => src.Email)
                 .Map(dest => dest.FirstName, src => src.FirstName)
@@ -22,7 +22,7 @@ public class UserMappingProfile : IRegister
                 .Map(dest => dest.UserRole, src => src.UserRole);
 
         config.NewConfig<User, UserDTO>()
-                .Map(dest => dest.UserId, src => src.ID)
+                .Map(dest => dest.UserId, src => src.Id)
                 .Map(dest => dest.Email, src => src.Email)
                 .Map(dest => dest.FirstName, src => src.FirstName)
                 .Map(dest => dest.LastName, src => src.LastName)
