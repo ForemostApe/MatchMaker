@@ -9,6 +9,7 @@ public class UserMappingProfile : IRegister
     public void Register(TypeAdapterConfig config)
     {
         config.NewConfig<CreateUserDTO, User>()
+            .Map(dest => dest.PasswordHash, src => src.Password)
             .Map(dest => dest.CreatedDate, src => DateTime.UtcNow)
             .Map(dest => dest.UserRole, src => "Guest");
 
