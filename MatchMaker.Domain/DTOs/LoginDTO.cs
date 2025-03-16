@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace MatchMaker.Domain.DTOs;
+﻿namespace MatchMaker.Domain.DTOs;
 
 public class LoginDTO
 {
