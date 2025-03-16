@@ -20,13 +20,13 @@ public class UserRepo(ILogger<UserRepo> logger, IMongoDatabase database) : Repos
 
     public async Task<User?> GetUserByIdAsync(string userId)
     {
-        var filter = Builders<User>.Filter.Eq(u => u.ID, userId);
+        var filter = Builders<User>.Filter.Eq(u => u.Id, userId);
         return await FindOneAsync(filter);
     }
 
     public async Task UpdateUserAsync(User updatedUser)
     {
-        var filter = Builders<User>.Filter.Eq(u => u.ID, updatedUser.ID);
+        var filter = Builders<User>.Filter.Eq(u => u.Id, updatedUser.Id);
         var update = Builders<User>.Update
             .Set(u => u.PasswordHash, updatedUser.PasswordHash)
             .Set(u => u.Email, updatedUser.Email)
@@ -39,7 +39,7 @@ public class UserRepo(ILogger<UserRepo> logger, IMongoDatabase database) : Repos
 
     public async Task DeleteUserAsync(string userId)
     {
-        var filter = Builders<User>.Filter.Eq(u => u.ID, userId);
+        var filter = Builders<User>.Filter.Eq(u => u.Id, userId);
         await DeleteOneAsync(filter);
     }
 }
