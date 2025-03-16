@@ -1,6 +1,6 @@
 ﻿using MatchMaker.Core.Interfaces;
+using MatchMaker.Domain.Configurations;
 using MatchMaker.Domain.Entities;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -8,43 +8,34 @@ using System.Security.Claims;
 using System.Text;
 
 namespace MatchMaker.Core.Services
-{
-    public class TokenService(IConfiguration configuration, ILogger<TokenService> logger, IUserService userService) : ITokenService
+{ 
+    public class TokenService(JwtSettings jwtSettings, ILogger<TokenService> logger, IUserService userService) : ITokenService
     {
-        private readonly string _signingKey = configuration["JwtSettings:SigningKey"] ?? throw new ArgumentNullException(nameof(configuration), "SigningKey is missing from configuration.");
-        private readonly string _issuer = configuration["JwtSettings:Issuer"] ?? throw new ArgumentNullException(nameof(configuration), "Issuer is missing from configuration.");
-        private readonly string _audience = configuration["JwtSettings:Audience"] ?? throw new ArgumentNullException(nameof(configuration), "Audience is missing from configuration.");
+
+        private readonly JwtSettings _jwtSettings = jwtSettings;
         private readonly ILogger<TokenService> _logger = logger;
         private readonly IUserService _userService = userService;
 
         public async Task<string> GenerateAccessToken(User user)
         {
-            if (user == null)
-            {
-                _logger.LogError("UserEntity cannot be null when trying to create access-token.");
-                throw new ArgumentNullException(nameof(user));
-            }
-
             try
             {
-                _logger.LogInformation("Trying to generate access-token for user-ID: {userId}", user.Id);
-
                 var tokenHandler = new JwtSecurityTokenHandler();
-                var key = Encoding.UTF8.GetBytes(_signingKey);
+                var key = Encoding.UTF8.GetBytes(_jwtSettings.SigningKey);
 
                 var tokenDescriptor = new SecurityTokenDescriptor
                 {
                     Subject = new ClaimsIdentity(new[]
                     {
-                new (JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new Claim(ClaimTypes.Email, user.Email),
-                new Claim(ClaimTypes.Role, user.UserRole.ToString())
-            }),
-                    Expires = DateTime.UtcNow.AddMinutes(15),
-                    Issuer = _issuer,
-                    Audience = _audience,
-                    SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+                    new (JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                    new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                    new Claim(ClaimTypes.Email, user.Email),
+                    new Claim(ClaimTypes.Role, user.UserRole.ToString())
+                }),
+                        Expires = DateTime.UtcNow.AddMinutes(15),
+                        Issuer = _jwtSettings.Issuer,
+                        Audience = _jwtSettings.Audience,
+                        SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
                 };
 
                 var accessToken = tokenHandler.CreateToken(tokenDescriptor);
@@ -70,7 +61,7 @@ namespace MatchMaker.Core.Services
                 _logger.LogInformation("Trying to generate JWT-token for user-ID: {userId}", user.Id);
 
                 var tokenHandler = new JwtSecurityTokenHandler();
-                var key = Encoding.UTF8.GetBytes(_signingKey);
+                var key = Encoding.UTF8.GetBytes(_jwtSettings.SigningKey);
 
                 var tokenDescriptor = new SecurityTokenDescriptor()
                 {
@@ -82,8 +73,8 @@ namespace MatchMaker.Core.Services
                     new Claim(ClaimTypes.Role, user.UserRole.ToString())
                 }),
                     Expires = DateTime.UtcNow.AddDays(7),
-                    Issuer = _issuer,
-                    Audience = _audience,
+                    Issuer = _jwtSettings.Issuer,
+                    Audience = _jwtSettings.Audience,
                     SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
                 };
 
@@ -103,30 +94,30 @@ namespace MatchMaker.Core.Services
             try
             {
                 var tokenHandler = new JwtSecurityTokenHandler();
-                var key = Encoding.UTF8.GetBytes(_signingKey);
+                var key = Encoding.UTF8.GetBytes(_jwtSettings.SigningKey);
 
                 var principal = tokenHandler.ValidateToken(refreshToken, new TokenValidationParameters
                 {
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = new SymmetricSecurityKey(key),
                     ValidateIssuer = true,
-                    ValidIssuer = _issuer,
+                    ValidIssuer = _jwtSettings.Issuer,
                     ValidateAudience = true,
-                    ValidAudience = _audience,
+                    ValidAudience = _jwtSettings.Audience,
                     ValidateLifetime = true,
-                    ClockSkew = TimeSpan.Zero
+                    ClockSkew = TimeSpan.FromMinutes(1)
                 }, out var validatedToken);
 
                 var userIdClaim = principal.FindFirst(ClaimTypes.NameIdentifier);
                 if (userIdClaim == null)
                 {
-                    return null;
+                    throw new Exception();
                 }
 
                 var user = await _userService.GetUserByIdAsync(userIdClaim.Value);
                 if (user == null)
                 {
-                    throw new Exception("Shit be crazy!");
+                    throw new Exception();
                 }
                 return user.Data!;
             }
