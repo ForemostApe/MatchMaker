@@ -1,4 +1,5 @@
 using MatchMaker.Api.Extensions;
+using MatchMaker.Api.Middlewares;
 
 namespace MatchMaker.Api
 {
@@ -9,13 +10,32 @@ namespace MatchMaker.Api
             var builder = WebApplication.CreateBuilder(args);
 
             builder.Services.AddMongoDb(builder.Configuration);
-
-            builder.Services.AddProjectServices(builder.Configuration, builder.Environment);
+            builder.Services.AddCoreServices(builder.Configuration);
+            builder.Services.AddJwtAuthentication(builder.Configuration);
+            builder.Services.AddSmtpServices(builder.Configuration);
 
             var app = builder.Build();
 
+            if (app.Environment.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+                //app.UseSwagger();
+                //app.UseSwaggerUI();
+            }
+            else
+            {
+                app.UseExceptionHandler("/error"); 
+                app.UseHsts();
+            }
+
             app.UseHttpsRedirection();
+            app.UseCors();
+            app.UseSession();
+            app.UseMiddleware<JwtMiddleware>();
+            app.UseRouting();
+            app.UseAuthentication();
             app.UseAuthorization();
+            app.MapHealthChecks("/health");
             app.MapControllers();
 
             app.Run();

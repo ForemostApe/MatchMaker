@@ -1,0 +1,99 @@
+﻿using DnsClient.Internal;
+using MapsterMapper;
+using MatchMaker.Core.Interfaces;
+using MatchMaker.Domain.DTOs;
+using MatchMaker.Domain.Entities;
+using Microsoft.Extensions.Logging;
+
+namespace MatchMaker.Core.Facades;
+
+public class UserServiceFacade(ILogger<UserServiceFacade> logger, IMapper mapper, IUserService userService) : IUserServiceFacade
+{
+    private readonly ILogger<UserServiceFacade> _logger = logger;
+    private readonly IMapper _mapper = mapper;
+    private readonly IUserService _userService = userService;
+
+    public async Task<Result<UserDTO>> CreateUserAsync(CreateUserDTO newUser)
+    {
+        try
+        {
+            var user = _mapper.Map<User>(newUser);
+            await _userService.CreateUserAsync(user);
+
+            UserDTO createdUser = _mapper.Map<UserDTO>(user);
+
+            return Result<UserDTO>.Success(createdUser, "User successfully created.");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An unexpected error occurred while creating user with email {Email}.", newUser.Email);
+            throw new ApplicationException("An error occurred while creating the user.", ex);
+        }
+    }
+    public async Task<Result<UserDTO>> GetUserByEmailAsync(string email)
+    {
+        try
+        {
+            var user = await _userService.GetUserByEmailAsync(email);
+            if (!user.IsSuccess) return Result<UserDTO>.Failure("Couldn't find user");
+
+            var existingUser = _mapper.Map<UserDTO>(user);
+
+            return Result<UserDTO>.Success(existingUser, "User successfully found.");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An unexpected error occurred while trying to get user with email-address {Email}", email);
+            throw new ApplicationException($"An unexpected error occurred while trying to get user with email-address {email}", ex);
+        }
+    }
+
+    public async Task<Result<UserDTO>> GetUserByIdAsync(string userId)
+    {
+        try
+        {
+            var user = await _userService.GetUserByIdAsync(userId);
+            if (!user.IsSuccess) return Result<UserDTO>.Failure("Couldn't find user");
+
+            var existingUser = _mapper.Map<UserDTO>(user);
+
+            return Result<UserDTO>.Success(existingUser, "User successfully found.");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An unexpected error occurred while trying to get user {UserId}", userId);
+            throw new ApplicationException($"An unexpected error occurred while trying to get user with user-id {userId}", ex);
+        }
+    }
+    public async Task<Result<UserDTO>> UpdateUserAsync(UpdateUserDTO userUpdate)
+    {
+        try
+        {
+            var user = _mapper.Map<User>(userUpdate);
+            await _userService.UpdateUserAsync(user);
+
+            var updatedUser = _mapper.Map<UserDTO>(user);
+
+            return Result<UserDTO>.Success(updatedUser, "User successfully updated.");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An unexpected error occurred while trying to update user {userId}", userUpdate.UserId);
+            throw new ApplicationException($"An unexpected error occurred while trying to update user {userUpdate.UserId}", ex);
+        }
+    }
+
+    public async Task<Result<bool>> DeleteUserAsync(string userId)
+    {
+        try
+        {
+            await _userService.DeleteUserAsync(userId);
+            return Result<bool>.Success(true, "user successfully deleted.");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An unexpected error occurred while trying to delete user with id {userId}", userId);
+            throw new ApplicationException($"An unexpected error occurred while trying to delete user with id {userId}", ex);
+        }
+    }
+}

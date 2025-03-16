@@ -11,7 +11,7 @@ public enum UserRole
 
 public class User : SchemaBase<User>
 {
-    public string Password { get; set; } = null!;
+    public string PasswordHash { get; set; } = null!;
     public string Email { get; set; } = null!;
     public string FirstName { get; set; } = null!;
     public string LastName { get; set; } = null!;

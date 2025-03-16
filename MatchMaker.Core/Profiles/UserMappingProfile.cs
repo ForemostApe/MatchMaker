@@ -14,7 +14,7 @@ public class UserMappingProfile : IRegister
 
         config.NewConfig<UpdateUserDTO, User>()
                 .Map(dest => dest.ID, src => src.UserId)
-                .Map(dest => dest.Password, src => src.Password)
+                .Map(dest => dest.PasswordHash, src => src.PasswordHash)
                 .Map(dest => dest.Email, src => src.Email)
                 .Map(dest => dest.FirstName, src => src.FirstName)
                 .Map(dest => dest.LastName, src => src.LastName)

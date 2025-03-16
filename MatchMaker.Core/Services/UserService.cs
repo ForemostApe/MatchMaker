@@ -1,5 +1,4 @@
-﻿using MapsterMapper;
-using MatchMaker.Core.Interfaces;
+﻿using MatchMaker.Core.Interfaces;
 using MatchMaker.Data.Interfaces;
 using MatchMaker.Domain.DTOs;
 using MatchMaker.Domain.Entities;
@@ -7,90 +6,97 @@ using Microsoft.Extensions.Logging;
 
 namespace MatchMaker.Core.Services;
 
-public class UserService(ILogger<UserService> logger, IMapper mapper, IUserRepo userRepo) : IUserService
+public class UserService(ILogger<UserService> logger, IUserRepo userRepo, IAuthService authService) : IUserService
 {
     private readonly ILogger<UserService> _logger = logger;
-    private readonly IMapper _mapper = mapper;
     private readonly IUserRepo _userRepo = userRepo;
+    private readonly IAuthService _authService = authService;
 
-    public async Task<Result<UserDTO>> CreateUserAsync(CreateUserDTO newUser)
+    public async Task<Result<User>> CreateUserAsync(User newUser)
     {
         try
         {
+            ArgumentNullException.ThrowIfNull(newUser);
+
             var existingUser = await _userRepo.GetUserByEmailAsync(newUser.Email);
             if (existingUser != null)
             {
                 _logger.LogWarning("User already exists.");
-                return Result<UserDTO>.Failure("User already exists.");
+                return Result<User>.Failure("User already exists.");
             }
 
-            var user = _mapper.Map<User>(newUser);
-            await _userRepo.CreateUserAsync(user);
+            newUser.PasswordHash = _authService.HashPassword(newUser.PasswordHash);
 
-            UserDTO createdUser = _mapper.Map<UserDTO>(user);
+            await _userRepo.CreateUserAsync(newUser);
 
-            return Result<UserDTO>.Success(createdUser, "User successfully created.");
+            return Result<User>.Success(newUser);
+
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "An unexpected error occurred while trying to apply logic when creating account for {email}", newUser.Email);
-            throw;
-        }
-    }
-    public async Task<Result<UserDTO>> GetUserByEmailAsync(string email)
-    {
-        try
-        {
-            var existingUser = await _userRepo.GetUserByEmailAsync(email);
-
-            if (existingUser == null) return Result<UserDTO>.Failure("Couldn't find user");
-
-            var fetchedUser = _mapper.Map<UserDTO>(existingUser);
-
-            return Result<UserDTO>.Success(fetchedUser, "User successfully found.");
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "An unexpected error occurred while trying to get user with {email}", email);
-            throw;
+            _logger.LogError(ex, "An unexpected error occurred in the business-logic when creating new user {Email}.", newUser.Email);
+            throw new Exception($"An unexpected error occurred in the business-logic when creating new user {newUser.Email}.", ex);
         }
     }
 
-    public async Task<Result<UserDTO>> GetUserByIdAsync(string userId)
+    public async Task<Result<User>> GetUserByEmailAsync(string email)
     {
         try
         {
-            var existingUser = await _userRepo.GetUserByIdAsync(userId);
+            ArgumentNullException.ThrowIfNull(email);
 
-            if (existingUser == null) return Result<UserDTO>.Failure("Couldn't find user");
-
-            var fetchedUser = _mapper.Map<UserDTO>(existingUser);
-
-            return Result<UserDTO>.Success(fetchedUser, "User successfully found.");
+            var user = await _userRepo.GetUserByEmailAsync(email);
+            if (user == null)
+            {
+                _logger.LogWarning($"User with email {email} couldn't be found.");
+                return Result<User>.Failure($"User with email {email} couldn't be found.");
+            }
+            
+            return Result<User>.Success(user, "User successfully found.");
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "An unexpected error occurred while trying to get user {userId}", userId);
-            throw;
+            _logger.LogError(ex, "An unexpected error occurred in the business-logic when trying to find user by email {Email}.", email);
+            throw new Exception($"An unexpected error occurred in the business-logic when trying to find user by email {email}.", ex);
         }
     }
 
-    public async Task<Result<UserDTO>> UpdateUserAsync(UpdateUserDTO userUpdate)
+    public async Task<Result<User>> GetUserByIdAsync(string userId)
     {
         try
         {
-            var user = _mapper.Map<User>(userUpdate);
+            ArgumentNullException.ThrowIfNull(userId);
 
-            await _userRepo.UpdateUserAsync(user);
+            var user = await _userRepo.GetUserByIdAsync(userId);
+            if (user == null)
+            {
+                _logger.LogWarning($"User with id {userId} couldn't be found.");
+                return Result<User>.Failure($"User with id {userId} couldn't be found.");
+            }
 
-            var updatedUser = _mapper.Map<UserDTO>(user);
-
-            return Result<UserDTO>.Success(updatedUser, "User successfully updated.");
+            return Result<User>.Success(user, "User successfully found.");
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "An unexpected error occurred while trying to update user {userId}", userUpdate.UserId);
-            throw;
+            _logger.LogError(ex, "An unexpected error occurred in the business-logic when trying to find user by Id {Id}.", userId);
+            throw new Exception($"An unexpected error occurred in the business-logic when trying to find user by Id {userId}.", ex);
+        }
+    }
+
+    public async Task<Result<User>> UpdateUserAsync(User updatedUser)
+    {
+        try
+        {
+            ArgumentNullException.ThrowIfNull(updatedUser);
+
+            await _userRepo.UpdateUserAsync(updatedUser);
+
+            return Result<User>.Success(updatedUser, "User succesfully updated.");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An unexpected error occurred in the business-logic when trying to update user {Id}.", updatedUser.ID);
+            throw new Exception($"An unexpected error occurred in the business-logic when trying to update user {updatedUser.ID}.", ex);
         }
     }
 
@@ -98,13 +104,15 @@ public class UserService(ILogger<UserService> logger, IMapper mapper, IUserRepo 
     {
         try
         {
+            ArgumentNullException.ThrowIfNull(userId);
+
             await _userRepo.DeleteUserAsync(userId);
-            return Result<bool>.Success(true, "user successfully deleted.");
+            return Result<bool>.Success(true);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "An unexpected error occurred while trying to delete user with Id {userId}", userId);
-            throw;
+            _logger.LogError(ex, "An unexpected error occurred in the business-logic when trying to delete user {Id}.", userId);
+            throw new Exception($"An unexpected error occurred in the business-logic when trying to delete user {userId}.", ex);
         }
     }
 }
