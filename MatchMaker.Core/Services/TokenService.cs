@@ -11,7 +11,7 @@ namespace MatchMaker.Core.Services
 {
     public class TokenService(IConfiguration configuration, ILogger<TokenService> logger, IUserService userService) : ITokenService
     {
-        private readonly string _tokenKey = configuration["JwtSettings:TokenKey"] ?? throw new ArgumentNullException(nameof(configuration), "TokenKey is missing from configuration.");
+        private readonly string _signingKey = configuration["JwtSettings:SigningKey"] ?? throw new ArgumentNullException(nameof(configuration), "SigningKey is missing from configuration.");
         private readonly string _issuer = configuration["JwtSettings:Issuer"] ?? throw new ArgumentNullException(nameof(configuration), "Issuer is missing from configuration.");
         private readonly string _audience = configuration["JwtSettings:Audience"] ?? throw new ArgumentNullException(nameof(configuration), "Audience is missing from configuration.");
         private readonly ILogger<TokenService> _logger = logger;
@@ -30,7 +30,7 @@ namespace MatchMaker.Core.Services
                 _logger.LogInformation("Trying to generate access-token for user-ID: {userId}", user.Id);
 
                 var tokenHandler = new JwtSecurityTokenHandler();
-                var key = Encoding.UTF8.GetBytes(_tokenKey);
+                var key = Encoding.UTF8.GetBytes(_signingKey);
 
                 var tokenDescriptor = new SecurityTokenDescriptor
                 {
@@ -70,7 +70,7 @@ namespace MatchMaker.Core.Services
                 _logger.LogInformation("Trying to generate JWT-token for user-ID: {userId}", user.Id);
 
                 var tokenHandler = new JwtSecurityTokenHandler();
-                var key = Encoding.UTF8.GetBytes(_tokenKey);
+                var key = Encoding.UTF8.GetBytes(_signingKey);
 
                 var tokenDescriptor = new SecurityTokenDescriptor()
                 {
@@ -103,7 +103,7 @@ namespace MatchMaker.Core.Services
             try
             {
                 var tokenHandler = new JwtSecurityTokenHandler();
-                var key = Encoding.UTF8.GetBytes(_tokenKey);
+                var key = Encoding.UTF8.GetBytes(_signingKey);
 
                 var principal = tokenHandler.ValidateToken(refreshToken, new TokenValidationParameters
                 {

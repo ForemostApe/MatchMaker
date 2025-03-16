@@ -16,13 +16,10 @@ namespace MatchMaker.Api.Controllers
         {
             try
             {
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest(ModelState);
-                }
+                if (!ModelState.IsValid) return ValidationProblem(ModelState);
 
                 var loginResult = await _authServiceFacade.LoginAsync(loginDTO);
-                if (loginResult == null)
+                if (loginResult.Data == null)
                 {
                     _logger.LogWarning("Invalid email-address or password.");
                     return Unauthorized(loginResult);
