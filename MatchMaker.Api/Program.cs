@@ -12,7 +12,7 @@ namespace MatchMaker.Api
             builder.Services.AddMongoDb(builder.Configuration);
             builder.Services.AddCoreServices(builder.Configuration);
             builder.Services.AddJwtAuthentication(builder.Configuration);
-            builder.Services.AddSmtpServices(builder.Configuration);
+            builder.Services.AddSmtpServices(builder.Configuration, builder.Environment);
 
             var app = builder.Build();
 
