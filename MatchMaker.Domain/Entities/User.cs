@@ -17,4 +17,5 @@ public class User : SchemaBase<User>
     public string LastName { get; set; } = null!;
     public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
     public UserRole UserRole { get; set; } = UserRole.Guest;
+    public bool IsVerified { get; set; } = false;
 }
