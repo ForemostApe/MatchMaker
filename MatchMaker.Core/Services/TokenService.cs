@@ -66,8 +66,6 @@ namespace MatchMaker.Core.Services
             }
         }
 
-
-
         public async Task<string> GenerateAccessToken(User user)
         {
             return await Task.FromResult(GenerateToken(user, TimeSpan.FromMinutes(15), "access"));
