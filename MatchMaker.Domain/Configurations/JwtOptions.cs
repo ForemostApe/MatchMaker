@@ -1,5 +1,6 @@
 ﻿using MatchMaker.Domain.Configurations;
 using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
 using System.Text;
 
 namespace MatchMaker.Core.Services;
@@ -19,5 +20,22 @@ public class JwtOptions
         AccessTokenExpirationMinutes = settings.AccessTokenExpirationMinutes;
         SigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(settings.SigningKey));
         EncryptionKey = new SymmetricSecurityKey(Convert.FromBase64String(settings.EncryptionKey));
+    }
+
+    public TokenValidationParameters GetTokenValidationParameters(bool validateLifetime = true)
+    {
+        return new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateIssuerSigningKey = true,
+            ValidateLifetime = validateLifetime,
+            ClockSkew = TimeSpan.FromMinutes(1),
+            ValidIssuer = Issuer,
+            ValidAudience = Audience,
+            IssuerSigningKey = SigningKey,
+            TokenDecryptionKey = EncryptionKey,
+            RoleClaimType = ClaimTypes.Role
+        };
     }
 }

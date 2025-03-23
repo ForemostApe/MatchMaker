@@ -1,9 +1,6 @@
 ﻿using MatchMaker.Core.Services;
 using MatchMaker.Domain.Configurations;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using System.Security.Claims;
-using System.Text;
 
 namespace MatchMaker.Api.Extensions;
 
@@ -25,19 +22,7 @@ public static class AuthenticationServiceExtension
         })
         .AddJwtBearer(options =>
         {
-            options.TokenValidationParameters = new TokenValidationParameters
-            {
-                ValidateIssuer = true,
-                ValidateAudience = true,
-                ValidateIssuerSigningKey = true,
-                ValidateLifetime = true,
-                ClockSkew = TimeSpan.FromMinutes(1),
-                ValidIssuer = jwtSettings.Issuer,
-                ValidAudience = jwtSettings.Audience,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.SigningKey)),
-                TokenDecryptionKey = new SymmetricSecurityKey(Convert.FromBase64String(jwtSettings.EncryptionKey)),
-                RoleClaimType = ClaimTypes.Role
-            };
+            options.TokenValidationParameters = jwtOptions.GetTokenValidationParameters();
         });
 
         services.AddAuthorization(options =>

@@ -15,17 +15,7 @@ namespace MatchMaker.Core.Services
         private readonly ILogger<TokenService> _logger = logger;
         private readonly IUserService _userService = userService;
 
-        private TokenValidationParameters TokenValidationParameters => new TokenValidationParameters
-        {
-            ValidateIssuerSigningKey = true,
-            IssuerSigningKey = _jwtOptions.SigningKey,
-            ValidateIssuer = true,
-            ValidIssuer = _jwtOptions.Issuer,
-            ValidateAudience = true,
-            ValidAudience = _jwtOptions.Audience,
-            ValidateLifetime = true,
-            ClockSkew = TimeSpan.FromMinutes(1)
-        };
+        private TokenValidationParameters TokenValidationParameters => _jwtOptions.GetTokenValidationParameters();
 
         private string GenerateToken(User user, TimeSpan expiration, string tokenType)
         {
@@ -117,9 +107,9 @@ namespace MatchMaker.Core.Services
 
                 var validationParameters = new TokenValidationParameters
                 {
-                    ValidateIssuer = false,
-                    ValidateAudience = false,
-                    ValidateLifetime = false,
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
                     IssuerSigningKey = _jwtOptions.SigningKey,
                     TokenDecryptionKey = _jwtOptions.EncryptionKey,
                     RequireSignedTokens = true
