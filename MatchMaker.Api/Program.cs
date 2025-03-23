@@ -9,18 +9,27 @@ namespace MatchMaker.Api
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            builder.Host.UseDefaultServiceProvider((context, options) =>
+            {
+                options.ValidateOnBuild = context.HostingEnvironment.IsDevelopment();
+                options.ValidateOnBuild = true;
+            });
+
             builder.Services.AddMongoDb(builder.Configuration);
             builder.Services.AddCoreServices(builder.Configuration);
             builder.Services.AddJwtAuthentication(builder.Configuration);
             builder.Services.AddSmtpServices(builder.Configuration, builder.Environment);
+            builder.Services.AddSwagger();
 
             var app = builder.Build();
 
             if (app.Environment.IsDevelopment())
             {
-                app.UseDeveloperExceptionPage();
-                //app.UseSwagger();
-                //app.UseSwaggerUI();
+                app.UseSwagger();
+                app.UseSwaggerUI(options =>
+                {
+                    options.SwaggerEndpoint("/swagger/v1/swagger.json", "MatchMaker API v1");
+                });
             }
             else
             {
