@@ -12,6 +12,19 @@ namespace MatchMaker.Core.Facades
         private readonly ITokenService _tokenService = tokenService;
         private readonly ISessionManager _sessionManager = sessionManager;
 
+        //public async Task<Result<bool>> VerifyEmailAsync(string token)
+        //{
+        //    try
+        //    {
+
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError(ex, "Unexpected error during email-verification.");
+        //        throw new ApplicationException("An unexpected error occurred. Please try again later.");
+        //    }
+        //}
+
         public async Task<Result<AuthenticationDTO>> LoginAsync(LoginDTO loginDTO)
         {
             try

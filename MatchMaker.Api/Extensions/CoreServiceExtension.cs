@@ -7,6 +7,7 @@ using MatchMaker.Core.Services;
 using MatchMaker.Core.Utilities;
 using MatchMaker.Data.Interfaces;
 using MatchMaker.Data.Repositories;
+using MatchMaker.Domain.Configurations;
 
 namespace MatchMaker.Api.Extensions;
 
@@ -33,6 +34,9 @@ public static class CoreServiceExtension
         services.AddScoped<ICookieFactory, CookieFactory>();
 
         services.AddScoped<ISessionManager, SessionManager>();
+
+        services.Configure<EmailSettings>(configuration.GetSection("EmailSettings"));
+        services.AddTransient<IEmailService, EmailService>();
 
         var allowedOrigins = configuration.GetSection("Cors:AllowedOrigins").Get<string[]>();
         services.AddCors(options =>

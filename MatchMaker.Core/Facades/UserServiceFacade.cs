@@ -1,17 +1,19 @@
 ﻿using DnsClient.Internal;
 using MapsterMapper;
 using MatchMaker.Core.Interfaces;
+using MatchMaker.Core.Services;
 using MatchMaker.Domain.DTOs;
 using MatchMaker.Domain.Entities;
 using Microsoft.Extensions.Logging;
 
 namespace MatchMaker.Core.Facades;
 
-public class UserServiceFacade(ILogger<UserServiceFacade> logger, IMapper mapper, IUserService userService) : IUserServiceFacade
+public class UserServiceFacade(ILogger<UserServiceFacade> logger, IMapper mapper, IUserService userService, IEmailService emailService) : IUserServiceFacade
 {
     private readonly ILogger<UserServiceFacade> _logger = logger;
     private readonly IMapper _mapper = mapper;
     private readonly IUserService _userService = userService;
+    private readonly IEmailService _emailService = emailService;
 
     public async Task<Result<UserDTO>> CreateUserAsync(CreateUserDTO newUser)
     {
@@ -22,6 +24,8 @@ public class UserServiceFacade(ILogger<UserServiceFacade> logger, IMapper mapper
 
             UserDTO createdUser = _mapper.Map<UserDTO>(user);
 
+            if (createdUser != null) await _emailService.CreateEmailAsync(newUser.Email, EmailService.EmailType.UserCreated);
+            
             return Result<UserDTO>.Success(createdUser, "User successfully created.");
         }
         catch (Exception ex)
@@ -30,6 +34,7 @@ public class UserServiceFacade(ILogger<UserServiceFacade> logger, IMapper mapper
             throw new ApplicationException("An error occurred while creating the user.", ex);
         }
     }
+
     public async Task<Result<UserDTO>> GetUserByEmailAsync(string email)
     {
         try
