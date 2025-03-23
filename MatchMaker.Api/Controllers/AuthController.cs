@@ -11,6 +11,36 @@ namespace MatchMaker.Api.Controllers
         private readonly ILogger<AuthController> _logger = logger;
         private readonly IAuthServiceFacade _authServiceFacade = authServiceFacade;
 
+
+        //Vad ska den här returnera? URI + ID?
+
+        //[HttpPost("verify-email")]
+        //public async Task<IActionResult> VerifyEmailAsync(string token)
+        //{
+        //    try
+        //    {
+        //        if (string.IsNullOrEmpty(token))
+        //        {
+        //            _logger.LogWarning("No token provided.");
+        //            return BadRequest();
+        //        }
+
+        //        var result = await _authServiceFacade.VerifyEmailAsync(token);
+        //        if (!result.Succeeded)
+        //        {
+        //            return BadRequest(result);
+        //        }
+
+        //        return Ok();
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError(ex, "An error occured while trying to verify user-email.");
+        //        return StatusCode(500, "An error occured while trying to verify user-email.");
+        //    }
+        //}
+
+
         [HttpPost("login")]
         public async Task<IActionResult> LoginAsync(LoginDTO loginDTO)
         {
@@ -18,16 +48,16 @@ namespace MatchMaker.Api.Controllers
             {
                 if (!ModelState.IsValid) return ValidationProblem(ModelState);
 
-                var loginResult = await _authServiceFacade.LoginAsync(loginDTO);
-                if (loginResult.Data == null)
+                var result = await _authServiceFacade.LoginAsync(loginDTO);
+                if (result.Data == null)
                 {
                     _logger.LogWarning("Invalid email-address or password.");
-                    return Unauthorized(loginResult);
+                    return Unauthorized(result);
                 }
 
                 _logger.LogInformation("User successfully logged in.");
-                Response.Headers.Append("Authorization", "Bearer" + loginResult.Data!.AccessToken);
-                return Ok(loginResult);
+                Response.Headers.Append("Authorization", "Bearer" + result.Data!.AccessToken);
+                return Ok(result);
 
             }
             catch (Exception ex)

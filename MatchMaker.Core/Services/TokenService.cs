@@ -2,6 +2,7 @@
 using MatchMaker.Domain.Entities;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using System.Buffers.Text;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -125,6 +126,29 @@ namespace MatchMaker.Core.Services
             {
                 _logger.LogError(ex, "An unexpected error occured while trying to decrypt token.");
                 throw new SecurityTokenException("Invalid token or decryption error.", ex);
+                
+        public string GenerateUrlSafeToken(string data)
+        {
+            try
+            {
+                return Base64UrlEncoder.Encode(data);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error encoding data into a URL-safe token.");
+                throw new ApplicationException("An error occurred while generating the token.", ex);
+            }
+        }
+        public string DecodeUrlSafeToken(string urlSafeToken)
+        {
+            try
+            {
+                return Base64UrlEncoder.Decode(urlSafeToken);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error decoding URL-safe token: {Token}", urlSafeToken);
+                throw new ApplicationException("An error occurred while decoding the token.", ex);
             }
         }
     }
