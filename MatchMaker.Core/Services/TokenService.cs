@@ -1,5 +1,4 @@
 ﻿using MatchMaker.Core.Interfaces;
-using MatchMaker.Domain.Configurations;
 using MatchMaker.Domain.Entities;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
@@ -9,31 +8,21 @@ using System.Text;
 
 namespace MatchMaker.Core.Services
 { 
-    public class TokenService(JwtSettings jwtSettings, ILogger<TokenService> logger, IUserService userService) : ITokenService
+    public class TokenService(JwtOptions jwtOptions, ILogger<TokenService> logger, IUserService userService) : ITokenService
     {
 
-        private readonly JwtSettings _jwtSettings = jwtSettings;
+        private readonly JwtOptions _jwtOptions = jwtOptions;
         private readonly ILogger<TokenService> _logger = logger;
         private readonly IUserService _userService = userService;
 
-        private TokenValidationParameters TokenValidationParameters => new TokenValidationParameters
-        {
-            ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.SigningKey)),
-            ValidateIssuer = true,
-            ValidIssuer = _jwtSettings.Issuer,
-            ValidateAudience = true,
-            ValidAudience = _jwtSettings.Audience,
-            ValidateLifetime = true,
-            ClockSkew = TimeSpan.FromMinutes(1)
-        };
+        private TokenValidationParameters TokenValidationParameters => _jwtOptions.GetTokenValidationParameters();
 
         private string GenerateToken(User user, TimeSpan expiration, string tokenType)
         {
             try
             {
                 var tokenHandler = new JwtSecurityTokenHandler();
-                var key = Encoding.UTF8.GetBytes(_jwtSettings.SigningKey);
+                var key = _jwtOptions.SigningKey;
 
                 var claims = new List<Claim>()
                 {
@@ -51,9 +40,10 @@ namespace MatchMaker.Core.Services
                 {
                     Subject = new ClaimsIdentity(claims),
                     Expires = DateTime.UtcNow.Add(expiration),
-                    Issuer = _jwtSettings.Issuer,
-                    Audience = _jwtSettings.Audience,
-                    SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+                    Issuer = _jwtOptions.Issuer,
+                    Audience = _jwtOptions.Audience,
+                    SigningCredentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256Signature),
+                    EncryptingCredentials = new EncryptingCredentials(_jwtOptions.EncryptionKey, SecurityAlgorithms.Aes256KW, SecurityAlgorithms.Aes256CbcHmacSha512)
                 };
 
                 var accessToken = tokenHandler.CreateToken(tokenDescriptor);
@@ -81,7 +71,7 @@ namespace MatchMaker.Core.Services
             try
             {
                 var tokenHandler = new JwtSecurityTokenHandler();
-                var key = Encoding.UTF8.GetBytes(_jwtSettings.SigningKey);
+                var key = _jwtOptions.SigningKey;
 
                 var principal = tokenHandler.ValidateToken(refreshToken, TokenValidationParameters, out var validatedToken);
 
@@ -102,6 +92,39 @@ namespace MatchMaker.Core.Services
             {
                 _logger.LogError(ex, "An unexpected error occured when trying to validate refresh-token.");
                 throw new Exception("An unexpected error occured when trying to validate refresh-token.", ex);
+            }
+        }
+
+        public ClaimsPrincipal DecryptToken(string encryptedToken)
+        {
+            try
+            {
+                _logger.LogInformation("Attempting to decrypt token.");
+                byte[] serializedToken = Base64UrlEncoder.DecodeBytes(encryptedToken);
+                string decryptedToken = Encoding.UTF8.GetString(serializedToken);
+
+                var tokenHandler = new JwtSecurityTokenHandler();
+
+                var validationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    IssuerSigningKey = _jwtOptions.SigningKey,
+                    TokenDecryptionKey = _jwtOptions.EncryptionKey,
+                    RequireSignedTokens = true
+                };
+
+                var jwtToken = tokenHandler.ReadJwtToken(decryptedToken);
+
+                var principal = tokenHandler.ValidateToken(decryptedToken, validationParameters, out var validatedToken);
+
+                return principal;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected error occured while trying to decrypt token.");
+                throw new SecurityTokenException("Invalid token or decryption error.", ex);
             }
         }
     }

@@ -9,6 +9,12 @@ namespace MatchMaker.Api
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            builder.Host.UseDefaultServiceProvider((context, options) =>
+            {
+                options.ValidateOnBuild = context.HostingEnvironment.IsDevelopment();
+                options.ValidateOnBuild = true;
+            });
+
             builder.Services.AddMongoDb(builder.Configuration);
             builder.Services.AddCoreServices(builder.Configuration);
             builder.Services.AddJwtAuthentication(builder.Configuration);

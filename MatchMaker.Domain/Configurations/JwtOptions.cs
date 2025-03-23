@@ -1,24 +1,32 @@
 ﻿using MatchMaker.Domain.Configurations;
 using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
 using System.Text;
 
 namespace MatchMaker.Core.Services;
 
-public class JwtOptions
+public class JwtOptions(JwtSettings settings)
 {
-    public string Issuer { get; }
-    public string Audience { get; }
-    public int AccessTokenExpirationMinutes { get; }
-    public SymmetricSecurityKey SigningKey { get; }
-    public SymmetricSecurityKey EncryptionKey { get; }
+    public string Issuer { get; } = settings.Issuer;
+    public string Audience { get; } = settings.Audience;
+    public int AccessTokenExpirationMinutes { get; } = settings.AccessTokenExpirationMinutes;
+    public SymmetricSecurityKey SigningKey { get; } = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(settings.SigningKey));
+    public SymmetricSecurityKey EncryptionKey { get; } = new SymmetricSecurityKey(Convert.FromBase64String(settings.EncryptionKey));
 
-    public JwtOptions(JwtSettings settings)
+    public TokenValidationParameters GetTokenValidationParameters(bool validateLifetime = true)
     {
-        Issuer = settings.Issuer;
-        Audience = settings.Audience;
-        AccessTokenExpirationMinutes = settings.AccessTokenExpirationMinutes;
-
-        SigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(settings.SigningKey));
-        EncryptionKey = new SymmetricSecurityKey(Convert.FromBase64String(settings.EncryptionKey));
+        return new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateIssuerSigningKey = true,
+            ValidateLifetime = validateLifetime,
+            ClockSkew = TimeSpan.FromMinutes(1),
+            ValidIssuer = Issuer,
+            ValidAudience = Audience,
+            IssuerSigningKey = SigningKey,
+            TokenDecryptionKey = EncryptionKey,
+            RoleClaimType = ClaimTypes.Role
+        };
     }
 }
