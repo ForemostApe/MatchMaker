@@ -21,8 +21,6 @@ public class JwtMiddleware(ILogger<JwtMiddleware> logger, RequestDelegate next, 
             {
                 var token = authHeader.Substring(7);
 
-                //_logger.LogInformation($"Received token: {token}");
-
                 var principal = ValidateToken(token);
 
                 if (principal != null)
@@ -62,9 +60,6 @@ public class JwtMiddleware(ILogger<JwtMiddleware> logger, RequestDelegate next, 
             IssuerSigningKey = _jwtOptions.SigningKey,
             ValidateIssuerSigningKey = true
         };
-
-        //_logger.LogInformation($"Validating token: {token}");
-        //_logger.LogInformation($"Expected Issuer: {_jwtOptions.Issuer}, Expected Audience: {_jwtOptions.Audience}");
 
         try
         {

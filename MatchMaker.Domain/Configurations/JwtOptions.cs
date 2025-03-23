@@ -17,7 +17,6 @@ public class JwtOptions
         Issuer = settings.Issuer;
         Audience = settings.Audience;
         AccessTokenExpirationMinutes = settings.AccessTokenExpirationMinutes;
-
         SigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(settings.SigningKey));
         EncryptionKey = new SymmetricSecurityKey(Convert.FromBase64String(settings.EncryptionKey));
     }
