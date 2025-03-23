@@ -5,22 +5,13 @@ using System.Text;
 
 namespace MatchMaker.Core.Services;
 
-public class JwtOptions
+public class JwtOptions(JwtSettings settings)
 {
-    public string Issuer { get; }
-    public string Audience { get; }
-    public int AccessTokenExpirationMinutes { get; }
-    public SymmetricSecurityKey SigningKey { get; }
-    public SymmetricSecurityKey EncryptionKey { get; }
-
-    public JwtOptions(JwtSettings settings)
-    {
-        Issuer = settings.Issuer;
-        Audience = settings.Audience;
-        AccessTokenExpirationMinutes = settings.AccessTokenExpirationMinutes;
-        SigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(settings.SigningKey));
-        EncryptionKey = new SymmetricSecurityKey(Convert.FromBase64String(settings.EncryptionKey));
-    }
+    public string Issuer { get; } = settings.Issuer;
+    public string Audience { get; } = settings.Audience;
+    public int AccessTokenExpirationMinutes { get; } = settings.AccessTokenExpirationMinutes;
+    public SymmetricSecurityKey SigningKey { get; } = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(settings.SigningKey));
+    public SymmetricSecurityKey EncryptionKey { get; } = new SymmetricSecurityKey(Convert.FromBase64String(settings.EncryptionKey));
 
     public TokenValidationParameters GetTokenValidationParameters(bool validateLifetime = true)
     {
