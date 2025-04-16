@@ -1,6 +1,7 @@
 ﻿using MatchMaker.Core.Interfaces;
 using MatchMaker.Domain.DTOs;
 using Microsoft.Extensions.Logging;
+using System.Security.Claims;
 
 namespace MatchMaker.Core.Facades
 {
@@ -12,18 +13,58 @@ namespace MatchMaker.Core.Facades
         private readonly ITokenService _tokenService = tokenService;
         private readonly ISessionManager _sessionManager = sessionManager;
 
-        //public async Task<Result<bool>> VerifyEmailAsync(string token)
-        //{
-        //    try
-        //    {
+        public async Task<Result<bool>> VerifyEmailAsync(string token)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(token))
+                {
+                    return Result<bool>.Failure("Token cannot be empty");
+                }
 
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _logger.LogError(ex, "Unexpected error during email-verification.");
-        //        throw new ApplicationException("An unexpected error occurred. Please try again later.");
-        //    }
-        //}
+                var principal = _tokenService.DecryptToken(token);
+                if (principal == null)
+                {
+                    return Result<bool>.Failure("Invalid or expired verification token");
+                }
+
+                var userId = principal.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? throw new UnauthorizedAccessException($"User-Id claim is missing.");
+                var userEmail = principal.FindFirst(ClaimTypes.Email)?.Value ?? throw new UnauthorizedAccessException($"User-email claim is missing.");
+                var tokenUsage = principal.FindFirst("token_usage")?.Value ?? throw new UnauthorizedAccessException($"Token-claim is missing.");
+
+                if (tokenUsage != "verification")
+                {
+                    return Result<bool>.Failure("This token is not for email-verification");
+                }
+
+                var user = await _userService.GetUserByIdAsync(userId);
+                if (!user.IsSuccess || user.Data == null)
+                {
+                    return Result<bool>.Failure("User not found");
+                }
+
+                if (user.Data.Email.ToLower() != userEmail.ToLower())
+                {
+                    return Result<bool>.Failure("Email does not match verification token");
+                }
+
+                if (user.Data.IsVerified)
+                {
+                    return Result<bool>.Success(true, "Email already verified");
+                }
+
+                user.Data.IsVerified = true;
+
+                var updateResult = await _userService.UpdateUserAsync(user.Data);
+               
+                return updateResult.IsSuccess ? Result<bool>.Success(true, "Email successfully verified") : Result<bool>.Failure("Failed to update verification status");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error during email-verification.");
+                throw new ApplicationException("An unexpected error occurred. Please try again later.");
+            }
+        }
 
         public async Task<Result<AuthenticationDTO>> LoginAsync(LoginDTO loginDTO)
         {

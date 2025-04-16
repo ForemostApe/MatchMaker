@@ -1,16 +1,18 @@
 ﻿using MatchMaker.Domain.Configurations;
 
-namespace MatchMaker.Api.Extensions;
+namespace MatchMaker.Domain.Extensions;
 
 public static class SmtpClientServiceExtension
 {
     public static IServiceCollection AddSmtpServices(this IServiceCollection services, IConfiguration configuration, IWebHostEnvironment env)
     {
-        services.Configure<SmtpSettings>(configuration.GetSection("SmtpSettings"));
+        var smtpSettings = new SmtpSettings();
+        configuration.GetSection("SmtpSettings").Bind(smtpSettings);
 
-        var clientURL = env.EnvironmentName == "Development" ? configuration.GetValue<string>("FrontendClient:DevelopmentURL") : configuration.GetValue<string>("FrontendClient:ProductionURL");
-        if (clientURL == null) throw new InvalidOperationException("Frontend URL is not configured.");
+        if (string.IsNullOrEmpty(smtpSettings.FromEmail))
+            throw new ArgumentNullException("SmtpFromEmail is missing in config");
 
+        services.AddSingleton(smtpSettings);
         return services;
     }
 }

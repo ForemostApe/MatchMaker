@@ -20,7 +20,9 @@ public class UserServiceFacade(ILogger<UserServiceFacade> logger, IMapper mapper
         try
         {
             var user = _mapper.Map<User>(newUser);
-            await _userService.CreateUserAsync(user);
+            var result = await _userService.CreateUserAsync(user);
+
+            if (!result.IsSuccess) return Result<UserDTO>.Failure("User already exists.");
 
             UserDTO createdUser = _mapper.Map<UserDTO>(user);
 

@@ -1,4 +1,4 @@
-﻿namespace MatchMaker.Api.Configurations;
+﻿namespace MatchMaker.Domain.Configurations;
 
 public class MongoDbSettings
 {

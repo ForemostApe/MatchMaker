@@ -31,10 +31,18 @@ namespace MatchMaker.Core.Services
                     new Claim(ClaimTypes.NameIdentifier, user.Id)
                 };
 
+                if (tokenType == "verification")
+                {
+                    claims.Add(new Claim(ClaimTypes.NameIdentifier, user.Id));
+                    claims.Add(new Claim(ClaimTypes.Email, user.Email));
+                    claims.Add(new Claim("token_usage", "email_verification"));
+                }   
+
                 if (tokenType == "access")
                 {
                     claims.Add(new Claim(ClaimTypes.Email, user.Email));
                     claims.Add(new Claim(ClaimTypes.Role, user.UserRole.ToString()));
+                    claims.Add(new Claim("token_usage", "access"));
                 }
 
                 var tokenDescriptor = new SecurityTokenDescriptor
@@ -65,6 +73,11 @@ namespace MatchMaker.Core.Services
         public async Task<string> GenerateRefreshToken(User user)
         {
             return await Task.FromResult(GenerateToken(user, TimeSpan.FromDays(7), "refresh"));
+        }
+
+        public async Task<string> GenerateVerificationToken(User user)
+        {
+            return await Task.FromResult(GenerateToken(user, TimeSpan.FromDays(1), "verification"));
         }
 
         public async Task<User> ValidateRefreshToken(string refreshToken)
@@ -126,29 +139,6 @@ namespace MatchMaker.Core.Services
             {
                 _logger.LogError(ex, "An unexpected error occured while trying to decrypt token.");
                 throw new SecurityTokenException("Invalid token or decryption error.", ex);
-                
-        public string GenerateUrlSafeToken(string data)
-        {
-            try
-            {
-                return Base64UrlEncoder.Encode(data);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error encoding data into a URL-safe token.");
-                throw new ApplicationException("An error occurred while generating the token.", ex);
-            }
-        }
-        public string DecodeUrlSafeToken(string urlSafeToken)
-        {
-            try
-            {
-                return Base64UrlEncoder.Decode(urlSafeToken);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error decoding URL-safe token: {Token}", urlSafeToken);
-                throw new ApplicationException("An error occurred while decoding the token.", ex);
             }
         }
     }

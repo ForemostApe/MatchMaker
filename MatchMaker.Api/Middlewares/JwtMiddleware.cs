@@ -3,7 +3,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
-namespace MatchMaker.Api.Middlewares;
+namespace MatchMaker.Domain.Middlewares;
 
 public class JwtMiddleware(ILogger<JwtMiddleware> logger, RequestDelegate next, JwtOptions jwtOptions)
 {
@@ -20,11 +20,22 @@ public class JwtMiddleware(ILogger<JwtMiddleware> logger, RequestDelegate next, 
             try
             {
                 var token = authHeader.Substring(7);
-
                 var principal = ValidateToken(token);
+
 
                 if (principal != null)
                 {
+                    var tokenUsage = principal.FindFirst("token_usage")?.Value;
+
+                    if (tokenUsage != "access")
+                    {
+                        _logger.LogWarning("Invalid token usage. Expected 'access' but got {TokenUsage}", tokenUsage);
+                        context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                        await context.Response.WriteAsync("Unauthorized: Invalid token type.");
+
+                        return;
+                    }
+
                     context.User = principal;
                 }
                 else
@@ -58,7 +69,9 @@ public class JwtMiddleware(ILogger<JwtMiddleware> logger, RequestDelegate next, 
             ValidIssuer = _jwtOptions.Issuer,
             ValidAudience = _jwtOptions.Audience,
             IssuerSigningKey = _jwtOptions.SigningKey,
-            ValidateIssuerSigningKey = true
+            ValidateIssuerSigningKey = true,
+            RequireAudience = true,
+            RequireExpirationTime = true
         };
 
         try

@@ -5,15 +5,14 @@ using MatchMaker.Domain.Configurations;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MimeKit;
-using System.Reflection;
+using System.Text;
 
 namespace MatchMaker.Core.Services;
 
-public class EmailService(ILogger<EmailService> logger, IOptions<SmtpSettings> smtpSettings, IOptions<EmailSettings> emailSettings) : IEmailService
+public class EmailService(ILogger<EmailService> logger, SmtpSettings smtpSettings) : IEmailService
 {
     private readonly ILogger<EmailService> _logger = logger;
-    private readonly SmtpSettings _smtpSettings = smtpSettings.Value;
-    private readonly EmailSettings _emailSettings = emailSettings.Value;
+    private readonly SmtpSettings _smtpSettings = smtpSettings;
 
     public enum EmailType
     {
@@ -24,17 +23,25 @@ public class EmailService(ILogger<EmailService> logger, IOptions<SmtpSettings> s
 
     public async Task CreateEmailAsync(string email, EmailType mailType)
     {
+        try
         {
-            string templatePath = mailType switch
+            if (string.IsNullOrWhiteSpace(email))
             {
-                EmailType.UserCreated => GetTemplatePath("UserCreatedTemplate.html"),
+                throw new ArgumentNullException(nameof(email), "Recipient email cannot be null or empty.");
+            }
+
+                byte[] templateBytes = mailType switch
+            {
+                EmailType.UserCreated => Resources.EmailTemplates.UserCreatedTemplate,
                 _ => throw new ArgumentOutOfRangeException(nameof(mailType), mailType, "Invalid email type."),
             };
 
-            string mailBody = await LoadEmailTemplateAsync(templatePath);
+            string mailBody = Encoding.UTF8.GetString(templateBytes);
+
+            _logger.LogInformation($"SmtpSettings: {_smtpSettings.FromEmail}");
 
             var mailMessage = new MimeMessage();
-            mailMessage.From.Add(new MailboxAddress("Sender Name", _smtpSettings.SmtpFromEmail));
+            mailMessage.From.Add(new MailboxAddress("Sender Name", _smtpSettings.FromEmail));
             mailMessage.To.Add(new MailboxAddress("Recipient Name", email));
             mailMessage.Subject = "Your MatchMaker-account has been created.";
 
@@ -44,27 +51,10 @@ public class EmailService(ILogger<EmailService> logger, IOptions<SmtpSettings> s
             _logger.LogInformation("UserCreated email content successfully created.");
             await SendEmailAsync(mailMessage);
         }
-    }
-
-    public async Task<string> LoadEmailTemplateAsync(string templatePath)
-    {
-        if (!File.Exists(templatePath))
-        {
-            throw new FileNotFoundException($"Template file not found: {templatePath}");
+        catch (Exception ex){
+            _logger.LogError(ex, "An unexpected error occurred while trying to send mail.");
+            throw new Exception($"An unexpected error occurred while trying to send mail. {ex.Message}");
         }
-
-        return await File.ReadAllTextAsync(templatePath);
-    }
-
-    public string GetTemplatePath(string templateFileName)
-    {
-        string currentDirectory = Directory.GetCurrentDirectory();
-        string combinedPath = Path.Combine(currentDirectory, _emailSettings.TemplateDirectory);
-        string emailTemplatesPath = Path.GetFullPath(combinedPath);
-
-        _logger.LogInformation("Resolved email templates path: {EmailTemplatesPath}", emailTemplatesPath);
-
-        return Path.Combine(emailTemplatesPath, templateFileName);
     }
 
     public async Task SendEmailAsync(MimeMessage mailMessage)
@@ -73,21 +63,22 @@ public class EmailService(ILogger<EmailService> logger, IOptions<SmtpSettings> s
 
         try
         {
-            _logger.LogInformation("Trying to connecting to SMTP server {SmtpHost}:{SmtpPort}", _smtpSettings.SmtpHost, _smtpSettings.SmtpPort);
+            var socketOptions = _smtpSettings.UseTsl ? SecureSocketOptions.StartTls : SecureSocketOptions.None;
 
-            await smtpClient.ConnectAsync(_smtpSettings.SmtpHost, _smtpSettings.SmtpPort, SecureSocketOptions.StartTls);
-            _logger.LogInformation("Initiated STARTTLS.");
+            await smtpClient.ConnectAsync(_smtpSettings.Host, _smtpSettings.Port, socketOptions);
 
-            await smtpClient.AuthenticateAsync(_smtpSettings.SmtpUsername, _smtpSettings.SmtpPassword);
-            _logger.LogInformation("Authenticated by SMTP-server.");
+            if (!string.IsNullOrEmpty(_smtpSettings.Username))
+            {
 
-            _logger.LogInformation("Sending email to {userEmailAddress}.", mailMessage.To);
+                await smtpClient.AuthenticateAsync(_smtpSettings.Username, _smtpSettings.Password);
+            };
+
             await smtpClient.SendAsync(mailMessage);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error while trying to send email to {userEmailAddress}.", mailMessage.To);
-            throw new ApplicationException("An unexpected error occurred. Please try again later.", ex);
+            throw new ApplicationException("An unexpected error occurred while trying to send email. Please try again later.", ex);
         }
         finally
         {

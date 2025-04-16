@@ -1,7 +1,7 @@
-using MatchMaker.Api.Extensions;
-using MatchMaker.Api.Middlewares;
+using MatchMaker.Domain.Extensions;
+using MatchMaker.Domain.Middlewares;
 
-namespace MatchMaker.Api
+namespace MatchMaker.Domain
 {
     public class Program
     {
@@ -16,7 +16,7 @@ namespace MatchMaker.Api
             });
 
             builder.Services.AddMongoDb(builder.Configuration);
-            builder.Services.AddCoreServices(builder.Configuration);
+            builder.Services.AddCoreServices(builder.Configuration, builder.Environment);
             builder.Services.AddJwtAuthentication(builder.Configuration);
             builder.Services.AddSmtpServices(builder.Configuration, builder.Environment);
             builder.Services.AddSwagger();
@@ -44,7 +44,7 @@ namespace MatchMaker.Api
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
-            app.MapHealthChecks("/health");
+            app.MapHealthChecks("/health"); //Check what this does.
             app.MapControllers();
 
             app.Run();

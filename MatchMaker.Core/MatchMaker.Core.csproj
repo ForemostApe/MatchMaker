@@ -21,7 +21,22 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="EmailTemplates\" />
+    <Folder Include="Resources\EmailTemplates\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Resources\EmailTemplates.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>EmailTemplates.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Resources\EmailTemplates.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>EmailTemplates.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
 
 </Project>

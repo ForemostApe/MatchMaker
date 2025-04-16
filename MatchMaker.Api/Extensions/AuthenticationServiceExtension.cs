@@ -2,7 +2,7 @@
 using MatchMaker.Domain.Configurations;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 
-namespace MatchMaker.Api.Extensions;
+namespace MatchMaker.Domain.Extensions;
 
 public static class AuthenticationServiceExtension
 {

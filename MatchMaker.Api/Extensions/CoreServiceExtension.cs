@@ -1,4 +1,5 @@
 ﻿using Mapster;
+using MatchMaker.Domain.Configurations;
 using MatchMaker.Core.Facades;
 using MatchMaker.Core.Factories;
 using MatchMaker.Core.Interfaces;
@@ -7,18 +8,28 @@ using MatchMaker.Core.Services;
 using MatchMaker.Core.Utilities;
 using MatchMaker.Data.Interfaces;
 using MatchMaker.Data.Repositories;
-using MatchMaker.Domain.Configurations;
 
-namespace MatchMaker.Api.Extensions;
+namespace MatchMaker.Domain.Extensions;
 
 public static class CoreServiceExtension
 {
-    public static IServiceCollection AddCoreServices(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddCoreServices(this IServiceCollection services, IConfiguration configuration, IWebHostEnvironment env)
     {
 
         var config = TypeAdapterConfig.GlobalSettings;
         config.Scan(typeof(UserMappingProfile).Assembly);
         services.AddMapster();
+
+        services.Configure<ClientSettings>(configuration.GetSection("FrontendClient"));
+
+        
+
+        var clientSettings = configuration.GetSection("FrontendClient").Get<ClientSettings>() ?? throw new ArgumentNullException("Couldn't get frontend-client settings.");
+        
+        string clientUrl = env.IsDevelopment() ? clientSettings.DevelopmentURL : clientSettings.ProductionURL;
+        if (string.IsNullOrEmpty(clientUrl)) throw new InvalidOperationException("Frontend URL is not configured.");
+
+        services.AddScoped<IVerificationLinkFactory>(_ => new VerificationLinkFactory(_.GetRequiredService<ILogger<VerificationLinkFactory>>(), clientUrl));
 
         services.AddHttpContextAccessor();
 
@@ -35,8 +46,9 @@ public static class CoreServiceExtension
 
         services.AddScoped<ISessionManager, SessionManager>();
 
-        services.Configure<EmailSettings>(configuration.GetSection("EmailSettings"));
         services.AddTransient<IEmailService, EmailService>();
+
+        services.AddScoped<IVerificationLinkFactory>(_ => new VerificationLinkFactory(_.GetRequiredService<ILogger<VerificationLinkFactory>>(), clientUrl));
 
         var allowedOrigins = configuration.GetSection("Cors:AllowedOrigins").Get<string[]>();
         services.AddCors(options =>

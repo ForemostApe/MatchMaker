@@ -1,8 +1,9 @@
 ﻿using MatchMaker.Core.Interfaces;
 using MatchMaker.Domain.DTOs;
+using MatchMaker.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 
-namespace MatchMaker.Api.Controllers
+namespace MatchMaker.Domain.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -11,34 +12,31 @@ namespace MatchMaker.Api.Controllers
         private readonly ILogger<AuthController> _logger = logger;
         private readonly IAuthServiceFacade _authServiceFacade = authServiceFacade;
 
+        [HttpGet("verify-email")]
+        public async Task<IActionResult> VerifyEmailAsync(string token)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(token))
+                {
+                    _logger.LogWarning("No token provided.");
+                    return BadRequest();
+                }
 
-        //Vad ska den här returnera? URI + ID?
+                var result = await _authServiceFacade.VerifyEmailAsync(token);
+                if (!result.IsSuccess)
+                {
+                    return BadRequest(result);
+                }
 
-        //[HttpPost("verify-email")]
-        //public async Task<IActionResult> VerifyEmailAsync(string token)
-        //{
-        //    try
-        //    {
-        //        if (string.IsNullOrEmpty(token))
-        //        {
-        //            _logger.LogWarning("No token provided.");
-        //            return BadRequest();
-        //        }
-
-        //        var result = await _authServiceFacade.VerifyEmailAsync(token);
-        //        if (!result.Succeeded)
-        //        {
-        //            return BadRequest(result);
-        //        }
-
-        //        return Ok();
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _logger.LogError(ex, "An error occured while trying to verify user-email.");
-        //        return StatusCode(500, "An error occured while trying to verify user-email.");
-        //    }
-        //}
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occured while trying to verify user-email.");
+                return StatusCode(500, "An error occured while trying to verify user-email.");
+            }
+        }
 
 
         [HttpPost("login")]

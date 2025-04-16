@@ -1,9 +1,8 @@
-﻿using MatchMaker.Api.Configurations;
+﻿using MatchMaker.Domain.Configurations;
 using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
-using MongoDB.Entities;
 
-namespace MatchMaker.Api.Extensions;
+namespace MatchMaker.Domain.Extensions;
 
 public static class MongoDbServiceExtensions
 {

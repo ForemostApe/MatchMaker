@@ -2,7 +2,7 @@
 using MatchMaker.Domain.DTOs;
 using Microsoft.AspNetCore.Mvc;
 
-namespace MatchMaker.Api.Controllers;
+namespace MatchMaker.Domain.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
