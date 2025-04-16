@@ -1,3 +1,4 @@
+using MatchMaker.Api.Extensions;
 using MatchMaker.Domain.Extensions;
 using MatchMaker.Domain.Middlewares;
 
@@ -18,8 +19,9 @@ namespace MatchMaker.Domain
             builder.Services.AddMongoDb(builder.Configuration);
             builder.Services.AddCoreServices(builder.Configuration, builder.Environment);
             builder.Services.AddJwtAuthentication(builder.Configuration);
-            builder.Services.AddSmtpServices(builder.Configuration, builder.Environment);
+            builder.Services.AddSmtpServices(builder.Configuration);
             builder.Services.AddSwagger();
+            builder.Services.AddRateLimiting(builder.Configuration);
 
             var app = builder.Build();
 
@@ -46,6 +48,7 @@ namespace MatchMaker.Domain
             app.UseAuthorization();
             app.MapHealthChecks("/health"); //Check what this does.
             app.MapControllers();
+            app.UseRateLimiter();
 
             app.Run();
         }

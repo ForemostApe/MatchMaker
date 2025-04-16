@@ -1,5 +1,4 @@
 ﻿using Mapster;
-using MatchMaker.Domain.Configurations;
 using MatchMaker.Core.Facades;
 using MatchMaker.Core.Factories;
 using MatchMaker.Core.Interfaces;
@@ -8,6 +7,7 @@ using MatchMaker.Core.Services;
 using MatchMaker.Core.Utilities;
 using MatchMaker.Data.Interfaces;
 using MatchMaker.Data.Repositories;
+using MatchMaker.Domain.Configurations;
 
 namespace MatchMaker.Domain.Extensions;
 
@@ -21,8 +21,6 @@ public static class CoreServiceExtension
         services.AddMapster();
 
         services.Configure<ClientSettings>(configuration.GetSection("FrontendClient"));
-
-        
 
         var clientSettings = configuration.GetSection("FrontendClient").Get<ClientSettings>() ?? throw new ArgumentNullException("Couldn't get frontend-client settings.");
         

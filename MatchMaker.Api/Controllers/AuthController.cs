@@ -1,7 +1,7 @@
 ﻿using MatchMaker.Core.Interfaces;
 using MatchMaker.Domain.DTOs;
-using MatchMaker.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace MatchMaker.Domain.Controllers
 {
@@ -12,7 +12,9 @@ namespace MatchMaker.Domain.Controllers
         private readonly ILogger<AuthController> _logger = logger;
         private readonly IAuthServiceFacade _authServiceFacade = authServiceFacade;
 
-        [HttpGet("verify-email")]
+        [IgnoreAntiforgeryToken]
+        [EnableRateLimiting("EmailVerificationPolicy")]
+        [HttpGet("verify-email")] //Once frontend is in place, replace GET with POST.
         public async Task<IActionResult> VerifyEmailAsync(string token)
         {
             try

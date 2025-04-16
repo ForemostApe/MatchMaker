@@ -4,7 +4,7 @@ namespace MatchMaker.Domain.Extensions;
 
 public static class SmtpClientServiceExtension
 {
-    public static IServiceCollection AddSmtpServices(this IServiceCollection services, IConfiguration configuration, IWebHostEnvironment env)
+    public static IServiceCollection AddSmtpServices(this IServiceCollection services, IConfiguration configuration)
     {
         var smtpSettings = new SmtpSettings();
         configuration.GetSection("SmtpSettings").Bind(smtpSettings);
