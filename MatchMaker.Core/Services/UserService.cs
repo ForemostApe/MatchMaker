@@ -26,11 +26,10 @@ public class UserService(ILogger<UserService> logger, IUserRepo userRepo, IAuthS
             }
 
             newUser.PasswordHash = _authService.HashPassword(newUser.PasswordHash);
-
+            
             await _userRepo.CreateUserAsync(newUser);
 
             return Result<User>.Success(newUser);
-
         }
         catch (Exception ex)
         {

@@ -9,7 +9,7 @@ using MatchMaker.Data.Interfaces;
 using MatchMaker.Data.Repositories;
 using MatchMaker.Domain.Configurations;
 
-namespace MatchMaker.Domain.Extensions;
+namespace MatchMaker.Api.Extensions;
 
 public static class CoreServiceExtension
 {
@@ -27,7 +27,7 @@ public static class CoreServiceExtension
         string clientUrl = env.IsDevelopment() ? clientSettings.DevelopmentURL : clientSettings.ProductionURL;
         if (string.IsNullOrEmpty(clientUrl)) throw new InvalidOperationException("Frontend URL is not configured.");
 
-        services.AddScoped<IVerificationLinkFactory>(_ => new VerificationLinkFactory(_.GetRequiredService<ILogger<VerificationLinkFactory>>(), clientUrl));
+        services.AddScoped<ILinkFactory>(_ => new LinkFactory(_.GetRequiredService<ILogger<LinkFactory>>(), clientUrl));
 
         services.AddHttpContextAccessor();
 
@@ -44,9 +44,10 @@ public static class CoreServiceExtension
 
         services.AddScoped<ISessionManager, SessionManager>();
 
-        services.AddTransient<IEmailService, EmailService>();
 
-        services.AddScoped<IVerificationLinkFactory>(_ => new VerificationLinkFactory(_.GetRequiredService<ILogger<VerificationLinkFactory>>(), clientUrl));
+        services.AddTransient<IEmailService, EmailService>();
+        services.AddSingleton<IEmailTemplateEngine, EmailTemplateEngine>();
+        services.AddScoped<ILinkFactory>(_ => new LinkFactory(_.GetRequiredService<ILogger<LinkFactory>>(), clientUrl));
 
         var allowedOrigins = configuration.GetSection("Cors:AllowedOrigins").Get<string[]>();
         services.AddCors(options =>

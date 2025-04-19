@@ -3,50 +3,67 @@ using MailKit.Security;
 using MatchMaker.Core.Interfaces;
 using MatchMaker.Domain.Configurations;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using MimeKit;
-using System.Text;
 
 namespace MatchMaker.Core.Services;
 
-public class EmailService(ILogger<EmailService> logger, SmtpSettings smtpSettings) : IEmailService
+public class EmailService(ILogger<EmailService> logger, SmtpSettings smtpSettings, ILinkFactory linkFactory, IEmailTemplateEngine emailTemplateEngine) : IEmailService
 {
     private readonly ILogger<EmailService> _logger = logger;
     private readonly SmtpSettings _smtpSettings = smtpSettings;
+    private readonly ILinkFactory _linkFactory = linkFactory;
+    private readonly IEmailTemplateEngine _emailTemplateEngine = emailTemplateEngine;
 
     public enum EmailType
     {
         UserCreated,
-        PasswordReset,
-        LoginLink,
+        PasswordReset
     }
 
-    public async Task CreateEmailAsync(string email, EmailType mailType)
+    public async Task CreateEmailAsync(string email, EmailType mailType, string? token = null)
     {
+        if (string.IsNullOrWhiteSpace(email))
+        {
+            throw new ArgumentNullException(nameof(email), "Recipient email cannot be null or empty.");
+        }
+
         try
         {
-            if (string.IsNullOrWhiteSpace(email))
+            string templateName;
+            string emailSubject;
+            object templateModel;
+
+            switch (mailType)
             {
-                throw new ArgumentNullException(nameof(email), "Recipient email cannot be null or empty.");
+                case EmailType.UserCreated:
+                    templateName = "UserCreatedTemplate";
+                    emailSubject = "Ditt MatchMaker-konto har skapats.";
+                    templateModel = new { verification_link = !string.IsNullOrEmpty(token) ? _linkFactory.CreateVerificationLink(token) : throw new ArgumentNullException("Token is null when trying to create verification-link.") };
+                    break;
+
+                case EmailType.PasswordReset:
+                    templateName = "PasswordResetTemplate";
+                    emailSubject = "Begäran att återställa MatchMaker-lösenord.";
+                    templateModel = new { resetPassword_link = !string.IsNullOrEmpty(email) ? _linkFactory.CreateResetPasswordLink(email!) : throw new ArgumentNullException("Email is null when trying create reset password-link.") };
+                    break;
+
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(mailType));
             }
 
-                byte[] templateBytes = mailType switch
+            string mailBody = _emailTemplateEngine.RenderTemplate(templateName, templateModel);
+
+            var mailMessage = new MimeMessage
             {
-                EmailType.UserCreated => Resources.EmailTemplates.UserCreatedTemplate,
-                _ => throw new ArgumentOutOfRangeException(nameof(mailType), mailType, "Invalid email type."),
+                From = { new MailboxAddress("MatchMaker", _smtpSettings.FromEmail) },
+                To = { new MailboxAddress("User", email) },
+                Subject = emailSubject,
+                Body = new BodyBuilder
+                {
+                    HtmlBody = _emailTemplateEngine.RenderTemplate(templateName, templateModel),
+                    TextBody = "Please enable HTML to view this message."
+                }.ToMessageBody()
             };
-
-            string mailBody = Encoding.UTF8.GetString(templateBytes);
-
-            _logger.LogInformation($"SmtpSettings: {_smtpSettings.FromEmail}");
-
-            var mailMessage = new MimeMessage();
-            mailMessage.From.Add(new MailboxAddress("Sender Name", _smtpSettings.FromEmail));
-            mailMessage.To.Add(new MailboxAddress("Recipient Name", email));
-            mailMessage.Subject = "Your MatchMaker-account has been created.";
-
-            var messageBody = new BodyBuilder { HtmlBody = mailBody };
-            mailMessage.Body = messageBody.ToMessageBody();
 
             _logger.LogInformation("UserCreated email content successfully created.");
             await SendEmailAsync(mailMessage);

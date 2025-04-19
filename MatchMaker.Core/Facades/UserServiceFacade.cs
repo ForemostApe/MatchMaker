@@ -8,33 +8,29 @@ using Microsoft.Extensions.Logging;
 
 namespace MatchMaker.Core.Facades;
 
-public class UserServiceFacade(ILogger<UserServiceFacade> logger, IMapper mapper, IUserService userService, IEmailService emailService) : IUserServiceFacade
+public class UserServiceFacade(ILogger<UserServiceFacade> logger, IMapper mapper, IUserService userService, IEmailService emailService, ITokenService tokenService) : IUserServiceFacade
 {
     private readonly ILogger<UserServiceFacade> _logger = logger;
     private readonly IMapper _mapper = mapper;
     private readonly IUserService _userService = userService;
     private readonly IEmailService _emailService = emailService;
+    private readonly ITokenService _tokenService = tokenService;
 
     public async Task<Result<UserDTO>> CreateUserAsync(CreateUserDTO newUser)
     {
-        try
-        {
-            var user = _mapper.Map<User>(newUser);
-            var result = await _userService.CreateUserAsync(user);
+        var user = _mapper.Map<User>(newUser);
+        var result = await _userService.CreateUserAsync(user);
 
-            if (!result.IsSuccess) return Result<UserDTO>.Failure("User already exists.");
+        if (!result.IsSuccess) return Result<UserDTO>.Failure("User already exists.");
 
-            UserDTO createdUser = _mapper.Map<UserDTO>(user);
+        if (result.Data == null) throw new Exception("User creation was successful but result is null.");
 
-            if (createdUser != null) await _emailService.CreateEmailAsync(newUser.Email, EmailService.EmailType.UserCreated);
-            
-            return Result<UserDTO>.Success(createdUser, "User successfully created.");
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "An unexpected error occurred while creating user with email {Email}.", newUser.Email);
-            throw new ApplicationException("An error occurred while creating the user.", ex);
-        }
+        string verificationToken = await _tokenService.GenerateVerificationToken(result.Data);
+        await _emailService.CreateEmailAsync(result.Data.Email, EmailService.EmailType.UserCreated, verificationToken);
+
+        UserDTO createdUser = _mapper.Map<UserDTO>(user);
+
+        return Result<UserDTO>.Success(createdUser, "User successfully created.");
     }
 
     public async Task<Result<UserDTO>> GetUserByEmailAsync(string email)

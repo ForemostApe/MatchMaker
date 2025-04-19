@@ -49,6 +49,17 @@ public class UserController(ILogger<UserController> logger, IUserServiceFacade u
 
             return Created(manualUri, result.Data.UserId);
         }
+        catch (FileNotFoundException ex)
+        {
+            _logger.LogError(ex, "An unexpected error occured while creating user.");
+            return StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetails
+            {
+                Title = "An unexpected error occurred",
+                Detail = $"{ex.Message} An unexpected error occurred while creating the user. Please try again later.",
+                Status = StatusCodes.Status500InternalServerError
+            });
+        }
+
         catch (Exception ex)
         {
             _logger.LogError(ex, "An unexpected error occured while creating user.");

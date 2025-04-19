@@ -5,6 +5,7 @@ namespace MatchMaker.Core.Interfaces;
 
 public interface ITokenService
 {
+    Task<string> GenerateVerificationToken(User user);
     Task<string> GenerateAccessToken(User user);
     Task<string> GenerateRefreshToken(User user);
     Task<User> ValidateRefreshToken(string refreshToken);

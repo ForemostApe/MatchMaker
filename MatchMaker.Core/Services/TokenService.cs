@@ -2,7 +2,6 @@
 using MatchMaker.Domain.Entities;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
-using System.Buffers.Text;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -65,6 +64,11 @@ namespace MatchMaker.Core.Services
             }
         }
 
+        public async Task<string> GenerateVerificationToken(User user)
+        {
+            return await Task.FromResult(GenerateToken(user, TimeSpan.FromDays(1), "verification"));
+        }
+
         public async Task<string> GenerateAccessToken(User user)
         {
             return await Task.FromResult(GenerateToken(user, TimeSpan.FromMinutes(15), "access"));
@@ -73,11 +77,6 @@ namespace MatchMaker.Core.Services
         public async Task<string> GenerateRefreshToken(User user)
         {
             return await Task.FromResult(GenerateToken(user, TimeSpan.FromDays(7), "refresh"));
-        }
-
-        public async Task<string> GenerateVerificationToken(User user)
-        {
-            return await Task.FromResult(GenerateToken(user, TimeSpan.FromDays(1), "verification"));
         }
 
         public async Task<User> ValidateRefreshToken(string refreshToken)
