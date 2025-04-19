@@ -1,56 +1,76 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
-  <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
-	  <GenerateDocumentationFile>true</GenerateDocumentationFile>
-	  <NoWarn>$(NoWarn);1591</NoWarn>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net9.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<NoWarn>$(NoWarn);1591</NoWarn>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\MatchMaker.Core\MatchMaker.Core.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\MatchMaker.Core\MatchMaker.Core.csproj" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Mapster" Version="7.4.0" />
-    <PackageReference Include="Mapster.DependencyInjection" Version="1.0.1" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.4" />
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.4" />
-    <PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" Version="8.8.0" />
-    <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="8.8.0" />
-    <PackageReference Include="MongoDB.Bson" Version="3.3.0" />
-    <PackageReference Include="MongoDB.Entities" Version="24.1.1" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="8.1.1" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Mapster" Version="7.4.0" />
+		<PackageReference Include="Mapster.DependencyInjection" Version="1.0.1" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.4" />
+		<PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.4" />
+		<PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" Version="8.8.0" />
+		<PackageReference Include="Microsoft.IdentityModel.Tokens" Version="8.8.0" />
+		<PackageReference Include="MongoDB.Bson" Version="3.3.0" />
+		<PackageReference Include="MongoDB.Entities" Version="24.1.1" />
+		<PackageReference Include="Swashbuckle.AspNetCore" Version="8.1.1" />
+	</ItemGroup>
 
 	<ItemGroup>
 		<None Update="EmailTemplates\*.html">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
 	</ItemGroup>
-	
+
 	<ItemGroup>
 		<Content Remove="wwwroot\**" />
 		<Content Include="wwwroot\**" Exclude="wwwroot\**\*.map" />
 	</ItemGroup>
 
+	<PropertyGroup>
+		<ViteAppDir>$(MSBuildProjectDirectory)/../MatchMaker.Client</ViteAppDir>
+	</PropertyGroup>
+
 	<Target Name="DebugRunVite" BeforeTargets="Build" Condition="'$(Configuration)' == 'Debug'">
-		<!--<Exec Command="npm install" WorkingDirectory="$(SolutionDir)../MatchMaker.Client" />-->
-		<Exec Command="npm install" WorkingDirectory="../MatchMaker.Client" />
-		<!--<Exec Command="npm run dev" WorkingDirectory="$(SolutionDir)../MatchMaker.Client" ContinueOnError="true" />-->
-		<Exec Command="npm run dev" WorkingDirectory="../MatchMaker.Client" ContinueOnError="true" />
+		<Message Text="Setting up Vite development server..." Importance="high" />
+
+		<Exec Command="npm install"
+			  WorkingDirectory="$(ViteAppDir)"
+			  ConsoleToMSBuild="true"
+			  IgnoreExitCode="false" />
+
+		<Exec Command="start cmd /c npm run dev"
+			  WorkingDirectory="$(ViteAppDir)"
+			  ConsoleToMSBuild="true"
+			  IgnoreExitCode="true"
+			  ContinueOnError="true" />
 	</Target>
 
 	<Target Name="PublishRunVite" AfterTargets="ComputeFilesToPublish" Condition="'$(Configuration)' == 'Release'">
-		<!--<Exec Command="npm install" WorkingDirectory="$(SolutionDir)../MatchMaker.Client" />-->
-		<Exec Command="npm install" WorkingDirectory="../MatchMaker.Client" />
-		<!--<Exec Command="npm run build" WorkingDirectory="$(SolutionDir)../MatchMaker.Client" />-->
-		<Exec Command="npm install" WorkingDirectory="../MatchMaker.Client" />
+		<Message Text="Building React production bundle..." Importance="high" />
+
+		<Exec Command="npm ci"
+			  WorkingDirectory="$(ViteAppDir)"
+			  ConsoleToMSBuild="true" />
+
+		<Exec Command="npm run build"
+			  WorkingDirectory="$(ViteAppDir)"
+			  ConsoleToMSBuild="true" />
+
 		<ItemGroup>
-			<DistFiles Include="$(SolutionDir)../MatchMaker.Client/dist\**" />
-			<ResolvedFileToPublish Include="@(DistFiles->'%(FullPath)')" RelativePath="wwwroot\%(RecursiveDir)%(FileName)%(Extension)" CopyToPublishDirectory="PreserveNewest" />
+			<DistFiles Include="$(ViteAppDir)/dist/**" />
+			<ResolvedFileToPublish Include="@(DistFiles->'%(FullPath)')"
+								 RelativePath="wwwroot\%(RecursiveDir)%(FileName)%(Extension)"
+								 CopyToPublishDirectory="PreserveNewest" />
 		</ItemGroup>
 	</Target>
-	
+
 </Project>
