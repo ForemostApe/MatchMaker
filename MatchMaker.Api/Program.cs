@@ -24,11 +24,6 @@ namespace MatchMaker.Domain
             builder.Services.AddSwagger();
             builder.Services.AddRateLimiting(builder.Configuration);
 
-
-            #if DEBUG
-                IdentityModelEventSource.ShowPII = true;
-            #endif
-
             var app = builder.Build();
 
             if (app.Environment.IsDevelopment())
@@ -38,6 +33,7 @@ namespace MatchMaker.Domain
                 {
                     options.SwaggerEndpoint("/swagger/v1/swagger.json", "MatchMaker API v1");
                 });
+                IdentityModelEventSource.ShowPII = true;
             }
             else
             {
@@ -46,15 +42,17 @@ namespace MatchMaker.Domain
             }
 
             app.UseHttpsRedirection();
-            app.UseCors();
-            app.UseSession();
-            app.UseMiddleware<JwtMiddleware>();
+            app.UseRateLimiter();
+            app.UseStaticFiles();
             app.UseRouting();
+            app.UseSession();
+            app.UseCors();
             app.UseAuthentication();
             app.UseAuthorization();
+            app.UseMiddleware<JwtMiddleware>();
             app.MapHealthChecks("/health"); //Check what this does.
             app.MapControllers();
-            app.UseRateLimiter();
+            app.MapFallbackToFile("index.html");
 
             app.Run();
         }

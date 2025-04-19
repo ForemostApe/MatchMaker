@@ -384,3 +384,7 @@ dist-ssr
 *.ntvs*
 *.njsproj
 *.sw?
+
+#Frontend-configurations
+.env.local
+*.env.*.local

@@ -4,6 +4,8 @@
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+	  <GenerateDocumentationFile>true</GenerateDocumentationFile>
+	  <NoWarn>$(NoWarn);1591</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
@@ -27,10 +29,28 @@
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
 	</ItemGroup>
+	
+	<ItemGroup>
+		<Content Remove="wwwroot\**" />
+		<Content Include="wwwroot\**" Exclude="wwwroot\**\*.map" />
+	</ItemGroup>
 
-	<PropertyGroup>
-		<GenerateDocumentationFile>true</GenerateDocumentationFile>
-		<NoWarn>$(NoWarn);1591</NoWarn>
-	</PropertyGroup>
+	<Target Name="DebugRunVite" BeforeTargets="Build" Condition="'$(Configuration)' == 'Debug'">
+		<!--<Exec Command="npm install" WorkingDirectory="$(SolutionDir)../MatchMaker.Client" />-->
+		<Exec Command="npm install" WorkingDirectory="../MatchMaker.Client" />
+		<!--<Exec Command="npm run dev" WorkingDirectory="$(SolutionDir)../MatchMaker.Client" ContinueOnError="true" />-->
+		<Exec Command="npm run dev" WorkingDirectory="../MatchMaker.Client" ContinueOnError="true" />
+	</Target>
 
+	<Target Name="PublishRunVite" AfterTargets="ComputeFilesToPublish" Condition="'$(Configuration)' == 'Release'">
+		<!--<Exec Command="npm install" WorkingDirectory="$(SolutionDir)../MatchMaker.Client" />-->
+		<Exec Command="npm install" WorkingDirectory="../MatchMaker.Client" />
+		<!--<Exec Command="npm run build" WorkingDirectory="$(SolutionDir)../MatchMaker.Client" />-->
+		<Exec Command="npm install" WorkingDirectory="../MatchMaker.Client" />
+		<ItemGroup>
+			<DistFiles Include="$(SolutionDir)../MatchMaker.Client/dist\**" />
+			<ResolvedFileToPublish Include="@(DistFiles->'%(FullPath)')" RelativePath="wwwroot\%(RecursiveDir)%(FileName)%(Extension)" CopyToPublishDirectory="PreserveNewest" />
+		</ItemGroup>
+	</Target>
+	
 </Project>
