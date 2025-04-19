@@ -37,6 +37,14 @@ public class UserRepo(ILogger<UserRepo> logger, IMongoDatabase database) : Repos
 
         await UpdateOneAsync(filter, update);
     }
+    public async Task VerifyEmailAsync(User verifiedUser)
+    {
+        var filter = Builders<User>.Filter.Eq(u => u.Id, verifiedUser.Id);
+        var update = Builders<User>.Update
+            .Set(u => u.IsVerified, verifiedUser.IsVerified);
+
+        await UpdateOneAsync(filter, update);
+    }
 
     public async Task DeleteUserAsync(string userId)
     {

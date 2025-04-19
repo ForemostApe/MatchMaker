@@ -55,7 +55,7 @@ namespace MatchMaker.Core.Facades
 
                 user.Data.IsVerified = true;
 
-                var updateResult = await _userService.UpdateUserAsync(user.Data);
+                var updateResult = await _userService.VerifyEmailAsync(user.Data);
                
                 return updateResult.IsSuccess ? Result<bool>.Success(true, "Email successfully verified") : Result<bool>.Failure("Failed to update verification status");
             }

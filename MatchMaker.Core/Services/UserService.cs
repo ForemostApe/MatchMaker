@@ -84,19 +84,21 @@ public class UserService(ILogger<UserService> logger, IUserRepo userRepo, IAuthS
 
     public async Task<Result<User>> UpdateUserAsync(User updatedUser)
     {
-        try
-        {
-            ArgumentNullException.ThrowIfNull(updatedUser);
+        ArgumentNullException.ThrowIfNull(updatedUser);
 
-            await _userRepo.UpdateUserAsync(updatedUser);
+        await _userRepo.UpdateUserAsync(updatedUser);
 
-            return Result<User>.Success(updatedUser, "User succesfully updated.");
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "An unexpected error occurred in the business-logic when trying to update user {Id}.", updatedUser.Id);
-            throw new Exception($"An unexpected error occurred in the business-logic when trying to update user {updatedUser.Id}.", ex);
-        }
+        return Result<User>.Success(updatedUser, "User succesfully updated.");
+    }
+     
+
+    public async Task<Result<User>> VerifyEmailAsync(User verifiedUser)
+    {
+        ArgumentNullException.ThrowIfNull(verifiedUser);
+
+        await _userRepo.VerifyEmailAsync(verifiedUser);
+
+        return Result<User>.Success(verifiedUser, "Email successfully verified.");
     }
 
     public async Task<Result<bool>> DeleteUserAsync(string userId)
