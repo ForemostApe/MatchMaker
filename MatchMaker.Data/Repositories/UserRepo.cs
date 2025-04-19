@@ -32,7 +32,16 @@ public class UserRepo(ILogger<UserRepo> logger, IMongoDatabase database) : Repos
             .Set(u => u.Email, updatedUser.Email)
             .Set(u => u.FirstName, updatedUser.FirstName)
             .Set(u => u.LastName, updatedUser.LastName)
-            .Set(u => u.UserRole, updatedUser.UserRole);
+            .Set(u => u.UserRole, updatedUser.UserRole)
+            .Set(u => u.IsVerified,  updatedUser.IsVerified);
+
+        await UpdateOneAsync(filter, update);
+    }
+    public async Task VerifyEmailAsync(User verifiedUser)
+    {
+        var filter = Builders<User>.Filter.Eq(u => u.Id, verifiedUser.Id);
+        var update = Builders<User>.Update
+            .Set(u => u.IsVerified, verifiedUser.IsVerified);
 
         await UpdateOneAsync(filter, update);
     }

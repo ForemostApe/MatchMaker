@@ -1,6 +1,6 @@
 ﻿using Microsoft.OpenApi.Models;
 
-namespace MatchMaker.Api.Extensions;
+namespace MatchMaker.Domain.Extensions;
 
 public static class OpenApiServiceExtension
 {

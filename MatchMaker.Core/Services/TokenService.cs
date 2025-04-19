@@ -2,10 +2,8 @@
 using MatchMaker.Domain.Entities;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
-using System.Buffers.Text;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Text;
 
 namespace MatchMaker.Core.Services
 { 
@@ -31,10 +29,18 @@ namespace MatchMaker.Core.Services
                     new Claim(ClaimTypes.NameIdentifier, user.Id)
                 };
 
+                if (tokenType == "verification")
+                {
+                    claims.Add(new Claim(ClaimTypes.NameIdentifier, user.Id));
+                    claims.Add(new Claim(ClaimTypes.Email, user.Email));
+                    claims.Add(new Claim("token_usage", "verification"));
+                }   
+
                 if (tokenType == "access")
                 {
                     claims.Add(new Claim(ClaimTypes.Email, user.Email));
                     claims.Add(new Claim(ClaimTypes.Role, user.UserRole.ToString()));
+                    claims.Add(new Claim("token_usage", "access"));
                 }
 
                 var tokenDescriptor = new SecurityTokenDescriptor
@@ -55,6 +61,11 @@ namespace MatchMaker.Core.Services
                 _logger.LogError(ex, "Error generating access-token for user-ID {userId}", user.Id);
                 throw new Exception($"Error generating access-token for user-ID {user.Id}", ex);
             }
+        }
+
+        public async Task<string> GenerateVerificationToken(User user)
+        {
+            return await Task.FromResult(GenerateToken(user, TimeSpan.FromDays(1), "verification"));
         }
 
         public async Task<string> GenerateAccessToken(User user)
@@ -100,55 +111,50 @@ namespace MatchMaker.Core.Services
         {
             try
             {
-                _logger.LogInformation("Attempting to decrypt token.");
-                byte[] serializedToken = Base64UrlEncoder.DecodeBytes(encryptedToken);
-                string decryptedToken = Encoding.UTF8.GetString(serializedToken);
+                //byte[] serializedToken = Base64UrlEncoder.DecodeBytes(encryptedToken);
+                //string decryptedToken = Encoding.UTF8.GetString(serializedToken);
+
+                //var tokenHandler = new JwtSecurityTokenHandler();
+
+                //var validationParameters = new TokenValidationParameters
+                //{
+                //    ValidateIssuer = true,
+                //    ValidateAudience = true,
+                //    ValidateLifetime = true,
+                //    IssuerSigningKey = _jwtOptions.SigningKey,
+                //    TokenDecryptionKey = _jwtOptions.EncryptionKey,
+                //    RequireSignedTokens = true
+                //};
+
+                //var jwtToken = tokenHandler.ReadJwtToken(decryptedToken);
+
+                //var principal = tokenHandler.ValidateToken(decryptedToken, validationParameters, out var validatedToken);
+
+                //return principal;
 
                 var tokenHandler = new JwtSecurityTokenHandler();
 
                 var validationParameters = new TokenValidationParameters
                 {
                     ValidateIssuer = true,
+                    ValidIssuer = _jwtOptions.Issuer,
                     ValidateAudience = true,
+                    ValidAudience = _jwtOptions.Audience,
                     ValidateLifetime = true,
                     IssuerSigningKey = _jwtOptions.SigningKey,
                     TokenDecryptionKey = _jwtOptions.EncryptionKey,
                     RequireSignedTokens = true
                 };
 
-                var jwtToken = tokenHandler.ReadJwtToken(decryptedToken);
-
-                var principal = tokenHandler.ValidateToken(decryptedToken, validationParameters, out var validatedToken);
+                var principal = tokenHandler.ValidateToken(encryptedToken, validationParameters, out var validatedToken);
 
                 return principal;
+
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An unexpected error occured while trying to decrypt token.");
                 throw new SecurityTokenException("Invalid token or decryption error.", ex);
-                
-        public string GenerateUrlSafeToken(string data)
-        {
-            try
-            {
-                return Base64UrlEncoder.Encode(data);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error encoding data into a URL-safe token.");
-                throw new ApplicationException("An error occurred while generating the token.", ex);
-            }
-        }
-        public string DecodeUrlSafeToken(string urlSafeToken)
-        {
-            try
-            {
-                return Base64UrlEncoder.Decode(urlSafeToken);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error decoding URL-safe token: {Token}", urlSafeToken);
-                throw new ApplicationException("An error occurred while decoding the token.", ex);
             }
         }
     }

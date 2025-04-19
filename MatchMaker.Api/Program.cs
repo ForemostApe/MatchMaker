@@ -1,7 +1,9 @@
 using MatchMaker.Api.Extensions;
-using MatchMaker.Api.Middlewares;
+using MatchMaker.Domain.Extensions;
+using MatchMaker.Domain.Middlewares;
+using Microsoft.IdentityModel.Logging;
 
-namespace MatchMaker.Api
+namespace MatchMaker.Domain
 {
     public class Program
     {
@@ -16,10 +18,16 @@ namespace MatchMaker.Api
             });
 
             builder.Services.AddMongoDb(builder.Configuration);
-            builder.Services.AddCoreServices(builder.Configuration);
+            builder.Services.AddCoreServices(builder.Configuration, builder.Environment);
             builder.Services.AddJwtAuthentication(builder.Configuration);
-            builder.Services.AddSmtpServices(builder.Configuration, builder.Environment);
+            builder.Services.AddSmtpServices(builder.Configuration);
             builder.Services.AddSwagger();
+            builder.Services.AddRateLimiting(builder.Configuration);
+
+
+            #if DEBUG
+                IdentityModelEventSource.ShowPII = true;
+            #endif
 
             var app = builder.Build();
 
@@ -44,8 +52,9 @@ namespace MatchMaker.Api
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
-            app.MapHealthChecks("/health");
+            app.MapHealthChecks("/health"); //Check what this does.
             app.MapControllers();
+            app.UseRateLimiter();
 
             app.Run();
         }

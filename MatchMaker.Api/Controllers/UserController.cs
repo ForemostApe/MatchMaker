@@ -2,7 +2,7 @@
 using MatchMaker.Domain.DTOs;
 using Microsoft.AspNetCore.Mvc;
 
-namespace MatchMaker.Api.Controllers;
+namespace MatchMaker.Domain.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
@@ -22,7 +22,6 @@ public class UserController(ILogger<UserController> logger, IUserServiceFacade u
 
             if (!result.IsSuccess)
             {
-                _logger.LogWarning("User with email {Email} already exists.", newUser.Email);
                 return Conflict(new ProblemDetails
                 {
                     Title = "User creation failed",
@@ -49,6 +48,17 @@ public class UserController(ILogger<UserController> logger, IUserServiceFacade u
 
             return Created(manualUri, result.Data.UserId);
         }
+        catch (FileNotFoundException ex)
+        {
+            _logger.LogError(ex, "An unexpected error occured while creating user.");
+            return StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetails
+            {
+                Title = "An unexpected error occurred",
+                Detail = $"{ex.Message} An unexpected error occurred while creating the user. Please try again later.",
+                Status = StatusCodes.Status500InternalServerError
+            });
+        }
+
         catch (Exception ex)
         {
             _logger.LogError(ex, "An unexpected error occured while creating user.");
