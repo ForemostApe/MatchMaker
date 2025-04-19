@@ -14,18 +14,17 @@ namespace MatchMaker.Domain.Controllers
 
         [IgnoreAntiforgeryToken]
         [EnableRateLimiting("EmailVerificationPolicy")]
-        [HttpGet("verify-email")] //Once frontend is in place, replace GET with POST.
-        public async Task<IActionResult> VerifyEmailAsync(string token)
+        [HttpPut("verify-email")]
+        public async Task<IActionResult> VerifyEmailAsync(string verificationToken)
         {
             try
             {
-                if (string.IsNullOrEmpty(token))
+                if (string.IsNullOrEmpty(verificationToken))
                 {
-                    _logger.LogWarning("No token provided.");
                     return BadRequest();
                 }
 
-                var result = await _authServiceFacade.VerifyEmailAsync(token);
+                var result = await _authServiceFacade.VerifyEmailAsync(verificationToken);
                 if (!result.IsSuccess)
                 {
                     return BadRequest(result);
@@ -36,7 +35,7 @@ namespace MatchMaker.Domain.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occured while trying to verify user-email.");
-                return StatusCode(500, "An error occured while trying to verify user-email.");
+                return StatusCode(500, ex.Message);
             }
         }
 

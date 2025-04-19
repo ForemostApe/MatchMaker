@@ -1,6 +1,7 @@
 using MatchMaker.Api.Extensions;
 using MatchMaker.Domain.Extensions;
 using MatchMaker.Domain.Middlewares;
+using Microsoft.IdentityModel.Logging;
 
 namespace MatchMaker.Domain
 {
@@ -22,6 +23,11 @@ namespace MatchMaker.Domain
             builder.Services.AddSmtpServices(builder.Configuration);
             builder.Services.AddSwagger();
             builder.Services.AddRateLimiting(builder.Configuration);
+
+
+            #if DEBUG
+                IdentityModelEventSource.ShowPII = true;
+            #endif
 
             var app = builder.Build();
 

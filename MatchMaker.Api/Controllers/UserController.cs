@@ -22,7 +22,6 @@ public class UserController(ILogger<UserController> logger, IUserServiceFacade u
 
             if (!result.IsSuccess)
             {
-                _logger.LogWarning("User with email {Email} already exists.", newUser.Email);
                 return Conflict(new ProblemDetails
                 {
                     Title = "User creation failed",

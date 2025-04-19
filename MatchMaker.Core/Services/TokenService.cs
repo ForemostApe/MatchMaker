@@ -4,7 +4,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Text;
 
 namespace MatchMaker.Core.Services
 { 
@@ -34,7 +33,7 @@ namespace MatchMaker.Core.Services
                 {
                     claims.Add(new Claim(ClaimTypes.NameIdentifier, user.Id));
                     claims.Add(new Claim(ClaimTypes.Email, user.Email));
-                    claims.Add(new Claim("token_usage", "email_verification"));
+                    claims.Add(new Claim("token_usage", "verification"));
                 }   
 
                 if (tokenType == "access")
@@ -112,27 +111,45 @@ namespace MatchMaker.Core.Services
         {
             try
             {
-                _logger.LogInformation("Attempting to decrypt token.");
-                byte[] serializedToken = Base64UrlEncoder.DecodeBytes(encryptedToken);
-                string decryptedToken = Encoding.UTF8.GetString(serializedToken);
+                //byte[] serializedToken = Base64UrlEncoder.DecodeBytes(encryptedToken);
+                //string decryptedToken = Encoding.UTF8.GetString(serializedToken);
+
+                //var tokenHandler = new JwtSecurityTokenHandler();
+
+                //var validationParameters = new TokenValidationParameters
+                //{
+                //    ValidateIssuer = true,
+                //    ValidateAudience = true,
+                //    ValidateLifetime = true,
+                //    IssuerSigningKey = _jwtOptions.SigningKey,
+                //    TokenDecryptionKey = _jwtOptions.EncryptionKey,
+                //    RequireSignedTokens = true
+                //};
+
+                //var jwtToken = tokenHandler.ReadJwtToken(decryptedToken);
+
+                //var principal = tokenHandler.ValidateToken(decryptedToken, validationParameters, out var validatedToken);
+
+                //return principal;
 
                 var tokenHandler = new JwtSecurityTokenHandler();
 
                 var validationParameters = new TokenValidationParameters
                 {
                     ValidateIssuer = true,
+                    ValidIssuer = _jwtOptions.Issuer,
                     ValidateAudience = true,
+                    ValidAudience = _jwtOptions.Audience,
                     ValidateLifetime = true,
                     IssuerSigningKey = _jwtOptions.SigningKey,
                     TokenDecryptionKey = _jwtOptions.EncryptionKey,
                     RequireSignedTokens = true
                 };
 
-                var jwtToken = tokenHandler.ReadJwtToken(decryptedToken);
-
-                var principal = tokenHandler.ValidateToken(decryptedToken, validationParameters, out var validatedToken);
+                var principal = tokenHandler.ValidateToken(encryptedToken, validationParameters, out var validatedToken);
 
                 return principal;
+
             }
             catch (Exception ex)
             {
