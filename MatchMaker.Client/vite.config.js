@@ -10,7 +10,7 @@ export default defineConfig(({ mode }) => {
     server: {
       proxy: {
         '/api': {
-          target: env.VITE_API_BASE, // Use loaded env variable
+          target: env.VITE_API_BASE,
           changeOrigin: true,
           secure: false,
           rewrite: (path) => path.replace(/^\/api/, '')
@@ -18,7 +18,7 @@ export default defineConfig(({ mode }) => {
       }
     },
     build: {
-      outDir: '../MatchMaker.Api/wwwroot', // Verify this matches your .NET project
+      outDir: '../MatchMaker.Api/wwwroot',
       emptyOutDir: true
     }
   };
