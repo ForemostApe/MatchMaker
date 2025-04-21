@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import LoginForm from "../../components/LoginForm/LoginForm";
 import { AuthService } from "../../services/authService";
@@ -5,12 +6,18 @@ import { AuthService } from "../../services/authService";
 const LoginPage = () => {
     const navigate = useNavigate();
 
+    const [loading, setLoading] = useState(false);
+
     const handleLogin = async (credentials) => {
         try {
+            setLoading(true);
             await AuthService.login(credentials);
             navigate('/home');
         } catch (error) {
-            alert('Login failed.')
+            alert('Login failed.') || 'Login failed.'
+        }
+        finally {
+            setLoading(false);
         }
     };
 

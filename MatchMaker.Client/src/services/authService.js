@@ -3,9 +3,11 @@ import { api } from './axiosConfig';
 export const AuthService = {
   login: async (credentials) => {
     try {
-      const response = await api.post('/Auth/login', credentials, {
+      const response = await api.post('/Auth/login', {
+        Email: credentials.email, 
+        Password: credentials.password
+      }, {
         withCredentials: true
-
       });
       return response.data;
     } catch (error) {

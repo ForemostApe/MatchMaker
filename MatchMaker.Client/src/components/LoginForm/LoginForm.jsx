@@ -6,9 +6,7 @@ const LoginForm = ({ onSubmit }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const credentials = { email, password };
-    console.log("Passing credentials to backend: ", credentials);
-    onSubmit({ credentials });
+    onSubmit({ email, password });
   };
 
   return (
