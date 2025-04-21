@@ -17,12 +17,28 @@ namespace MatchMaker.Domain
                 options.ValidateOnBuild = true;
             });
 
+            if (builder.Environment.IsDevelopment()) builder.WebHost.ConfigureKestrelServer();
+
             builder.Services.AddMongoDb(builder.Configuration);
             builder.Services.AddCoreServices(builder.Configuration, builder.Environment);
             builder.Services.AddJwtAuthentication(builder.Configuration);
             builder.Services.AddSmtpServices(builder.Configuration);
             builder.Services.AddSwagger();
             builder.Services.AddRateLimiting(builder.Configuration);
+
+            var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? new[] { "http://localhost:5173" };
+            builder.Services.AddCors(options =>
+            {
+                    options.AddPolicy("Development", policy =>
+                    {
+                        policy.WithOrigins(allowedOrigins)
+                              .AllowAnyMethod()
+                              .AllowAnyHeader()
+                              .AllowCredentials()
+                              .SetPreflightMaxAge(TimeSpan.FromSeconds(86400));
+                    });
+                });
+
 
             var app = builder.Build();
 
@@ -37,16 +53,24 @@ namespace MatchMaker.Domain
             }
             else
             {
-                app.UseExceptionHandler("/error"); 
                 app.UseHsts();
+                app.UseExceptionHandler("/error");
             }
 
             app.UseHttpsRedirection();
+
+            //Check what this actually does. Tied to Kestrel and security-headers.
+            if (app.Environment.IsDevelopment()) app.Use(async (context, next) =>
+            {
+                context.Response.Headers.Add("X-Content-Type-Options", "nosniff");
+                await next();
+            });
+
             app.UseRateLimiter();
             app.UseStaticFiles();
             app.UseRouting();
             app.UseSession();
-            app.UseCors();
+            app.UseCors("Development");
             app.UseAuthentication();
             app.UseAuthorization();
             app.UseMiddleware<JwtMiddleware>();
