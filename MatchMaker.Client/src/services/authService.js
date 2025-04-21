@@ -4,11 +4,8 @@ export const AuthService = {
   login: async (credentials) => {
     try {
       const response = await api.post('/Auth/login', credentials, {
-        withCredentials: true,
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Requested-With': 'XMLHttpRequest'
-        }
+        withCredentials: true
+
       });
       return response.data;
     } catch (error) {
