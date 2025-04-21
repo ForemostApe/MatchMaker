@@ -49,18 +49,6 @@ public static class CoreServiceExtension
         services.AddSingleton<IEmailTemplateEngine, EmailTemplateEngine>();
         services.AddScoped<ILinkFactory>(_ => new LinkFactory(_.GetRequiredService<ILogger<LinkFactory>>(), clientUrl));
 
-        var allowedOrigins = configuration.GetSection("Cors:AllowedOrigins").Get<string[]>();
-        services.AddCors(options =>
-        {
-            options.AddDefaultPolicy(policy =>
-            {
-                policy.WithOrigins(allowedOrigins ?? new[] { "http://localhost:5173" })
-                      .AllowAnyMethod()
-                      .AllowAnyHeader()
-                      .AllowCredentials();
-            });
-        });
-
         services.AddSingleton(config);
 
         services.AddDistributedMemoryCache(); //Check out how to use this properly later on.

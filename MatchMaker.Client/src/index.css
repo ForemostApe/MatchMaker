@@ -1,0 +1,5 @@
+@import "tailwindcss";
+
+body {
+    background: repeating-linear-gradient(90deg, rgb(214, 50, 49) 0, rgb(214, 50, 49) 0.4rem, rgb(226, 56, 59) 0.4rem, rgb(226, 56, 59) 0.8rem);
+  }

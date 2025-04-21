@@ -17,6 +17,8 @@ namespace MatchMaker.Domain
                 options.ValidateOnBuild = true;
             });
 
+            if (builder.Environment.IsDevelopment()) builder.WebHost.ConfigureKestrelServer();
+
             builder.Services.AddMongoDb(builder.Configuration);
             builder.Services.AddCoreServices(builder.Configuration, builder.Environment);
             builder.Services.AddJwtAuthentication(builder.Configuration);
@@ -24,10 +26,19 @@ namespace MatchMaker.Domain
             builder.Services.AddSwagger();
             builder.Services.AddRateLimiting(builder.Configuration);
 
+            var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? new[] { "http://localhost:5173" };
+            builder.Services.AddCors(options =>
+            {
+                    options.AddPolicy("Development", policy =>
+                    {
+                        policy.WithOrigins(allowedOrigins)
+                              .AllowAnyMethod()
+                              .AllowAnyHeader()
+                              .AllowCredentials()
+                              .SetPreflightMaxAge(TimeSpan.FromSeconds(86400));
+                    });
+                });
 
-            #if DEBUG
-                IdentityModelEventSource.ShowPII = true;
-            #endif
 
             var app = builder.Build();
 
@@ -38,23 +49,34 @@ namespace MatchMaker.Domain
                 {
                     options.SwaggerEndpoint("/swagger/v1/swagger.json", "MatchMaker API v1");
                 });
+                IdentityModelEventSource.ShowPII = true;
             }
             else
             {
-                app.UseExceptionHandler("/error"); 
                 app.UseHsts();
+                app.UseExceptionHandler("/error");
             }
 
             app.UseHttpsRedirection();
-            app.UseCors();
-            app.UseSession();
-            app.UseMiddleware<JwtMiddleware>();
+
+            //Check what this actually does. Tied to Kestrel and security-headers.
+            if (app.Environment.IsDevelopment()) app.Use(async (context, next) =>
+            {
+                context.Response.Headers.Add("X-Content-Type-Options", "nosniff");
+                await next();
+            });
+
+            app.UseRateLimiter();
+            app.UseStaticFiles();
             app.UseRouting();
+            app.UseSession();
+            app.UseCors("Development");
             app.UseAuthentication();
             app.UseAuthorization();
+            app.UseMiddleware<JwtMiddleware>();
             app.MapHealthChecks("/health"); //Check what this does.
             app.MapControllers();
-            app.UseRateLimiter();
+            app.MapFallbackToFile("index.html");
 
             app.Run();
         }
