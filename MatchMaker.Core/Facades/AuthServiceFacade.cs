@@ -85,7 +85,7 @@ namespace MatchMaker.Core.Facades
                 _cookieFactory.CreateHttpOnlyCookie("refreshToken", refreshToken);
                 _logger.LogInformation("Token created: {token}", accessToken);
 
-                AuthenticationDTO token = new AuthenticationDTO()
+                AuthenticationDTO result = new AuthenticationDTO()
                 {
                     AccessToken = accessToken,
                     User = new UserDTO()
@@ -98,7 +98,7 @@ namespace MatchMaker.Core.Facades
                     }
                 };
 
-                return Result<AuthenticationDTO>.Success(token, "User successfully authenticated.");
+                return Result<AuthenticationDTO>.Success(result, "User successfully authenticated.");
             }
             catch (Exception ex)
             {
@@ -119,12 +119,20 @@ namespace MatchMaker.Core.Facades
                 var newRefreshToken = await _tokenService.GenerateRefreshToken(user);
                 _cookieFactory.CreateHttpOnlyCookie("refreshToken", newRefreshToken);
 
-                AuthenticationDTO token = new AuthenticationDTO()
+                AuthenticationDTO result = new AuthenticationDTO()
                 {
                     AccessToken = newAccessToken,
+                    User = new UserDTO()
+                    {
+                        UserId = user.Id,
+                        Email = user.Email,
+                        FirstName = user.FirstName,
+                        LastName = user.LastName,
+                        UserRole = user.UserRole.ToString()
+                    }
                 };
 
-                return Result<AuthenticationDTO>.Success(token, "User successfully reauthenticated.");
+                return Result<AuthenticationDTO>.Success(result, "User successfully reauthenticated.");
 
             }
             catch (Exception ex)

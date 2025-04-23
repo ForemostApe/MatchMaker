@@ -1,5 +1,6 @@
 ﻿using MatchMaker.Core.Interfaces;
 using MatchMaker.Domain.DTOs;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 
@@ -38,7 +39,6 @@ namespace MatchMaker.Domain.Controllers
                 return StatusCode(500, ex.Message);
             }
         }
-
 
         [HttpPost("login")]
         public async Task<IActionResult> LoginAsync(LoginDTO loginDTO)
