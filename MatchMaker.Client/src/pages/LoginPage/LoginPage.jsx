@@ -1,17 +1,17 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import LoginForm from "../../components/LoginForm/LoginForm";
-import { AuthService } from "../../services/authService";
+import { useAuth } from "../../context/AuthContext/AuthContext";
 
 const LoginPage = () => {
     const navigate = useNavigate();
-
+    const { login } = useAuth();
     const [loading, setLoading] = useState(false);
 
     const handleLogin = async (credentials) => {
         try {
             setLoading(true);
-            await AuthService.login(credentials);
+            await login(credentials);
             navigate('/home');
         } catch (error) {
             alert('Login failed.') || 'Login failed.'

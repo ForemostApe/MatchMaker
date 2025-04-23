@@ -88,8 +88,8 @@ namespace MatchMaker.Domain.Controllers
             }
         }
 
-        [HttpPost("refresh-token")]
-        public async Task<IActionResult> RefreshToken()
+        [HttpPost("refresh")]
+        public async Task<IActionResult> RefreshTokens()
         {
             try
             {
@@ -97,11 +97,17 @@ namespace MatchMaker.Domain.Controllers
                 if (string.IsNullOrEmpty(refreshToken))
                 {
                     _logger.LogWarning("Refresh-token is missing.");
-                    return Unauthorized("Refresh-token is missing.");
+                    return Unauthorized(new { Message = "Refresh-token required." });
                 }
 
-                var newAccessToken = await _authServiceFacade.RefreshTokenAsync(refreshToken);
-                return Ok();
+                var result = await _authServiceFacade.GenerateRefreshTokenAsync(refreshToken);
+
+                if (!result.IsSuccess)
+                {
+                    return Unauthorized(new { result.Message });
+                }
+
+                return Ok(result.Data);
             }
             catch (UnauthorizedAccessException ex)
             {

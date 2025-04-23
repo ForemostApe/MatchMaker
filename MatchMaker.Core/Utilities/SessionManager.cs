@@ -20,7 +20,7 @@ namespace MatchMaker.Core.Utilities
             }
 
             httpContext.Session.Clear();
-            httpContext.Response.Cookies.Delete("session-id");
+            httpContext.Response.Cookies.Delete("refreshToken");
         }
     }
 }

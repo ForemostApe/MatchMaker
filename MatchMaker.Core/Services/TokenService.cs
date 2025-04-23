@@ -29,18 +29,23 @@ namespace MatchMaker.Core.Services
                     new Claim(ClaimTypes.NameIdentifier, user.Id)
                 };
 
-                if (tokenType == "verification")
+                switch (tokenType)
                 {
-                    claims.Add(new Claim(ClaimTypes.NameIdentifier, user.Id));
-                    claims.Add(new Claim(ClaimTypes.Email, user.Email));
-                    claims.Add(new Claim("token_usage", "verification"));
-                }   
+                    case "verification":
+                        claims.Add(new Claim(ClaimTypes.NameIdentifier, user.Id));
+                        claims.Add(new Claim(ClaimTypes.Email, user.Email));
+                        claims.Add(new Claim("token_usage", "verification"));
+                        break;
 
-                if (tokenType == "access")
-                {
-                    claims.Add(new Claim(ClaimTypes.Email, user.Email));
-                    claims.Add(new Claim(ClaimTypes.Role, user.UserRole.ToString()));
-                    claims.Add(new Claim("token_usage", "access"));
+                    case "access":
+                        claims.Add(new Claim(ClaimTypes.Email, user.Email));
+                        claims.Add(new Claim(ClaimTypes.Role, user.UserRole.ToString()));
+                        claims.Add(new Claim("token_usage", "access"));
+                        break;
+
+                    case "refresh":
+                        claims.Add(new Claim("token_usage", "refresh"));
+                        break;
                 }
 
                 var tokenDescriptor = new SecurityTokenDescriptor
@@ -65,17 +70,20 @@ namespace MatchMaker.Core.Services
 
         public async Task<string> GenerateVerificationToken(User user)
         {
-            return await Task.FromResult(GenerateToken(user, TimeSpan.FromDays(1), "verification"));
+            var expiration = TimeSpan.FromMinutes(_jwtOptions.VerificationTokenExpirationMinutes);
+            return await Task.FromResult(GenerateToken(user, expiration, "verification"));
         }
 
         public async Task<string> GenerateAccessToken(User user)
         {
-            return await Task.FromResult(GenerateToken(user, TimeSpan.FromMinutes(15), "access"));
+            var expiration = TimeSpan.FromMinutes(_jwtOptions.AccessTokenExpirationMinutes);
+            return await Task.FromResult(GenerateToken(user, expiration, "access"));
         }
 
         public async Task<string> GenerateRefreshToken(User user)
         {
-            return await Task.FromResult(GenerateToken(user, TimeSpan.FromDays(7), "refresh"));
+            var expiration = TimeSpan.FromDays(_jwtOptions.RefreshTokenExpirationDays);
+            return await Task.FromResult(GenerateToken(user, expiration, "refresh"));
         }
 
         public async Task<User> ValidateRefreshToken(string refreshToken)
@@ -86,6 +94,12 @@ namespace MatchMaker.Core.Services
                 var key = _jwtOptions.SigningKey;
 
                 var principal = tokenHandler.ValidateToken(refreshToken, TokenValidationParameters, out var validatedToken);
+
+                var tokenUsage = principal.FindFirst("token_usage")?.Value;
+                if (tokenUsage != "refresh")
+                {
+                    throw new SecurityTokenException("Invalid token usage");
+                }
 
                 var userIdClaim = principal.FindFirst(ClaimTypes.NameIdentifier);
                 if (userIdClaim == null)
@@ -100,6 +114,11 @@ namespace MatchMaker.Core.Services
                 }
                 return user.Data!;
             }
+            catch (SecurityTokenException ex)
+            {
+                _logger.LogWarning(ex, "Refresh token validation failed");
+                throw;
+            }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An unexpected error occured when trying to validate refresh-token.");
@@ -111,27 +130,6 @@ namespace MatchMaker.Core.Services
         {
             try
             {
-                //byte[] serializedToken = Base64UrlEncoder.DecodeBytes(encryptedToken);
-                //string decryptedToken = Encoding.UTF8.GetString(serializedToken);
-
-                //var tokenHandler = new JwtSecurityTokenHandler();
-
-                //var validationParameters = new TokenValidationParameters
-                //{
-                //    ValidateIssuer = true,
-                //    ValidateAudience = true,
-                //    ValidateLifetime = true,
-                //    IssuerSigningKey = _jwtOptions.SigningKey,
-                //    TokenDecryptionKey = _jwtOptions.EncryptionKey,
-                //    RequireSignedTokens = true
-                //};
-
-                //var jwtToken = tokenHandler.ReadJwtToken(decryptedToken);
-
-                //var principal = tokenHandler.ValidateToken(decryptedToken, validationParameters, out var validatedToken);
-
-                //return principal;
-
                 var tokenHandler = new JwtSecurityTokenHandler();
 
                 var validationParameters = new TokenValidationParameters

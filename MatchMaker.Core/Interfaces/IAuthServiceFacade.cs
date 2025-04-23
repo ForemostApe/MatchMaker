@@ -6,5 +6,5 @@ public interface IAuthServiceFacade
     Task<Result<bool>> VerifyEmailAsync(string token);
     Task<Result<AuthenticationDTO>> LoginAsync(LoginDTO loginDTO);
     Result<string> Logout();
-    Task<bool> RefreshTokenAsync(string refreshToken);
+    Task<Result<AuthenticationDTO>> GenerateRefreshTokenAsync(string refreshToken);
 }

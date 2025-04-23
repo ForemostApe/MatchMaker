@@ -81,13 +81,21 @@ namespace MatchMaker.Core.Facades
                 }
 
                 var accessToken = await _tokenService.GenerateAccessToken(user.Data!);
-                var refreshToken = await _tokenService.GenerateAccessToken(user.Data!);
+                var refreshToken = await _tokenService.GenerateRefreshToken(user.Data!);
                 _cookieFactory.CreateHttpOnlyCookie("refreshToken", refreshToken);
                 _logger.LogInformation("Token created: {token}", accessToken);
 
                 AuthenticationDTO token = new AuthenticationDTO()
                 {
-                    AccessToken = accessToken
+                    AccessToken = accessToken,
+                    User = new UserDTO()
+                    {
+                        UserId = user.Data!.Id,
+                        Email = user.Data!.Email,
+                        FirstName = user.Data!.FirstName,
+                        LastName = user.Data!.LastName,
+                        UserRole = user.Data!.UserRole.ToString()
+                    }
                 };
 
                 return Result<AuthenticationDTO>.Success(token, "User successfully authenticated.");
@@ -99,28 +107,30 @@ namespace MatchMaker.Core.Facades
             }
         }
 
-        public async Task<bool> RefreshTokenAsync(string refreshToken)
+        public async Task<Result<AuthenticationDTO>> GenerateRefreshTokenAsync(string refreshToken)
         {
             try
             {
                 var user = await _tokenService.ValidateRefreshToken(refreshToken);
 
-                if (user == null)
-                {
-                    _logger.LogWarning("Invalid refresh token.");
-                    throw new UnauthorizedAccessException("Invalid refresh token.");
-                }
-                    
-                var newAccessToken = await _tokenService.GenerateAccessToken(user);
-                _logger.LogInformation("Successfully generated new access token for user-ID {userId}", user.Id);
+                if (user == null) throw new UnauthorizedAccessException("Invalid refresh token.");
 
-                return true;
+                var newAccessToken = await _tokenService.GenerateAccessToken(user);
+                var newRefreshToken = await _tokenService.GenerateRefreshToken(user);
+                _cookieFactory.CreateHttpOnlyCookie("refreshToken", newRefreshToken);
+
+                AuthenticationDTO token = new AuthenticationDTO()
+                {
+                    AccessToken = newAccessToken,
+                };
+
+                return Result<AuthenticationDTO>.Success(token, "User successfully reauthenticated.");
 
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error refreshing token.");
-                return false;
+                throw new ApplicationException("An unexpected error occurred trying to refresh token. Please try again later.");
             }
         }
 
