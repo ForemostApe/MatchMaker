@@ -3,6 +3,7 @@ using MapsterMapper;
 using MatchMaker.Core.Interfaces;
 using MatchMaker.Core.Services;
 using MatchMaker.Domain.DTOs;
+using MatchMaker.Domain.DTOs.Users;
 using MatchMaker.Domain.Entities;
 using Microsoft.Extensions.Logging;
 

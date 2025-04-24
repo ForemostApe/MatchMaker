@@ -1,4 +1,4 @@
-﻿namespace MatchMaker.Domain.DTOs;
+﻿namespace MatchMaker.Domain.DTOs.Authentication;
 
 public class LoginDTO
 {

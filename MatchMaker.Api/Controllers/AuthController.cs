@@ -1,5 +1,5 @@
 ﻿using MatchMaker.Core.Interfaces;
-using MatchMaker.Domain.DTOs;
+using MatchMaker.Domain.DTOs.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 

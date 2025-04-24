@@ -1,4 +1,5 @@
 ﻿using MatchMaker.Domain.DTOs;
+using MatchMaker.Domain.DTOs.Authentication;
 
 namespace MatchMaker.Core.Interfaces;
 public interface IAuthServiceFacade

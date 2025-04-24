@@ -1,4 +1,5 @@
 ﻿using MatchMaker.Domain.DTOs;
+using MatchMaker.Domain.DTOs.Users;
 using MatchMaker.Domain.Entities;
 
 namespace MatchMaker.Core.Interfaces;

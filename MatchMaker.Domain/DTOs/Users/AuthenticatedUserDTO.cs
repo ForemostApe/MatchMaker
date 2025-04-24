@@ -1,4 +1,4 @@
-﻿namespace MatchMaker.Domain.DTOs;
+﻿namespace MatchMaker.Domain.DTOs.Users;
 
 public class AuthenticatedUserDTO
 {
