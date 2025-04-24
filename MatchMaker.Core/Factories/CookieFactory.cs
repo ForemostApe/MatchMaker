@@ -16,7 +16,7 @@ public class CookieFactory(IHttpContextAccessor httpContextAccessor) : ICookieFa
             HttpOnly = true,
             Secure = true,
             SameSite = SameSiteMode.Strict,
-            Expires = DateTime.UtcNow.AddHours(24)
+            Expires = DateTime.UtcNow.AddHours(7)
         };
 
         response.Cookies.Append(tokenName, token, cookieOptions);

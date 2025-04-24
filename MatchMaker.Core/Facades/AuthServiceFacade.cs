@@ -1,17 +1,19 @@
-﻿using MatchMaker.Core.Interfaces;
+﻿using MapsterMapper;
+using MatchMaker.Core.Interfaces;
 using MatchMaker.Domain.DTOs;
 using Microsoft.Extensions.Logging;
 using System.Security.Claims;
 
 namespace MatchMaker.Core.Facades
 {
-    public class AuthServiceFacade(ILogger<AuthServiceFacade> logger, ICookieFactory cookieFactory, IUserService userService, ITokenService tokenService, ISessionManager sessionManager) : IAuthServiceFacade
+    public class AuthServiceFacade(ILogger<AuthServiceFacade> logger, ICookieFactory cookieFactory, IUserService userService, ITokenService tokenService, ISessionManager sessionManager, IMapper mapper) : IAuthServiceFacade
     {
         private readonly ILogger<AuthServiceFacade> _logger = logger;
         private readonly ICookieFactory _cookieFactory = cookieFactory;
         private readonly IUserService _userService = userService;
         private readonly ITokenService _tokenService = tokenService;
         private readonly ISessionManager _sessionManager = sessionManager;
+        private readonly IMapper _mapper = mapper;
 
         public async Task<Result<bool>> VerifyEmailAsync(string token)
         {
@@ -38,26 +40,26 @@ namespace MatchMaker.Core.Facades
                 }
 
                 var user = await _userService.GetUserByIdAsync(userId);
-                if (!user.IsSuccess || user.Data == null)
+                if (user == null)
                 {
                     return Result<bool>.Failure("User not found");
                 }
 
-                if (user.Data.Email.ToLower() != userEmail.ToLower())
+                if (user.Email.ToLower() != userEmail.ToLower())
                 {
                     return Result<bool>.Failure("Email does not match verification token");
                 }
 
-                if (user.Data.IsVerified)
+                if (user.IsVerified)
                 {
                     return Result<bool>.Success(true, "Email already verified");
                 }
 
-                user.Data.IsVerified = true;
+                user.IsVerified = true;
 
-                var updateResult = await _userService.VerifyEmailAsync(user.Data);
-               
-                return updateResult.IsSuccess ? Result<bool>.Success(true, "Email successfully verified") : Result<bool>.Failure("Failed to update verification status");
+                var updateResult = await _userService.VerifyEmailAsync(user);
+
+                return Result<bool>.Success(true, "Email successfully verified");
             }
             catch (Exception ex)
             {
@@ -73,24 +75,25 @@ namespace MatchMaker.Core.Facades
                 _logger.LogInformation("Attempting to login user with email {email}", loginDTO.Email);
 
                 var user = await _userService.GetUserByEmailAsync(loginDTO.Email);
-                if (user.Data == null || !BCrypt.Net.BCrypt.Verify(loginDTO.Password, user.Data.PasswordHash))
+                if (user == null || !BCrypt.Net.BCrypt.Verify(loginDTO.Password, user.PasswordHash))
                 {
                     _logger.LogError("Invalid email-address or password.");
 
                     return Result<AuthenticationDTO>.Failure("Invalid email-address or password.");
                 }
 
-                var accessToken = await _tokenService.GenerateAccessToken(user.Data!);
-                var refreshToken = await _tokenService.GenerateAccessToken(user.Data!);
+                var accessToken = await _tokenService.GenerateAccessToken(user);
+                var refreshToken = await _tokenService.GenerateRefreshToken(user);
                 _cookieFactory.CreateHttpOnlyCookie("refreshToken", refreshToken);
                 _logger.LogInformation("Token created: {token}", accessToken);
 
-                AuthenticationDTO token = new AuthenticationDTO()
+                AuthenticationDTO result = new AuthenticationDTO()
                 {
-                    AccessToken = accessToken
+                    AccessToken = accessToken,
+                    User = _mapper.Map<AuthenticatedUserDTO>(user)
                 };
 
-                return Result<AuthenticationDTO>.Success(token, "User successfully authenticated.");
+                return Result<AuthenticationDTO>.Success(result, "User successfully authenticated.");
             }
             catch (Exception ex)
             {
@@ -99,28 +102,31 @@ namespace MatchMaker.Core.Facades
             }
         }
 
-        public async Task<bool> RefreshTokenAsync(string refreshToken)
+        public async Task<Result<AuthenticationDTO>> GenerateRefreshTokenAsync(string refreshToken)
         {
             try
             {
                 var user = await _tokenService.ValidateRefreshToken(refreshToken);
 
-                if (user == null)
-                {
-                    _logger.LogWarning("Invalid refresh token.");
-                    throw new UnauthorizedAccessException("Invalid refresh token.");
-                }
-                    
-                var newAccessToken = await _tokenService.GenerateAccessToken(user);
-                _logger.LogInformation("Successfully generated new access token for user-ID {userId}", user.Id);
+                if (user == null) throw new UnauthorizedAccessException("Invalid refresh token.");
 
-                return true;
+                var newAccessToken = await _tokenService.GenerateAccessToken(user);
+                var newRefreshToken = await _tokenService.GenerateRefreshToken(user);
+                _cookieFactory.CreateHttpOnlyCookie("refreshToken", newRefreshToken);
+
+                AuthenticationDTO result = new AuthenticationDTO()
+                {
+                    AccessToken = newAccessToken,
+                    User = _mapper.Map<AuthenticatedUserDTO>(user)
+                };
+
+                return Result<AuthenticationDTO>.Success(result, "User successfully reauthenticated.");
 
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error refreshing token.");
-                return false;
+                throw new ApplicationException("An unexpected error occurred trying to refresh token. Please try again later.");
             }
         }
 

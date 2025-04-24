@@ -1,23 +1,41 @@
 import { createBrowserRouter, RouterProvider, Route } from 'react-router-dom'
 import Layout from './layout/layout'
 import HomePage from './pages/HomePage/HomePage';
-
 import './App.css'
 import LoginPage from './pages/LoginPage/LoginPage';
+import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
+import { AuthProvider, useAuth } from './context/AuthContext/AuthContext';
+
+const ProtectedRouteWrapper = ({ children }) => {
+  const { user } = useAuth();
+  return (
+    <ProtectedRoute isAllowed={!!user} redirectPath="/">
+      {children}
+    </ProtectedRoute>
+  );
+};
 
 const router = createBrowserRouter([
   {
     path: '/',
     element: <Layout />,
     children: [
-      { index: true, element: <LoginPage /> },
-      { path: 'home', element: <HomePage /> },
+        { index: true, element: <LoginPage /> },
+        { path: 'home', element: 
+          <ProtectedRouteWrapper>
+            <HomePage />
+          </ProtectedRouteWrapper> 
+        },
     ]
   }
 ]);
 
 function App() {
-  return <RouterProvider router={router} />
+  return (
+    <AuthProvider>
+      <RouterProvider router={router} />
+    </AuthProvider>
+  )
 }
 
 export default App

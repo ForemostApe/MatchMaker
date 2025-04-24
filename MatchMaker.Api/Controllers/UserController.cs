@@ -31,11 +31,11 @@ public class UserController(ILogger<UserController> logger, IUserServiceFacade u
             }
 
             var baseUrl = $"{Request.Scheme}://{Request.Host}";
-            var manualUri = $"{baseUrl}/api/User/{result.Data!.UserId}";
+            var manualUri = $"{baseUrl}/api/User/{result.Data!.Id}";
 
             if (manualUri == null)
             {
-                _logger.LogError("Failed to generate URI for user with ID: {UserId}", result.Data!.UserId);
+                _logger.LogError("Failed to generate URI for user with ID: {UserId}", result.Data!.Id);
                 return StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetails
                 {
                     Title = "Failed to generate URI",
@@ -44,9 +44,9 @@ public class UserController(ILogger<UserController> logger, IUserServiceFacade u
                 });
             }
 
-            _logger.LogInformation("User successfully created with user-Id: {UserId}", result.Data!.UserId);
+            _logger.LogInformation("User successfully created with user-Id: {UserId}", result.Data!.Id);
 
-            return Created(manualUri, result.Data.UserId);
+            return Created(manualUri, result.Data.Id);
         }
         catch (FileNotFoundException ex)
         {
@@ -157,7 +157,7 @@ public class UserController(ILogger<UserController> logger, IUserServiceFacade u
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "An unexpected error occured while trying to update user {UserId}.", updatedUser.UserId);
+            _logger.LogError(ex, "An unexpected error occured while trying to update user {UserId}.", updatedUser.Id);
             return StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetails
             {
                 Title = "An unexpected error occurred",

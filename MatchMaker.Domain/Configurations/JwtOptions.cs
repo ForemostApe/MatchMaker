@@ -9,9 +9,12 @@ public class JwtOptions(JwtSettings settings)
 {
     public string Issuer { get; } = settings.Issuer;
     public string Audience { get; } = settings.Audience;
+    public int VerificationTokenExpirationMinutes { get; } = settings.VerificationTokenExpirationMinutes;
     public int AccessTokenExpirationMinutes { get; } = settings.AccessTokenExpirationMinutes;
+    public int RefreshTokenExpirationDays { get; } = settings.RefreshTokenExpirationDays;
     public SymmetricSecurityKey SigningKey { get; } = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(settings.SigningKey));
     public SymmetricSecurityKey EncryptionKey { get; } = new SymmetricSecurityKey(Convert.FromBase64String(settings.EncryptionKey));
+    
 
     public TokenValidationParameters GetTokenValidationParameters(bool validateLifetime = true)
     {
