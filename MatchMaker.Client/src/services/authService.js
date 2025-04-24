@@ -1,5 +1,15 @@
 import api from './axiosConfig';
 
+const register = async (formData) => {
+  const response = await api.post("/User/", {
+    Password: formData.password,
+    Email: formData.email,
+    FirstName: formData.firstName,
+    LastName: formData.lastName
+  });
+  return response.data;
+}
+
 const login = async (credentials) => {
   const response = await api.post("/Auth/login", {
     Email: credentials.email,
@@ -24,6 +34,7 @@ const refresh = async () => {
 };
 
 export default {
+  register,
   login,
   logout,
   refresh,

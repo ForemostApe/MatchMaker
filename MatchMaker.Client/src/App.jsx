@@ -5,6 +5,7 @@ import './App.css'
 import LoginPage from './pages/LoginPage/LoginPage';
 import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
 import { AuthProvider, useAuth } from './context/AuthContext/AuthContext';
+import RegistrationPage from './pages/RegistrationPage/RegistrationPage';
 
 const ProtectedRouteWrapper = ({ children }) => {
   const { user } = useAuth();
@@ -21,6 +22,7 @@ const router = createBrowserRouter([
     element: <Layout />,
     children: [
         { index: true, element: <LoginPage /> },
+        { path: 'register', element: <RegistrationPage /> },
         { path: 'home', element: 
           <ProtectedRouteWrapper>
             <HomePage />
