@@ -79,8 +79,8 @@ public class UserServiceFacade(ILogger<UserServiceFacade> logger, IMapper mapper
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "An unexpected error occurred while trying to update user {userId}", userUpdate.UserId);
-            throw new ApplicationException($"An unexpected error occurred while trying to update user {userUpdate.UserId}", ex);
+            _logger.LogError(ex, "An unexpected error occurred while trying to update user {userId}", userUpdate.Id);
+            throw new ApplicationException($"An unexpected error occurred while trying to update user {userUpdate.Id}", ex);
         }
     }
 

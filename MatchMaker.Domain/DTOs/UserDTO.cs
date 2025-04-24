@@ -2,7 +2,7 @@
 
 public class UserDTO
 {
-    public string? UserId { get; set; }
+    public string? Id { get; set; }
     public string? PasswordHash { get; set; }
     public string? Email { get; set; }
     public string? FirstName { get; set; }
@@ -21,7 +21,7 @@ public class CreateUserDTO
 
 public class UpdateUserDTO
 {
-    public string UserId { get; set; } = null!;
+    public string Id { get; set; } = null!;
     public string? PasswordHash { get; set; }
     public string? Email { get; set; }
     public string? FirstName { get; set; }
