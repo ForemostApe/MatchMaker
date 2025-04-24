@@ -1,12 +1,18 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import LoginForm from "../../components/LoginForm/LoginForm";
 import { useAuth } from "../../context/AuthContext/AuthContext";
 
 const LoginPage = () => {
     const navigate = useNavigate();
-    const { login } = useAuth();
+    const { user, login } = useAuth();
     const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        if (user) {
+            navigate('/home');
+        }
+    }, [user, navigate]);
 
     const handleLogin = async (credentials) => {
         try {
@@ -20,6 +26,10 @@ const LoginPage = () => {
             setLoading(false);
         }
     };
+
+    if (user) {
+        return null;
+    }
 
     return (
         <div className="min-h-screen flex items-center justify-center">

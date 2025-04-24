@@ -22,7 +22,10 @@ const router = createBrowserRouter([
     path: '/',
     element: <Layout />,
     children: [
-        { index: true, element: <LoginPage /> },
+        { index: true, element: <LoginPage />, loader: async () => {
+            return null; 
+          } 
+        },
         { path: 'register', element: <RegistrationPage /> },
         { path: "/verify-email", element: <VerifyEmailPage />},
         { path: 'home', element: 
