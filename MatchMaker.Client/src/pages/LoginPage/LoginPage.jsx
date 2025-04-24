@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import LoginForm from "../../components/LoginForm/LoginForm";
 import { useAuth } from "../../context/AuthContext/AuthContext";
 
@@ -24,6 +24,12 @@ const LoginPage = () => {
     return (
         <div className="min-h-screen flex items-center justify-center">
             <LoginForm onSubmit={handleLogin} />
+            <div className="text-sm text-gray-600">
+                Don't have an account?{" "}
+                <Link to="/register" className="text-blue-600 hover:underline">
+                    Register here
+                </Link>
+            </div>
         </div>
     );
 };
