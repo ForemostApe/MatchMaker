@@ -1,6 +1,8 @@
 ﻿using MapsterMapper;
 using MatchMaker.Core.Interfaces;
 using MatchMaker.Domain.DTOs;
+using MatchMaker.Domain.DTOs.Authentication;
+using MatchMaker.Domain.DTOs.Users;
 using Microsoft.Extensions.Logging;
 using System.Security.Claims;
 
