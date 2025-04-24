@@ -11,7 +11,7 @@ public class LinkFactory(ILogger<LinkFactory> logger, string clientUrl) : ILinkF
     public string CreateVerificationLink(string token)
     {
         _logger.LogInformation("Creating verification-link for mail.");
-        return $"{_clientUrl}/api/Auth/verify-email?verificationToken={token}";
+        return $"{_clientUrl}/verify-email?verificationToken={token}";
     }
     public string CreateResetPasswordLink(string email)
     {
