@@ -6,6 +6,7 @@ import LoginPage from './pages/LoginPage/LoginPage';
 import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
 import { AuthProvider, useAuth } from './context/AuthContext/AuthContext';
 import RegistrationPage from './pages/RegistrationPage/RegistrationPage';
+import VerifyEmailPage from './pages/VerifyEmailPage/VerifyEmailPage';
 
 const ProtectedRouteWrapper = ({ children }) => {
   const { user } = useAuth();
@@ -23,6 +24,7 @@ const router = createBrowserRouter([
     children: [
         { index: true, element: <LoginPage /> },
         { path: 'register', element: <RegistrationPage /> },
+        { path: "/verify-email", element: <VerifyEmailPage />},
         { path: 'home', element: 
           <ProtectedRouteWrapper>
             <HomePage />
