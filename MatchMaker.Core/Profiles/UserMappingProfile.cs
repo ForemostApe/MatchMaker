@@ -29,6 +29,7 @@ public class UserMappingProfile : IRegister
             .Map(dest => dest.UserRole, src => src.UserRole)
             .IgnoreNonMapped(true);
 
+
         config.NewConfig<User, UserDTO>()
             .Map(dest => dest.Id, src => src.Id)
             .Map(dest => dest.Email, src => src.Email)
