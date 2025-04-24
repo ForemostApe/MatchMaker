@@ -112,7 +112,8 @@ namespace MatchMaker.Core.Services
                 {
                     throw new Exception();
                 }
-                return user.Data!;
+
+                return user;
             }
             catch (SecurityTokenException ex)
             {

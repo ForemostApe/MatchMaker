@@ -1,6 +1,5 @@
 ﻿using MatchMaker.Core.Interfaces;
 using MatchMaker.Data.Interfaces;
-using MatchMaker.Domain.DTOs;
 using MatchMaker.Domain.Entities;
 using Microsoft.Extensions.Logging;
 
@@ -12,7 +11,7 @@ public class UserService(ILogger<UserService> logger, IUserRepo userRepo, IAuthS
     private readonly IUserRepo _userRepo = userRepo;
     private readonly IAuthService _authService = authService;
 
-    public async Task<Result<User>> CreateUserAsync(User newUser)
+    public async Task<User?> CreateUserAsync(User newUser)
     {
         try
         {
@@ -22,14 +21,14 @@ public class UserService(ILogger<UserService> logger, IUserRepo userRepo, IAuthS
             if (existingUser != null)
             {
                 _logger.LogWarning("User already exists.");
-                return Result<User>.Failure("User already exists.");
+                return null;
             }
 
             newUser.PasswordHash = _authService.HashPassword(newUser.PasswordHash);
             
             await _userRepo.CreateUserAsync(newUser);
 
-            return Result<User>.Success(newUser);
+            return newUser;
         }
         catch (Exception ex)
         {
@@ -38,7 +37,7 @@ public class UserService(ILogger<UserService> logger, IUserRepo userRepo, IAuthS
         }
     }
 
-    public async Task<Result<User>> GetUserByEmailAsync(string email)
+    public async Task<User?> GetUserByEmailAsync(string email)
     {
         try
         {
@@ -48,10 +47,10 @@ public class UserService(ILogger<UserService> logger, IUserRepo userRepo, IAuthS
             if (user == null)
             {
                 _logger.LogWarning($"User with email {email} couldn't be found.");
-                return Result<User>.Failure($"User with email {email} couldn't be found.");
+                return null;
             }
-            
-            return Result<User>.Success(user, "User successfully found.");
+
+            return user;
         }
         catch (Exception ex)
         {
@@ -60,7 +59,7 @@ public class UserService(ILogger<UserService> logger, IUserRepo userRepo, IAuthS
         }
     }
 
-    public async Task<Result<User>> GetUserByIdAsync(string userId)
+    public async Task<User?> GetUserByIdAsync(string userId)
     {
         try
         {
@@ -70,10 +69,10 @@ public class UserService(ILogger<UserService> logger, IUserRepo userRepo, IAuthS
             if (user == null)
             {
                 _logger.LogWarning($"User with id {userId} couldn't be found.");
-                return Result<User>.Failure($"User with id {userId} couldn't be found.");
+                return null;
             }
 
-            return Result<User>.Success(user, "User successfully found.");
+            return user;
         }
         catch (Exception ex)
         {
@@ -82,33 +81,33 @@ public class UserService(ILogger<UserService> logger, IUserRepo userRepo, IAuthS
         }
     }
 
-    public async Task<Result<User>> UpdateUserAsync(User updatedUser)
+    public async Task<User?> UpdateUserAsync(User updatedUser)
     {
         ArgumentNullException.ThrowIfNull(updatedUser);
 
         await _userRepo.UpdateUserAsync(updatedUser);
 
-        return Result<User>.Success(updatedUser, "User succesfully updated.");
+        return updatedUser;
     }
      
 
-    public async Task<Result<User>> VerifyEmailAsync(User verifiedUser)
+    public async Task<User?> VerifyEmailAsync(User verifiedUser)
     {
         ArgumentNullException.ThrowIfNull(verifiedUser);
 
         await _userRepo.VerifyEmailAsync(verifiedUser);
 
-        return Result<User>.Success(verifiedUser, "Email successfully verified.");
+        return verifiedUser;
     }
 
-    public async Task<Result<bool>> DeleteUserAsync(string userId)
+    public async Task<bool> DeleteUserAsync(string userId)
     {
         try
         {
             ArgumentNullException.ThrowIfNull(userId);
 
             await _userRepo.DeleteUserAsync(userId);
-            return Result<bool>.Success(true);
+            return true;
         }
         catch (Exception ex)
         {

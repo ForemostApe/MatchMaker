@@ -21,12 +21,10 @@ public class UserServiceFacade(ILogger<UserServiceFacade> logger, IMapper mapper
         var user = _mapper.Map<User>(newUser);
         var result = await _userService.CreateUserAsync(user);
 
-        if (!result.IsSuccess) return Result<UserDTO>.Failure("User already exists.");
+        if (result == null) return Result<UserDTO>.Failure("User already exists.");
 
-        if (result.Data == null) throw new Exception("User creation was successful but result is null.");
-
-        string verificationToken = await _tokenService.GenerateVerificationToken(result.Data);
-        await _emailService.CreateEmailAsync(result.Data.Email, EmailService.EmailType.UserCreated, verificationToken);
+        string verificationToken = await _tokenService.GenerateVerificationToken(result);
+        await _emailService.CreateEmailAsync(result.Email, EmailService.EmailType.UserCreated, verificationToken);
 
         UserDTO createdUser = _mapper.Map<UserDTO>(user);
 
@@ -38,9 +36,9 @@ public class UserServiceFacade(ILogger<UserServiceFacade> logger, IMapper mapper
         try
         {
             var user = await _userService.GetUserByEmailAsync(email);
-            if (!user.IsSuccess) return Result<UserDTO>.Failure("Couldn't find user");
+            if (user == null) return Result<UserDTO>.Failure("Couldn't find user");
 
-            var existingUser = _mapper.Map<UserDTO>(user.Data!);
+            var existingUser = _mapper.Map<UserDTO>(user);
 
             return Result<UserDTO>.Success(existingUser, "User successfully found.");
         }
@@ -56,9 +54,9 @@ public class UserServiceFacade(ILogger<UserServiceFacade> logger, IMapper mapper
         try
         {
             var user = await _userService.GetUserByIdAsync(userId);
-            if (!user.IsSuccess) return Result<UserDTO>.Failure("Couldn't find user");
+            if (user == null) return Result<UserDTO>.Failure("Couldn't find user");
 
-            var existingUser = _mapper.Map<UserDTO>(user.Data!);
+            var existingUser = _mapper.Map<UserDTO>(user);
 
             return Result<UserDTO>.Success(existingUser, "User successfully found.");
         }
