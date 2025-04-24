@@ -71,6 +71,18 @@ public class UserServiceFacade(ILogger<UserServiceFacade> logger, IMapper mapper
     {
         try
         {
+            if (string.IsNullOrWhiteSpace(userUpdate.Email))
+            {
+                return Result<UserDTO>.Failure("Email must not be empty.");
+            }
+
+            var existingUser = await _userService.GetUserByEmailAsync(userUpdate.Email);
+
+            if (existingUser != null && !existingUser.Id.Equals(userUpdate.Id))
+            {
+                return Result<UserDTO>.Failure("Email already exists.");
+            }
+
             var user = _mapper.Map<User>(userUpdate);
             await _userService.UpdateUserAsync(user);
 

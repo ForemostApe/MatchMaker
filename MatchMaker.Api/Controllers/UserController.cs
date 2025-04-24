@@ -153,7 +153,6 @@ public class UserController(ILogger<UserController> logger, IUserServiceFacade u
             });
 
             return Ok(result.Data);
-
         }
         catch (Exception ex)
         {

@@ -85,6 +85,8 @@ public class UserService(ILogger<UserService> logger, IUserRepo userRepo, IAuthS
     {
         ArgumentNullException.ThrowIfNull(updatedUser);
 
+        updatedUser.PasswordHash = _authService.HashPassword(updatedUser.PasswordHash);
+
         await _userRepo.UpdateUserAsync(updatedUser);
 
         return updatedUser;
