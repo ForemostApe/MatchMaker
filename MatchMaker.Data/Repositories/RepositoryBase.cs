@@ -32,9 +32,10 @@ public class RepositoryBase<T>(ILogger<RepositoryBase<T>> logger, IMongoDatabase
             throw; 
         }
     }
-    public async Task InsertOneAsync(T document, CancellationToken cancellationToken = default)
+    public async Task<T> InsertOneAsync(T document, CancellationToken cancellationToken = default)
     {
         await HandleMongoOperationAsync(() => _collection.InsertOneAsync(document, cancellationToken: cancellationToken), $"An error occurred while inserting a document into the {_collection.CollectionNamespace.CollectionName} collection.");
+        return document;
     }
 
     public async Task<T> FindOneAsync(FilterDefinition<T> filter, CancellationToken cancellationToken = default)
@@ -42,9 +43,9 @@ public class RepositoryBase<T>(ILogger<RepositoryBase<T>> logger, IMongoDatabase
         return await HandleMongoOperationAsync(() => _collection.Find(filter).FirstOrDefaultAsync(cancellationToken), $"An unexpected error occured when trying to find a document in {_collection.CollectionNamespace.CollectionName}.");
     }
 
-    public async Task UpdateOneAsync(FilterDefinition<T> filter, UpdateDefinition<T> update, CancellationToken cancellationToken = default)
+    public async Task<UpdateResult> UpdateOneAsync(FilterDefinition<T> filter, UpdateDefinition<T> update, CancellationToken cancellationToken = default)
     {
-        await HandleMongoOperationAsync(() => _collection.UpdateOneAsync(filter, update, cancellationToken: cancellationToken), $"An error occurred while updating a document in the {_collection.CollectionNamespace.CollectionName} collection.");
+        return await HandleMongoOperationAsync(() => _collection.UpdateOneAsync(filter, update, cancellationToken: cancellationToken), $"An error occurred while updating a document in the {_collection.CollectionNamespace.CollectionName} collection.");
     }
 
     public async Task<DeleteResult> DeleteOneAsync(FilterDefinition<T> filter, CancellationToken cancellationToken = default)
