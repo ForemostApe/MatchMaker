@@ -50,7 +50,12 @@ public class TeamController(ILogger<TeamController> logger, ITeamServiceFacade t
     [HttpGet("id/{teamId}", Name = nameof(GetTeamByIdAsync))]
     public async Task<IActionResult> GetTeamByIdAsync(string teamId)
     {
-        if (string.IsNullOrEmpty(teamId)) return BadRequest("TeamId must be provided.");
+        if (string.IsNullOrEmpty(teamId)) return BadRequest(new ProblemDetails
+        {
+            Title = "Bad Request",
+            Detail = "TeamId must be provided.",
+            Status = StatusCodes.Status400BadRequest
+        });
 
         try
         {
@@ -84,7 +89,12 @@ public class TeamController(ILogger<TeamController> logger, ITeamServiceFacade t
     [HttpGet("name/{teamName}", Name = nameof(GetTeamByNameAsync))]
     public async Task<IActionResult> GetTeamByNameAsync(string teamName)
     {
-        if (string.IsNullOrEmpty(teamName)) return BadRequest("TeamId must be provided.");
+        if (string.IsNullOrEmpty(teamName)) return BadRequest(new ProblemDetails
+        {
+            Title = "Bad Request",
+            Detail = "TeamName must be provided.",
+            Status = StatusCodes.Status400BadRequest
+        });
 
         try
         {
@@ -105,6 +115,39 @@ public class TeamController(ILogger<TeamController> logger, ITeamServiceFacade t
         catch (Exception ex)
         {
             _logger.LogError(ex, $"An unexpected error occurred while trying to get team by name. {ex.Message}");
+            return StatusCode(500, new ProblemDetails
+            {
+                Title = "Internal Server Error",
+                Detail = "An unexpected error occured. Please try again later",
+                Status = StatusCodes.Status500InternalServerError
+            });
+        }
+    }
+
+    [HttpDelete(Name = nameof(DeleteTeamAsync))]
+    public async Task<IActionResult> DeleteTeamAsync([FromBody] DeleteTeamDTO deleteTeamDTO)
+    {
+        if (!ModelState.IsValid) return ValidationProblem(ModelState);
+
+        try
+        {
+            var result = await _teamServiceFacade.DeleteTeamAsync(deleteTeamDTO);
+
+            if (!result.IsSuccess)
+            {
+                return NotFound(new ProblemDetails
+                {
+                    Title = "Team not found",
+                    Detail = result.Message,
+                    Status = StatusCodes.Status404NotFound
+                });
+            }
+
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"An unexpected error occurred while trying to delete team. {ex.Message}");
             return StatusCode(500, new ProblemDetails
             {
                 Title = "Internal Server Error",

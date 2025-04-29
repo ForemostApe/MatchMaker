@@ -34,9 +34,9 @@ public class TeamRepo(ILogger<TeamRepo> logger, IMongoDatabase database) : Repos
         await UpdateOneAsync(filter, update);
     }
 
-    public async Task DeleteTeamAsync(string teamId)
+    public async Task<DeleteResult> DeleteTeamAsync(string teamId)
     {
         var filter = Builders<Team>.Filter.Eq(t => t.Id, teamId);
-        await DeleteOneAsync(filter);
+        return await DeleteOneAsync(filter);
     }
 }

@@ -47,8 +47,8 @@ public class RepositoryBase<T>(ILogger<RepositoryBase<T>> logger, IMongoDatabase
         await HandleMongoOperationAsync(() => _collection.UpdateOneAsync(filter, update, cancellationToken: cancellationToken), $"An error occurred while updating a document in the {_collection.CollectionNamespace.CollectionName} collection.");
     }
 
-    public async Task DeleteOneAsync(FilterDefinition<T> filter, CancellationToken cancellationToken = default)
+    public async Task<DeleteResult> DeleteOneAsync(FilterDefinition<T> filter, CancellationToken cancellationToken = default)
     {
-        await HandleMongoOperationAsync(() => _collection.DeleteOneAsync(filter, cancellationToken: cancellationToken), $"An error occurred while deleting a document from the {_collection.CollectionNamespace.CollectionName} collection.");
+        return await HandleMongoOperationAsync(() => _collection.DeleteOneAsync(filter, cancellationToken: cancellationToken), $"An error occurred while deleting a document from the {_collection.CollectionNamespace.CollectionName} collection.");
     }
 }

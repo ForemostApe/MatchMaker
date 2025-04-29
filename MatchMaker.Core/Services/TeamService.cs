@@ -63,4 +63,22 @@ public class TeamService(ITeamRepo teamRepo) : ITeamService
             throw;
         }
     }
+
+    public async Task<Result<Team>> DeleteTeamAsync(string teamId)
+    {
+        ArgumentException.ThrowIfNullOrEmpty(teamId);
+
+        try
+        {
+            var result = await _teamRepo.DeleteTeamAsync(teamId);
+
+            if (result.DeletedCount <= 0) return Result<Team>.Failure("Team not found.");
+
+            return Result<Team>.Success(null, "Team successfully deleted.");
+        }
+        catch
+        {
+            throw;
+        }
+    }
 }

@@ -8,4 +8,5 @@ public interface ITeamServiceFacade
     Task<Result<TeamDTO>> CreateTeamAsync(CreateTeamDTO newTeam);
     Task<Result<TeamDTO>> GetTeamByIdAsync(string teamId);
     Task<Result<TeamDTO>> GetTeamByNameAsync(string teamName);
+    Task<Result<TeamDTO>> DeleteTeamAsync(DeleteTeamDTO deleteTeamDTO);
 }

@@ -71,4 +71,25 @@ public class TeamServiceFacade(IMapper mapper, ITeamService teamService) : ITeam
             throw;
         }
     }
+
+    public async Task<Result<TeamDTO>> DeleteTeamAsync(DeleteTeamDTO deleteTeamDTO)
+    {
+        ArgumentNullException.ThrowIfNull(deleteTeamDTO);
+
+        try
+        {
+            var result = await _teamService.DeleteTeamAsync(deleteTeamDTO.TeamId);
+
+            if (!result.IsSuccess) return Result<TeamDTO>.Failure(result.Message);
+
+            TeamDTO teamDTO = _mapper.Map<TeamDTO>(result.Data!);
+
+            return Result<TeamDTO>.Success(teamDTO, result.Message);
+
+        }
+        catch
+        {
+            throw;
+        }
+    }
 }
