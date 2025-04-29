@@ -18,9 +18,9 @@ public class TeamService(ITeamRepo teamRepo) : ITeamService
 
             if (existingTeam != null) return Result<Team>.Failure("Team already exists.");
 
-            await _teamRepo.CreateTeamAsync(newTeam);
+            var result = await _teamRepo.CreateTeamAsync(newTeam);
 
-            return Result<Team>.Success(newTeam, "Team successfully created.");
+            return Result<Team>.Success(result, "Team successfully created.");
         }
         catch
         {

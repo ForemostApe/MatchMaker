@@ -5,7 +5,7 @@ namespace MatchMaker.Data.Interfaces;
 
 public interface ITeamRepo
 {
-    Task CreateTeamAsync(Team newTeam);
+    Task<Team> CreateTeamAsync(Team newTeam);
     Task<Team?> GetTeamByIdAsync(string teamId);
     Task<Team?> GetTeamByNameAsync(string teamName);
     Task UpdateTeamAsync(Team updatedTeam);

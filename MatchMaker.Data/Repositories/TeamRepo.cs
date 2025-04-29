@@ -7,9 +7,9 @@ namespace MatchMaker.Data.Repositories;
 
 public class TeamRepo(ILogger<TeamRepo> logger, IMongoDatabase database) : RepositoryBase<Team>(logger, database, "teams"), ITeamRepo
 {
-    public async Task CreateTeamAsync(Team newTeam)
+    public async Task<Team> CreateTeamAsync(Team newTeam)
     {
-        await InsertOneAsync(newTeam);
+        return await InsertOneAsync(newTeam);
     }
 
     public async Task<Team?> GetTeamByIdAsync(string teamId)
