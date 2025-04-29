@@ -1,0 +1,9 @@
+﻿using MatchMaker.Domain.DTOs;
+using MatchMaker.Domain.DTOs.Teams;
+
+namespace MatchMaker.Core.Interfaces;
+
+public interface ITeamServiceFacade
+{
+    Task<Result<TeamDTO>> CreateTeamAsync(CreateTeamDTO newTeam);
+}

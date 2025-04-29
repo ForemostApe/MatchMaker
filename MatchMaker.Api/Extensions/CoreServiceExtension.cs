@@ -44,10 +44,13 @@ public static class CoreServiceExtension
 
         services.AddScoped<ISessionManager, SessionManager>();
 
-
         services.AddTransient<IEmailService, EmailService>();
         services.AddSingleton<IEmailTemplateEngine, EmailTemplateEngine>();
         services.AddScoped<ILinkFactory>(_ => new LinkFactory(_.GetRequiredService<ILogger<LinkFactory>>(), clientUrl));
+
+        services.AddScoped<ITeamServiceFacade, TeamServiceFacade>();
+        services.AddScoped<ITeamService, TeamService>();
+        services.AddScoped<ITeamRepo, TeamRepo>();
 
         services.AddSingleton(config);
 

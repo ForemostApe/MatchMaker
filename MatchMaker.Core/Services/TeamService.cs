@@ -1,5 +1,6 @@
-﻿using MatchMaker.Data.Interfaces;
-using MatchMaker.Domain.DTOs.Teams;
+﻿using MatchMaker.Core.Interfaces;
+using MatchMaker.Data.Interfaces;
+using MatchMaker.Domain.DTOs;
 using MatchMaker.Domain.Entities;
 
 namespace MatchMaker.Core.Services;
@@ -7,14 +8,16 @@ namespace MatchMaker.Core.Services;
 public class TeamService(ITeamRepo teamRepo) : ITeamService
 {
     private readonly ITeamRepo _teamRepo = teamRepo;
-    public async Task<Team> CreateTeamAsync(Team newTeam)
+    public async Task<Result<Team>> CreateTeamAsync(Team newTeam)
     {
         ArgumentNullException.ThrowIfNull(newTeam);
 
         var existingTeam = await _teamRepo.GetTeamByNameAsync(newTeam.TeamName);
 
-        if (existingTeam == null) await _teamRepo.CreateTeamAsync(newTeam);
+        if (existingTeam != null) return Result<Team>.Failure("Team already exists.");
+
+        await _teamRepo.CreateTeamAsync(newTeam);
      
-        return newTeam;
+        return Result<Team>.Success(newTeam, "Team successfully created.");
     }
 }
