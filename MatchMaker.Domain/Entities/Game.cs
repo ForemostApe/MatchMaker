@@ -1,4 +1,4 @@
-﻿namespace MatchMaker.Domain.Entities;
+﻿    namespace MatchMaker.Domain.Entities;
 public enum GameStatus
 {
     Cancelled,

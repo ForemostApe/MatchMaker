@@ -2,5 +2,5 @@
 public class Team : SchemaBase<Team>
 { 
     public string TeamName { get; set; } = null!;
-    public List<User> TeamCoaches { get; set; } = new();
+    public string TeamLogo { get; set; } = null!; //Set URL to a default-placeholder
 }
