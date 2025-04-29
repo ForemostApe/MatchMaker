@@ -20,7 +20,7 @@ public class TeamRepo(ILogger<TeamRepo> logger, IMongoDatabase database) : Repos
 
     public async Task<Team?> GetTeamByNameAsync(string teamName)
     {
-        var filter = Builders<Team>.Filter.Eq(t => t.TeamName, teamName);
+        var filter = Builders<Team>.Filter.Regex(t => t.TeamName, new MongoDB.Bson.BsonRegularExpression($"^{teamName}$", "i"));
         return await FindOneAsync(filter);
     }
 

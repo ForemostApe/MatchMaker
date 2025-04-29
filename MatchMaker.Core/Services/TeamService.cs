@@ -45,4 +45,22 @@ public class TeamService(ITeamRepo teamRepo) : ITeamService
             throw;
         }
     }
+
+    public async Task<Result<Team>> GetTeamByNameAsync(string teamName)
+    {
+        ArgumentException.ThrowIfNullOrEmpty(teamName);
+
+        try
+        {
+            var existingTeam = await _teamRepo.GetTeamByNameAsync(teamName);
+
+            if (existingTeam == null) return Result<Team>.Failure("Coulnd't find the specified team.");
+
+            return Result<Team>.Success(existingTeam, "Team successfully found.");
+        }
+        catch
+        {
+            throw;
+        }
+    }
 }
