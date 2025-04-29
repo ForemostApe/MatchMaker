@@ -6,4 +6,6 @@ namespace MatchMaker.Core.Interfaces;
 public interface ITeamServiceFacade
 {
     Task<Result<TeamDTO>> CreateTeamAsync(CreateTeamDTO newTeam);
+
+    Task<Result<TeamDTO>> GetTeamByIdAsync(string teamId);
 }
