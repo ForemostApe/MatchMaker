@@ -46,7 +46,7 @@ public class TeamController(ILogger<TeamController> logger, ITeamServiceFacade t
         }
     }
 
-    [HttpGet("{teamId}", Name = "GetTeamByIdAsync")]
+    [HttpGet("{teamId}", Name = nameof(GetTeamByIdAsync))]
     public async Task<IActionResult> GetTeamByIdAsync(string teamId)
     {
         _logger.LogInformation($"{teamId}");
