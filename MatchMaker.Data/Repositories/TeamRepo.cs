@@ -17,6 +17,13 @@ public class TeamRepo(ILogger<TeamRepo> logger, IMongoDatabase database) : Repos
         var filter = Builders<Team>.Filter.Eq(t => t.Id, teamId);
         return await FindOneAsync(filter);
     }
+
+    public async Task<Team?> GetTeamByNameAsync(string teamName)
+    {
+        var filter = Builders<Team>.Filter.Eq(t => t.TeamName, teamName);
+        return await FindOneAsync(filter);
+    }
+
     public async Task UpdateTeamAsync(Team updatedTeam)
     {
         var filter = Builders<Team>.Filter.Eq(t => t.Id, updatedTeam.Id);
