@@ -1,4 +1,7 @@
-﻿namespace MatchMaker.Domain.Entities;
+﻿using MongoDB.Bson.Serialization.Attributes;
+using MongoDB.Bson;
+
+namespace MatchMaker.Domain.Entities;
 
 public enum UserRole
 {
@@ -6,7 +9,8 @@ public enum UserRole
     Coach,
     Referee,
     Functionary,
-    Guest
+    Guest,
+    Unspecified
 };
 
 public class User : SchemaBase<User>
@@ -16,6 +20,9 @@ public class User : SchemaBase<User>
     public string FirstName { get; set; } = null!;
     public string LastName { get; set; } = null!;
     public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
-    public UserRole UserRole { get; set; } = UserRole.Guest;
+    public UserRole UserRole { get; set; } = UserRole.Unspecified;
+    
+    [BsonRepresentation(BsonType.ObjectId)]
+    public string? TeamAffiliation { get; set; }
     public bool IsVerified { get; set; } = false;
 }
