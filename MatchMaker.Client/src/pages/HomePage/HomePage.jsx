@@ -33,10 +33,10 @@ const mockBookings = [
   {
     id: 3,
     date: "2025-05-01",
-    homeTeam: "Tigers",
-    awayTeam: "Lions",
+    homeTeam: "Salem Laserbadgers",
+    awayTeam: "Tungelsta Loverboys",
     time: "17:00",
-    place: "City Dome",
+    place: "Kungsängen Grillad Kyckling Arena",
   },
 ];
 

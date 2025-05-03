@@ -47,19 +47,19 @@ namespace MatchMaker.Core.Facades
                     return Result<bool>.Failure("User not found");
                 }
 
-                if (user.Email.ToLower() != userEmail.ToLower())
+                if (user.Data!.Email.ToLower() != userEmail.ToLower())
                 {
                     return Result<bool>.Failure("Email does not match verification token");
                 }
 
-                if (user.IsVerified)
+                if (user.Data!.IsVerified)
                 {
                     return Result<bool>.Success(true, "Email already verified");
                 }
 
-                user.IsVerified = true;
+                user.Data!.IsVerified = true;
 
-                var updateResult = await _userService.VerifyEmailAsync(user);
+                var updateResult = await _userService.VerifyEmailAsync(user.Data!);
 
                 return Result<bool>.Success(true, "Email successfully verified");
             }
@@ -77,15 +77,15 @@ namespace MatchMaker.Core.Facades
                 _logger.LogInformation("Attempting to login user with email {email}", loginDTO.Email);
 
                 var user = await _userService.GetUserByEmailAsync(loginDTO.Email);
-                if (user == null || !BCrypt.Net.BCrypt.Verify(loginDTO.Password, user.PasswordHash))
+                if (user == null || !BCrypt.Net.BCrypt.Verify(loginDTO.Password, user.Data!.PasswordHash))
                 {
                     _logger.LogError("Invalid email-address or password.");
 
                     return Result<AuthenticationDTO>.Failure("Invalid email-address or password.");
                 }
 
-                var accessToken = await _tokenService.GenerateAccessToken(user);
-                var refreshToken = await _tokenService.GenerateRefreshToken(user);
+                var accessToken = await _tokenService.GenerateAccessToken(user.Data!);
+                var refreshToken = await _tokenService.GenerateRefreshToken(user.Data);
                 _cookieFactory.CreateHttpOnlyCookie("refreshToken", refreshToken);
                 _logger.LogInformation("Token created: {token}", accessToken);
 

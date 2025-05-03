@@ -19,7 +19,8 @@ public class UserMappingProfile : IRegister
             .Map(dest => dest.Email, src => src.Email)
             .Map(dest => dest.FirstName, src => src.FirstName)
             .Map(dest => dest.LastName, src => src.LastName)
-            .Map(dest => dest.UserRole, src => src.UserRole);
+            .Map(dest => dest.UserRole, src => src.UserRole)
+            .IgnoreNullValues(true);
 
         config.NewConfig<User, UpdateUserDTO>()
             .Map(dest => dest.Id, src => src.Id)
@@ -27,7 +28,8 @@ public class UserMappingProfile : IRegister
             .Map(dest => dest.FirstName, src => src.FirstName)
             .Map(dest => dest.LastName, src => src.LastName)
             .Map(dest => dest.UserRole, src => src.UserRole)
-            .IgnoreNonMapped(true);
+            .IgnoreNonMapped(true)
+            .IgnoreNullValues(true);
 
 
         config.NewConfig<User, UserDTO>()
@@ -37,7 +39,8 @@ public class UserMappingProfile : IRegister
             .Map(dest => dest.LastName, src => src.LastName)
             .Map(dest => dest.CreatedDate, src => src.CreatedDate)
             .Map(dest => dest.UserRole, src => src.UserRole)
-            .IgnoreNonMapped(true);
+            .IgnoreNonMapped(true)
+            .IgnoreNullValues(true);
 
         config.NewConfig<User, AuthenticatedUserDTO>()
             .Map(dest => dest.Id, src => src.Id)
@@ -45,6 +48,7 @@ public class UserMappingProfile : IRegister
             .Map(dest => dest.FirstName, src => src.FirstName)
             .Map(dest => dest.LastName, src => src.LastName)
             .Map(dest => dest.UserRole, src => src.UserRole)
-            .IgnoreNonMapped(true);
+            .IgnoreNonMapped(true)
+            .IgnoreNullValues(true);
     }
 }
