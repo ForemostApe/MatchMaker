@@ -9,19 +9,40 @@ public class UserRepo(ILogger<UserRepo> logger, IMongoDatabase database) : Repos
 {
     public async Task CreateUserAsync(User newUser)
     {
-        await InsertOneAsync(newUser);
+        try
+        {
+            await InsertOneAsync(newUser);
+        }
+        catch
+        {
+            throw;
+        }
     }
 
     public async Task<User?> GetUserByEmailAsync(string email)
     {
-        var filter = Builders<User>.Filter.Eq(u => u.Email, email);
-        return await FindOneAsync(filter);
+        try
+        {
+            var filter = Builders<User>.Filter.Eq(u => u.Email, email);
+            return await FindOneAsync(filter);
+        }
+        catch
+        {
+            throw;
+        }
     }
 
     public async Task<User?> GetUserByIdAsync(string userId)
     {
-        var filter = Builders<User>.Filter.Eq(u => u.Id, userId);
-        return await FindOneAsync(filter);
+        try
+        {
+            var filter = Builders<User>.Filter.Eq(u => u.Id, userId);
+            return await FindOneAsync(filter);
+        }
+        catch
+        {
+            throw;
+        }
     }
 
     public async Task<UpdateResult> UpdateUserAsync(User updatedUser)
@@ -47,16 +68,30 @@ public class UserRepo(ILogger<UserRepo> logger, IMongoDatabase database) : Repos
 
     public async Task VerifyEmailAsync(User verifiedUser)
     {
-        var filter = Builders<User>.Filter.Eq(u => u.Id, verifiedUser.Id);
-        var update = Builders<User>.Update
-            .Set(u => u.IsVerified, verifiedUser.IsVerified);
+        try
+        {
+            var filter = Builders<User>.Filter.Eq(u => u.Id, verifiedUser.Id);
+            var update = Builders<User>.Update
+                .Set(u => u.IsVerified, verifiedUser.IsVerified);
 
-        await UpdateOneAsync(filter, update);
+            await UpdateOneAsync(filter, update);
+        }
+        catch
+        {
+            throw;
+        }
     }
 
-    public async Task DeleteUserAsync(string userId)
+    public async Task<DeleteResult> DeleteUserAsync(string userId)
     {
-        var filter = Builders<User>.Filter.Eq(u => u.Id, userId);
-        await DeleteOneAsync(filter);
+        try
+        {
+            var filter = Builders<User>.Filter.Eq(u => u.Id, userId);
+            return await DeleteOneAsync(filter);
+        }
+        catch
+        {
+            throw;
+        }
     }
 }
