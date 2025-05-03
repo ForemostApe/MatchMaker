@@ -1,5 +1,6 @@
 ﻿using MatchMaker.Core.Interfaces;
 using MatchMaker.Data.Interfaces;
+using MatchMaker.Domain.DTOs;
 using MatchMaker.Domain.Entities;
 using Microsoft.Extensions.Logging;
 
@@ -13,10 +14,10 @@ public class UserService(ILogger<UserService> logger, IUserRepo userRepo, IAuthS
 
     public async Task<User?> CreateUserAsync(User newUser)
     {
+        ArgumentNullException.ThrowIfNull(newUser);
+
         try
         {
-            ArgumentNullException.ThrowIfNull(newUser);
-
             var existingUser = await _userRepo.GetUserByEmailAsync(newUser.Email);
             if (existingUser != null)
             {
@@ -30,66 +31,67 @@ public class UserService(ILogger<UserService> logger, IUserRepo userRepo, IAuthS
 
             return newUser;
         }
-        catch (Exception ex)
+        catch
         {
-            _logger.LogError(ex, "An unexpected error occurred in the business-logic when creating new user {Email}.", newUser.Email);
-            throw new Exception($"An unexpected error occurred in the business-logic when creating new user {newUser.Email}.", ex);
+            throw;
         }
     }
 
-    public async Task<User?> GetUserByEmailAsync(string email)
+    public async Task<Result<User>> GetUserByEmailAsync(string email)
     {
+        ArgumentNullException.ThrowIfNull(email);
+
         try
         {
-            ArgumentNullException.ThrowIfNull(email);
-
             var user = await _userRepo.GetUserByEmailAsync(email);
             if (user == null)
             {
-                _logger.LogWarning($"User with email {email} couldn't be found.");
-                return null;
+                return Result<User>.Failure($"Couldn't find user with email-address {email}");
             }
 
-            return user;
+            return Result<User>.Success(user, "User successfully found.");
         }
-        catch (Exception ex)
+        catch
         {
-            _logger.LogError(ex, "An unexpected error occurred in the business-logic when trying to find user by email {Email}.", email);
-            throw new Exception($"An unexpected error occurred in the business-logic when trying to find user by email {email}.", ex);
+            throw;
         }
     }
 
-    public async Task<User?> GetUserByIdAsync(string userId)
+    public async Task<Result<User>> GetUserByIdAsync(string userId)
     {
+        ArgumentNullException.ThrowIfNull(userId);
+
         try
         {
-            ArgumentNullException.ThrowIfNull(userId);
-
             var user = await _userRepo.GetUserByIdAsync(userId);
-            if (user == null)
-            {
-                _logger.LogWarning($"User with id {userId} couldn't be found.");
-                return null;
-            }
+            if (user == null) return Result<User>.Failure("Failed to find user.");
 
-            return user;
+            return Result<User>.Success(user, "User successfully found.");
         }
-        catch (Exception ex)
+        catch
         {
-            _logger.LogError(ex, "An unexpected error occurred in the business-logic when trying to find user by Id {Id}.", userId);
-            throw new Exception($"An unexpected error occurred in the business-logic when trying to find user by Id {userId}.", ex);
+            throw;
         }
     }
 
-    public async Task<User?> UpdateUserAsync(User updatedUser)
+    public async Task<Result<User>> UpdateUserAsync(User updatedUser)
     {
         ArgumentNullException.ThrowIfNull(updatedUser);
 
-        updatedUser.PasswordHash = _authService.HashPassword(updatedUser.PasswordHash);
+        try
+        {
+            updatedUser.PasswordHash = _authService.HashPassword(updatedUser.PasswordHash);
 
-        await _userRepo.UpdateUserAsync(updatedUser);
+            var result = await _userRepo.UpdateUserAsync(updatedUser);
 
-        return updatedUser;
+            if (result.ModifiedCount <= 0) return Result<User>.Failure("An error occurred trying to update user.");
+
+            return Result<User>.Success(updatedUser, "User successully updated.");
+        }
+        catch 
+        {
+            throw;
+        }
     }
      
 
@@ -97,24 +99,33 @@ public class UserService(ILogger<UserService> logger, IUserRepo userRepo, IAuthS
     {
         ArgumentNullException.ThrowIfNull(verifiedUser);
 
-        await _userRepo.VerifyEmailAsync(verifiedUser);
-
-        return verifiedUser;
-    }
-
-    public async Task<bool> DeleteUserAsync(string userId)
-    {
         try
         {
-            ArgumentNullException.ThrowIfNull(userId);
+            await _userRepo.VerifyEmailAsync(verifiedUser);
 
-            await _userRepo.DeleteUserAsync(userId);
-            return true;
+            return verifiedUser;
         }
-        catch (Exception ex)
+        catch
         {
-            _logger.LogError(ex, "An unexpected error occurred in the business-logic when trying to delete user {Id}.", userId);
-            throw new Exception($"An unexpected error occurred in the business-logic when trying to delete user {userId}.", ex);
+            throw;
+        }
+    }
+
+    public async Task<Result<User>> DeleteUserAsync(string userId)
+    {
+        ArgumentNullException.ThrowIfNull(userId);
+
+        try
+        {
+            var result = await _userRepo.DeleteUserAsync(userId);
+
+            if (result.DeletedCount <= 0) return Result<User>.Failure($"Failed to delete user.");
+
+            return Result<User>.Success(null, "Successfully deleted user.");
+        }
+        catch
+        {
+            throw;
         }
     }
 }

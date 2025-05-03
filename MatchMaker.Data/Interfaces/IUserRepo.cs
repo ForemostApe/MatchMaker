@@ -1,4 +1,5 @@
 ﻿using MatchMaker.Domain.Entities;
+using MongoDB.Driver;
 
 namespace MatchMaker.Data.Interfaces
 {
@@ -7,8 +8,8 @@ namespace MatchMaker.Data.Interfaces
         Task CreateUserAsync(User newUser);
         Task<User?> GetUserByEmailAsync(string email);
         Task<User?> GetUserByIdAsync(string userId);
-        Task UpdateUserAsync(User updatedUser);
+        Task<UpdateResult> UpdateUserAsync(User updatedUser);
         Task VerifyEmailAsync(User verifiedUser);
-        Task DeleteUserAsync(string userId);
+        Task<DeleteResult> DeleteUserAsync(string userId);
     }
 }
