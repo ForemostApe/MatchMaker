@@ -1,4 +1,5 @@
-﻿using MapsterMapper;
+﻿using Mapster;
+using MapsterMapper;
 using MatchMaker.Core.Interfaces;
 using MatchMaker.Domain.DTOs;
 using MatchMaker.Domain.DTOs.Teams;
@@ -18,6 +19,7 @@ public class TeamServiceFacade(IMapper mapper, ITeamService teamService) : ITeam
         try
         {
             var team = _mapper.Map<Team>(newTeam);
+
             var result = await _teamService.CreateTeamAsync(team);
 
             if (!result.IsSuccess) return Result<TeamDTO>.Failure(result.Message);
@@ -63,6 +65,32 @@ public class TeamServiceFacade(IMapper mapper, ITeamService teamService) : ITeam
             if (!result.IsSuccess) return Result<TeamDTO>.Failure(result.Message);
 
             TeamDTO teamDTO = _mapper.Map<TeamDTO>(result.Data!);
+
+            return Result<TeamDTO>.Success(teamDTO, result.Message);
+        }
+        catch
+        {
+            throw;
+        }
+    }
+
+    public async Task<Result<TeamDTO>> UpdateTeamAsync(UpdateTeamDTO updatedTeam)
+    {
+        ArgumentNullException.ThrowIfNull(updatedTeam);
+
+        try
+        {
+            var existingTeam = await _teamService.GetTeamByIdAsync(updatedTeam.TeamId);
+
+            if (existingTeam == null) return Result<TeamDTO>.Failure("Coulnd't find the specified team.");
+
+            updatedTeam.Adapt(existingTeam.Data!);
+
+            var result = await _teamService.UpdateTeamAsync(existingTeam.Data!);
+
+            if (!result.IsSuccess) return Result<TeamDTO>.Failure(result.Message);
+
+            var teamDTO = result.Data!.Adapt<TeamDTO>();
 
             return Result<TeamDTO>.Success(teamDTO, result.Message);
         }

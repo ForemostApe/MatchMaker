@@ -124,6 +124,39 @@ public class TeamController(ILogger<TeamController> logger, ITeamServiceFacade t
         }
     }
 
+    [HttpPatch(Name = nameof(UpdateTeamAsync))]
+    public async Task<IActionResult> UpdateTeamAsync([FromBody] UpdateTeamDTO updatedTeam)
+    {
+        if (!ModelState.IsValid) return ValidationProblem(ModelState);
+
+        try
+        {
+            var result = await _teamServiceFacade.UpdateTeamAsync(updatedTeam);
+
+            if (!result.IsSuccess)
+            {
+                return NotFound(new ProblemDetails
+                {
+                    Title = "Team not found",
+                    Detail = result.Message,
+                    Status = StatusCodes.Status404NotFound
+                });
+            }
+
+            return Ok(result.Data!);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"An unexpected error occurred while trying to update team. {ex.Message}");
+            return StatusCode(500, new ProblemDetails
+            {
+                Title = "Internal Server Error",
+                Detail = "An unexpected error occured. Please try again later",
+                Status = StatusCodes.Status500InternalServerError
+            });
+        }
+    }
+
     [HttpDelete(Name = nameof(DeleteTeamAsync))]
     public async Task<IActionResult> DeleteTeamAsync([FromBody] DeleteTeamDTO deleteTeamDTO)
     {

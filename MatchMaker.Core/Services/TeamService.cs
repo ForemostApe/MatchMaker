@@ -64,6 +64,23 @@ public class TeamService(ITeamRepo teamRepo) : ITeamService
         }
     }
 
+    public async Task<Result<Team>> UpdateTeamAsync(Team updatedTeam)
+    {
+        ArgumentNullException.ThrowIfNull(updatedTeam);
+
+        try
+        {
+            var result = await _teamRepo.UpdateTeamAsync(updatedTeam);
+
+            return Result<Team>.Success(updatedTeam, "Team successfully updated.");
+
+        }
+        catch
+        {
+            throw;
+        }
+    }
+
     public async Task<Result<Team>> DeleteTeamAsync(string teamId)
     {
         ArgumentException.ThrowIfNullOrEmpty(teamId);
