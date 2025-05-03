@@ -72,6 +72,8 @@ public class TeamService(ITeamRepo teamRepo) : ITeamService
         {
             var result = await _teamRepo.UpdateTeamAsync(updatedTeam);
 
+            if (result.ModifiedCount <= 0) return Result<Team>.Failure("An error occurred trying to update team.");
+
             return Result<Team>.Success(updatedTeam, "Team successfully updated.");
 
         }

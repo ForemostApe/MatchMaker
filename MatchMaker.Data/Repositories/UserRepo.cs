@@ -24,19 +24,27 @@ public class UserRepo(ILogger<UserRepo> logger, IMongoDatabase database) : Repos
         return await FindOneAsync(filter);
     }
 
-    public async Task UpdateUserAsync(User updatedUser)
+    public async Task<UpdateResult> UpdateUserAsync(User updatedUser)
     {
-        var filter = Builders<User>.Filter.Eq(u => u.Id, updatedUser.Id);
-        var update = Builders<User>.Update
-            .Set(u => u.PasswordHash, updatedUser.PasswordHash)
-            .Set(u => u.Email, updatedUser.Email)
-            .Set(u => u.FirstName, updatedUser.FirstName)
-            .Set(u => u.LastName, updatedUser.LastName)
-            .Set(u => u.UserRole, updatedUser.UserRole)
-            .Set(u => u.IsVerified,  updatedUser.IsVerified);
+        try
+        {
+            var filter = Builders<User>.Filter.Eq(u => u.Id, updatedUser.Id);
+            var update = Builders<User>.Update
+                .Set(u => u.PasswordHash, updatedUser.PasswordHash)
+                .Set(u => u.Email, updatedUser.Email)
+                .Set(u => u.FirstName, updatedUser.FirstName)
+                .Set(u => u.LastName, updatedUser.LastName)
+                .Set(u => u.UserRole, updatedUser.UserRole)
+                .Set(u => u.IsVerified, updatedUser.IsVerified);
 
-        await UpdateOneAsync(filter, update);
+            return await UpdateOneAsync(filter, update);
+        }
+        catch
+        {
+            throw;
+        }
     }
+
     public async Task VerifyEmailAsync(User verifiedUser)
     {
         var filter = Builders<User>.Filter.Eq(u => u.Id, verifiedUser.Id);

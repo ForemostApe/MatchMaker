@@ -1,8 +1,10 @@
 ﻿using DnsClient.Internal;
+using Mapster;
 using MapsterMapper;
 using MatchMaker.Core.Interfaces;
 using MatchMaker.Core.Services;
 using MatchMaker.Domain.DTOs;
+using MatchMaker.Domain.DTOs.Teams;
 using MatchMaker.Domain.DTOs.Users;
 using MatchMaker.Domain.Entities;
 using Microsoft.Extensions.Logging;
@@ -55,7 +57,7 @@ public class UserServiceFacade(ILogger<UserServiceFacade> logger, IMapper mapper
         try
         {
             var user = await _userService.GetUserByIdAsync(userId);
-            if (user == null) return Result<UserDTO>.Failure("Couldn't find user");
+            if (user == null) return Result<UserDTO>.Failure("User couldn't be found.");
 
             var existingUser = _mapper.Map<UserDTO>(user);
 
@@ -69,31 +71,32 @@ public class UserServiceFacade(ILogger<UserServiceFacade> logger, IMapper mapper
     }
     public async Task<Result<UserDTO>> UpdateUserAsync(UpdateUserDTO userUpdate)
     {
+        ArgumentNullException.ThrowIfNull(userUpdate);      
+
         try
         {
-            if (string.IsNullOrWhiteSpace(userUpdate.Email))
-            {
-                return Result<UserDTO>.Failure("Email must not be empty.");
-            }
-
             var existingUser = await _userService.GetUserByEmailAsync(userUpdate.Email);
 
-            if (existingUser != null && !existingUser.Id.Equals(userUpdate.Id))
+            if (existingUser == null) return Result<UserDTO>.Failure("User couldn't be found.");
+
+            if (existingUser.Data != null && !existingUser.Data!.Id.Equals(userUpdate.Id))
             {
                 return Result<UserDTO>.Failure("Email already exists.");
-            }
+            }            
 
-            var user = _mapper.Map<User>(userUpdate);
-            await _userService.UpdateUserAsync(user);
+            userUpdate.Adapt(existingUser.Data);
+            
+            var result = await _userService.UpdateUserAsync(existingUser.Data!);
 
-            var updatedUser = _mapper.Map<UserDTO>(user);
+            if (!result.IsSuccess) return Result<UserDTO>.Failure(result.Message);
+
+            var updatedUser = result.Data!.Adapt<UserDTO>();
 
             return Result<UserDTO>.Success(updatedUser, "User successfully updated.");
         }
-        catch (Exception ex)
+        catch
         {
-            _logger.LogError(ex, "An unexpected error occurred while trying to update user {userId}", userUpdate.Id);
-            throw new ApplicationException($"An unexpected error occurred while trying to update user {userUpdate.Id}", ex);
+            throw;
         }
     }
 

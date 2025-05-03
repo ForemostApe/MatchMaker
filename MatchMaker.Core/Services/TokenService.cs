@@ -108,12 +108,12 @@ namespace MatchMaker.Core.Services
                 }
 
                 var user = await _userService.GetUserByIdAsync(userIdClaim.Value);
-                if (user == null)
+                if (user.Data == null)
                 {
                     throw new Exception();
                 }
 
-                return user;
+                return user.Data;
             }
             catch (SecurityTokenException ex)
             {
@@ -123,7 +123,7 @@ namespace MatchMaker.Core.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An unexpected error occured when trying to validate refresh-token.");
-                throw new Exception("An unexpected error occured when trying to validate refresh-token.", ex);
+                throw;
             }
         }
 
