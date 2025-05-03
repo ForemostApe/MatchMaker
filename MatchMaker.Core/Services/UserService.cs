@@ -14,10 +14,10 @@ public class UserService(ILogger<UserService> logger, IUserRepo userRepo, IAuthS
 
     public async Task<User?> CreateUserAsync(User newUser)
     {
+        ArgumentNullException.ThrowIfNull(newUser);
+
         try
         {
-            ArgumentNullException.ThrowIfNull(newUser);
-
             var existingUser = await _userRepo.GetUserByEmailAsync(newUser.Email);
             if (existingUser != null)
             {
@@ -31,10 +31,9 @@ public class UserService(ILogger<UserService> logger, IUserRepo userRepo, IAuthS
 
             return newUser;
         }
-        catch (Exception ex)
+        catch
         {
-            _logger.LogError(ex, "An unexpected error occurred in the business-logic when creating new user {Email}.", newUser.Email);
-            throw new Exception($"An unexpected error occurred in the business-logic when creating new user {newUser.Email}.", ex);
+            throw;
         }
     }
 
@@ -100,24 +99,33 @@ public class UserService(ILogger<UserService> logger, IUserRepo userRepo, IAuthS
     {
         ArgumentNullException.ThrowIfNull(verifiedUser);
 
-        await _userRepo.VerifyEmailAsync(verifiedUser);
-
-        return verifiedUser;
-    }
-
-    public async Task<bool> DeleteUserAsync(string userId)
-    {
         try
         {
-            ArgumentNullException.ThrowIfNull(userId);
+            await _userRepo.VerifyEmailAsync(verifiedUser);
 
-            await _userRepo.DeleteUserAsync(userId);
-            return true;
+            return verifiedUser;
         }
-        catch (Exception ex)
+        catch
         {
-            _logger.LogError(ex, "An unexpected error occurred in the business-logic when trying to delete user {Id}.", userId);
-            throw new Exception($"An unexpected error occurred in the business-logic when trying to delete user {userId}.", ex);
+            throw;
+        }
+    }
+
+    public async Task<Result<User>> DeleteUserAsync(string userId)
+    {
+        ArgumentNullException.ThrowIfNull(userId);
+
+        try
+        {
+            var result = await _userRepo.DeleteUserAsync(userId);
+
+            if (result.DeletedCount <= 0) return Result<User>.Failure($"Failed to delete user.");
+
+            return Result<User>.Success(null, "Successfully deleted user.");
+        }
+        catch
+        {
+            throw;
         }
     }
 }

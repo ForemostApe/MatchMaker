@@ -100,17 +100,23 @@ public class UserServiceFacade(ILogger<UserServiceFacade> logger, IMapper mapper
         }
     }
 
-    public async Task<Result<bool>> DeleteUserAsync(string userId)
+    public async Task<Result<UserDTO>> DeleteUserAsync(string userId)
     {
+        ArgumentException.ThrowIfNullOrEmpty(userId);
+
         try
         {
-            await _userService.DeleteUserAsync(userId);
-            return Result<bool>.Success(true, "user successfully deleted.");
+            var result = await _userService.DeleteUserAsync(userId);
+
+            if (!result.IsSuccess) return Result<UserDTO>.Failure(result.Message);
+
+            var userDTO = _mapper.Map<UserDTO>(result.Data!);
+
+            return Result<UserDTO>.Success(userDTO, result.Message);
         }
-        catch (Exception ex)
+        catch
         {
-            _logger.LogError(ex, "An unexpected error occurred while trying to delete user with id {userId}", userId);
-            throw new ApplicationException($"An unexpected error occurred while trying to delete user with id {userId}", ex);
+            throw;
         }
     }
 }

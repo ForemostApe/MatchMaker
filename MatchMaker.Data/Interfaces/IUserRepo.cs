@@ -10,6 +10,6 @@ namespace MatchMaker.Data.Interfaces
         Task<User?> GetUserByIdAsync(string userId);
         Task<UpdateResult> UpdateUserAsync(User updatedUser);
         Task VerifyEmailAsync(User verifiedUser);
-        Task DeleteUserAsync(string userId);
+        Task<DeleteResult> DeleteUserAsync(string userId);
     }
 }
