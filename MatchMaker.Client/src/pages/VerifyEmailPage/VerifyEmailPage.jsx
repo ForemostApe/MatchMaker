@@ -30,9 +30,9 @@ const VerifyEmailPage = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center">
-      {status === "loading" && <p>Verifying your email...</p>}
-      {status === "success" && <p className="text-green-600">Your email has been verified! You can now log in.</p>}
-      {status === "error" && <p className="text-red-600">Verification failed. The link may be invalid or expired.</p>}
+      {status === "loading" && <p>Verifierar email-adress.</p>}
+      {status === "success" && <p className="text-green-600">Din email-adress är verifierad, du kan nu logga in..</p>}
+      {status === "error" && <p className="text-red-600">Din email-adress kunde inte verifieras. Verifikationslänken är felaktig eller ogiltig.</p>}
     </div>
   );
 };
