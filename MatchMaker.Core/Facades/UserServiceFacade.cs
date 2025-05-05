@@ -1,10 +1,8 @@
-﻿using DnsClient.Internal;
-using Mapster;
+﻿using Mapster;
 using MapsterMapper;
 using MatchMaker.Core.Interfaces;
 using MatchMaker.Core.Services;
 using MatchMaker.Domain.DTOs;
-using MatchMaker.Domain.DTOs.Teams;
 using MatchMaker.Domain.DTOs.Users;
 using MatchMaker.Domain.Entities;
 using Microsoft.Extensions.Logging;
@@ -21,52 +19,63 @@ public class UserServiceFacade(ILogger<UserServiceFacade> logger, IMapper mapper
 
     public async Task<Result<UserDTO>> CreateUserAsync(CreateUserDTO newUser)
     {
-        var user = _mapper.Map<User>(newUser);
-        var result = await _userService.CreateUserAsync(user);
+        ArgumentNullException.ThrowIfNull(newUser);
 
-        if (result == null) return Result<UserDTO>.Failure("User already exists.");
+        try
+        {
+            var user = _mapper.Map<User>(newUser);
+            var result = await _userService.CreateUserAsync(user);
 
-        string verificationToken = await _tokenService.GenerateVerificationToken(result);
-        await _emailService.CreateEmailAsync(result.Email, EmailService.EmailType.UserCreated, verificationToken);
+            if (!result.IsSuccess) return Result<UserDTO>.Failure(result.Message);
 
-        UserDTO createdUser = _mapper.Map<UserDTO>(user);
+            string verificationToken = await _tokenService.GenerateVerificationToken(result.Data!);
+            await _emailService.CreateEmailAsync(result.Data!.Email, EmailService.EmailType.UserCreated, verificationToken);
 
-        return Result<UserDTO>.Success(createdUser, "User successfully created.");
+            UserDTO createdUser = _mapper.Map<UserDTO>(user);
+
+            return Result<UserDTO>.Success(createdUser, result.Message);
+        }
+        catch
+        {
+            throw;
+        }
     }
 
     public async Task<Result<UserDTO>> GetUserByEmailAsync(string email)
     {
+        ArgumentException.ThrowIfNullOrEmpty(email);
+
         try
         {
             var user = await _userService.GetUserByEmailAsync(email);
-            if (user == null) return Result<UserDTO>.Failure("Couldn't find user");
+            if (!user.IsSuccess) return Result<UserDTO>.Failure(user.Message);
 
             var existingUser = _mapper.Map<UserDTO>(user);
 
-            return Result<UserDTO>.Success(existingUser, "User successfully found.");
+            return Result<UserDTO>.Success(existingUser, user.Message);
         }
-        catch (Exception ex)
+        catch
         {
-            _logger.LogError(ex, "An unexpected error occurred while trying to get user with email-address {Email}", email);
-            throw new ApplicationException($"An unexpected error occurred while trying to get user with email-address {email}", ex);
+            throw;
         }
     }
 
     public async Task<Result<UserDTO>> GetUserByIdAsync(string userId)
     {
+        ArgumentException.ThrowIfNullOrEmpty(userId);
+
         try
         {
             var user = await _userService.GetUserByIdAsync(userId);
-            if (user == null) return Result<UserDTO>.Failure("User couldn't be found.");
+            if (!user.IsSuccess) return Result<UserDTO>.Failure(user.Message);
 
             var existingUser = _mapper.Map<UserDTO>(user);
 
-            return Result<UserDTO>.Success(existingUser, "User successfully found.");
+            return Result<UserDTO>.Success(existingUser, user.Message);
         }
-        catch (Exception ex)
+        catch
         {
-            _logger.LogError(ex, "An unexpected error occurred while trying to get user {UserId}", userId);
-            throw new ApplicationException($"An unexpected error occurred while trying to get user with user-id {userId}", ex);
+            throw;
         }
     }
     public async Task<Result<UserDTO>> UpdateUserAsync(UpdateUserDTO userUpdate)
@@ -77,7 +86,7 @@ public class UserServiceFacade(ILogger<UserServiceFacade> logger, IMapper mapper
         {
             var existingUser = await _userService.GetUserByEmailAsync(userUpdate.Email);
 
-            if (existingUser == null) return Result<UserDTO>.Failure("User couldn't be found.");
+            if (!existingUser.IsSuccess) return Result<UserDTO>.Failure(existingUser.Message);
 
             if (existingUser.Data != null && !existingUser.Data!.Id.Equals(userUpdate.Id))
             {
@@ -92,7 +101,7 @@ public class UserServiceFacade(ILogger<UserServiceFacade> logger, IMapper mapper
 
             var updatedUser = result.Data!.Adapt<UserDTO>();
 
-            return Result<UserDTO>.Success(updatedUser, "User successfully updated.");
+            return Result<UserDTO>.Success(updatedUser, result.Message);
         }
         catch
         {

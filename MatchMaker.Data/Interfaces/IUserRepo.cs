@@ -5,11 +5,11 @@ namespace MatchMaker.Data.Interfaces
 {
     public interface IUserRepo
     {
-        Task CreateUserAsync(User newUser);
+        Task<User> CreateUserAsync(User newUser);
         Task<User?> GetUserByEmailAsync(string email);
         Task<User?> GetUserByIdAsync(string userId);
         Task<UpdateResult> UpdateUserAsync(User updatedUser);
-        Task VerifyEmailAsync(User verifiedUser);
+        Task<UpdateResult> VerifyEmailAsync(User verifiedUser);
         Task<DeleteResult> DeleteUserAsync(string userId);
     }
 }
