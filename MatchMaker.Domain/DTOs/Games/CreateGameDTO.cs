@@ -1,21 +1,16 @@
-﻿    namespace MatchMaker.Domain.Entities;
-public enum GameStatus
-{
-    Cancelled,
-    Planned,
-    Booked,
-    Completed,  
-}
+﻿using MatchMaker.Domain.Entities;
 
-public class Game : SchemaBase<Game>
+namespace MatchMaker.Domain.DTOs.Games;
+
+public class CreateGameDTO
 {
     public DateTime StartTime { get; set; }
     public DateTime EndTime { get; set; }
     public string GameType { get; set; } = null!;
     public string Location { get; set; } = null!;
-    public GameStatus GameStatus { get; set; } = GameStatus.Planned;
+    public GameStatus GameStatus { get; set; }
     public int HomeTeamId { get; set; }
     public int AwayTeamId { get; set; }
-    public string RefereeId { get; set; } = null!;
+    public string? RefereeId { get; set; }
     public Conditions Conditions { get; set; } = null!;
 }

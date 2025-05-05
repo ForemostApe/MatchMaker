@@ -31,9 +31,7 @@ public class TeamController(ILogger<TeamController> logger, ITeamServiceFacade t
                 });
             }
 
-            var test = CreatedAtRoute(nameof(GetTeamByIdAsync), new { teamId = result.Data!.Id }, result.Data);
-
-            return test;
+            return CreatedAtRoute(nameof(GetTeamByIdAsync), new { teamId = result.Data!.Id }, result.Data);
         }
         catch (Exception ex)
         {
