@@ -15,6 +15,7 @@ public class GameService(IGameRepo gameRepo) : IGameService
         try
         {
             var result = await _gameRepo.CreateGameAsync(newGame);
+
             if (result == null) return Result<Game>.Failure("Couldn't create game.");
 
             return Result<Game>.Success(result, "Game successfully created.");

@@ -11,6 +11,6 @@ public class CreateGameDTO
     public GameStatus GameStatus { get; set; }
     public int HomeTeamId { get; set; }
     public int AwayTeamId { get; set; }
-    public string? RefereeId { get; set; }
+    public string? RefereeId { get; set; } = null!;
     public Conditions Conditions { get; set; } = null!;
 }
