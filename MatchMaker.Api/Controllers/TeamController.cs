@@ -1,6 +1,7 @@
 ﻿using MatchMaker.Core.Interfaces;
 using MatchMaker.Domain.DTOs.Teams;
 using MatchMaker.Domain.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MatchMaker.Api.Controllers;
