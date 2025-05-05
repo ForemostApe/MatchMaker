@@ -15,7 +15,6 @@ public class TeamService(ITeamRepo teamRepo) : ITeamService
         try
         {
             var existingTeam = await _teamRepo.GetTeamByNameAsync(newTeam.TeamName);
-
             if (existingTeam != null) return Result<Team>.Failure("Team already exists.");
 
             var result = await _teamRepo.CreateTeamAsync(newTeam);
@@ -35,7 +34,6 @@ public class TeamService(ITeamRepo teamRepo) : ITeamService
         try
         {
             var existingTeam = await _teamRepo.GetTeamByIdAsync(teamId);
-
             if (existingTeam == null) return Result<Team>.Failure("Coulnd't find the specified team.");
 
             return Result<Team>.Success(existingTeam, "Team successfully found.");
@@ -53,7 +51,6 @@ public class TeamService(ITeamRepo teamRepo) : ITeamService
         try
         {
             var existingTeam = await _teamRepo.GetTeamByNameAsync(teamName);
-
             if (existingTeam == null) return Result<Team>.Failure("Coulnd't find the specified team.");
 
             return Result<Team>.Success(existingTeam, "Team successfully found.");
@@ -71,7 +68,6 @@ public class TeamService(ITeamRepo teamRepo) : ITeamService
         try
         {
             var result = await _teamRepo.UpdateTeamAsync(updatedTeam);
-
             if (result.ModifiedCount <= 0) return Result<Team>.Failure("An error occurred trying to update team.");
 
             return Result<Team>.Success(updatedTeam, "Team successfully updated.");
@@ -90,7 +86,6 @@ public class TeamService(ITeamRepo teamRepo) : ITeamService
         try
         {
             var result = await _teamRepo.DeleteTeamAsync(teamId);
-
             if (result.DeletedCount <= 0) return Result<Team>.Failure("Team not found.");
 
             return Result<Team>.Success(null, "Team successfully deleted.");

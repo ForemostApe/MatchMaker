@@ -12,24 +12,20 @@ public class UserService(ILogger<UserService> logger, IUserRepo userRepo, IAuthS
     private readonly IUserRepo _userRepo = userRepo;
     private readonly IAuthService _authService = authService;
 
-    public async Task<User?> CreateUserAsync(User newUser)
+    public async Task<Result<User>> CreateUserAsync(User newUser)
     {
         ArgumentNullException.ThrowIfNull(newUser);
 
         try
         {
             var existingUser = await _userRepo.GetUserByEmailAsync(newUser.Email);
-            if (existingUser != null)
-            {
-                _logger.LogWarning("User already exists.");
-                return null;
-            }
+            if (existingUser != null) return Result<User>.Failure("User already exists.");
 
             newUser.PasswordHash = _authService.HashPassword(newUser.PasswordHash);
             
-            await _userRepo.CreateUserAsync(newUser);
+            var result = await _userRepo.CreateUserAsync(newUser);
 
-            return newUser;
+            return Result<User>.Success(result, "User successfully created");
         }
         catch
         {
@@ -44,10 +40,7 @@ public class UserService(ILogger<UserService> logger, IUserRepo userRepo, IAuthS
         try
         {
             var user = await _userRepo.GetUserByEmailAsync(email);
-            if (user == null)
-            {
-                return Result<User>.Failure($"Couldn't find user with email-address {email}");
-            }
+            if (user == null) return Result<User>.Failure($"Couldn't find user with email-address {email}");
 
             return Result<User>.Success(user, "User successfully found.");
         }
@@ -95,15 +88,16 @@ public class UserService(ILogger<UserService> logger, IUserRepo userRepo, IAuthS
     }
      
 
-    public async Task<User?> VerifyEmailAsync(User verifiedUser)
+    public async Task<Result<User>> VerifyEmailAsync(User verifiedUser)
     {
         ArgumentNullException.ThrowIfNull(verifiedUser);
 
         try
         {
-            await _userRepo.VerifyEmailAsync(verifiedUser);
+            var result = await _userRepo.VerifyEmailAsync(verifiedUser);
+            if (result.ModifiedCount <= 0) return Result<User>.Failure("Failed to verify email-address.");
 
-            return verifiedUser;
+            return Result<User>.Success(verifiedUser, "Email-address successfully verified.");
         }
         catch
         {
@@ -119,7 +113,7 @@ public class UserService(ILogger<UserService> logger, IUserRepo userRepo, IAuthS
         {
             var result = await _userRepo.DeleteUserAsync(userId);
 
-            if (result.DeletedCount <= 0) return Result<User>.Failure($"Failed to delete user.");
+            if (result.DeletedCount <= 0) return Result<User>.Failure("Failed to delete user.");
 
             return Result<User>.Success(null, "Successfully deleted user.");
         }

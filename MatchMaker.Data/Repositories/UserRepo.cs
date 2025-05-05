@@ -7,24 +7,11 @@ namespace MatchMaker.Data.Repositories;
 
 public class UserRepo(ILogger<UserRepo> logger, IMongoDatabase database) : RepositoryBase<User>(logger, database, "users"), IUserRepo
 {
-    public async Task CreateUserAsync(User newUser)
+    public async Task<User> CreateUserAsync(User newUser)
     {
         try
         {
-            await InsertOneAsync(newUser);
-        }
-        catch
-        {
-            throw;
-        }
-    }
-
-    public async Task<User?> GetUserByEmailAsync(string email)
-    {
-        try
-        {
-            var filter = Builders<User>.Filter.Eq(u => u.Email, email);
-            return await FindOneAsync(filter);
+            return await InsertOneAsync(newUser);
         }
         catch
         {
@@ -37,6 +24,19 @@ public class UserRepo(ILogger<UserRepo> logger, IMongoDatabase database) : Repos
         try
         {
             var filter = Builders<User>.Filter.Eq(u => u.Id, userId);
+            return await FindOneAsync(filter);
+        }
+        catch
+        {
+            throw;
+        }
+    }
+
+    public async Task<User?> GetUserByEmailAsync(string email)
+    {
+        try
+        {
+            var filter = Builders<User>.Filter.Regex(u => u.Email, new MongoDB.Bson.BsonRegularExpression($"^{email}$", "i"));
             return await FindOneAsync(filter);
         }
         catch
@@ -66,7 +66,7 @@ public class UserRepo(ILogger<UserRepo> logger, IMongoDatabase database) : Repos
         }
     }
 
-    public async Task VerifyEmailAsync(User verifiedUser)
+    public async Task<UpdateResult> VerifyEmailAsync(User verifiedUser)
     {
         try
         {
@@ -74,7 +74,7 @@ public class UserRepo(ILogger<UserRepo> logger, IMongoDatabase database) : Repos
             var update = Builders<User>.Update
                 .Set(u => u.IsVerified, verifiedUser.IsVerified);
 
-            await UpdateOneAsync(filter, update);
+            return await UpdateOneAsync(filter, update);
         }
         catch
         {

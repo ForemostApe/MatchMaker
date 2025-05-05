@@ -42,9 +42,9 @@ namespace MatchMaker.Core.Facades
                 }
 
                 var user = await _userService.GetUserByIdAsync(userId);
-                if (user == null)
+                if (!user.IsSuccess)
                 {
-                    return Result<bool>.Failure("User not found");
+                    return Result<bool>.Failure(user.Message);
                 }
 
                 if (user.Data!.Email.ToLower() != userEmail.ToLower())
