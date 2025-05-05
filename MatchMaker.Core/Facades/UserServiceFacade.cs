@@ -50,7 +50,7 @@ public class UserServiceFacade(ILogger<UserServiceFacade> logger, IMapper mapper
             var user = await _userService.GetUserByEmailAsync(email);
             if (!user.IsSuccess) return Result<UserDTO>.Failure(user.Message);
 
-            var existingUser = _mapper.Map<UserDTO>(user);
+            var existingUser = _mapper.Map<UserDTO>(user.Data!);
 
             return Result<UserDTO>.Success(existingUser, user.Message);
         }
@@ -69,7 +69,7 @@ public class UserServiceFacade(ILogger<UserServiceFacade> logger, IMapper mapper
             var user = await _userService.GetUserByIdAsync(userId);
             if (!user.IsSuccess) return Result<UserDTO>.Failure(user.Message);
 
-            var existingUser = _mapper.Map<UserDTO>(user);
+            var existingUser = _mapper.Map<UserDTO>(user.Data!);
 
             return Result<UserDTO>.Success(existingUser, user.Message);
         }
