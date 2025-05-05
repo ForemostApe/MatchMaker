@@ -34,6 +34,23 @@ public class TeamServiceFacade(IMapper mapper, ITeamService teamService) : ITeam
         }
     }
 
+    public async Task<Result<List<TeamDTO>>> GetAllTeamsAsync()
+    {
+        try
+        {
+            var result = await _teamService.GetAllTeamsAsync();
+            if (!result.IsSuccess) return Result<List<TeamDTO>>.Failure(result.Message);
+
+            var teams = _mapper.Map<List<TeamDTO>>(result.Data!);
+            return Result<List<TeamDTO>>.Success(teams, result.Message);
+
+        }
+        catch
+        {
+            throw;
+        }
+    }
+
     public async Task<Result<TeamDTO>> GetTeamByIdAsync(string teamId)
     {
         ArgumentException.ThrowIfNullOrEmpty(teamId);

@@ -19,6 +19,18 @@ public class TeamRepo(ILogger<TeamRepo> logger, IMongoDatabase database) : Repos
         }
     }
 
+    public async Task<List<Team>> GetAllTeamsAsync()
+    {
+        try
+        {
+            return await FindAllAsync();
+        }
+        catch
+        {
+            throw;
+        }
+    }
+
     public async Task<Team?> GetTeamByIdAsync(string teamId)
     {
         try

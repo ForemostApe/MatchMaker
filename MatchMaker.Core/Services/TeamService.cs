@@ -27,6 +27,21 @@ public class TeamService(ITeamRepo teamRepo) : ITeamService
         }
     }
 
+    public async Task<Result<List<Team>>> GetAllTeamsAsync()
+    {
+        try
+        {
+            var result = await _teamRepo.GetAllTeamsAsync();
+            if (result.Count == 0) return Result<List<Team>>.Failure("No teams found.");
+
+            return Result<List<Team>>.Success(result, "Teams successfully found.");
+        }
+        catch
+        {
+            throw;
+        }
+    }
+
     public async Task<Result<Team>> GetTeamByIdAsync(string teamId)
     {
         ArgumentException.ThrowIfNullOrEmpty(teamId);

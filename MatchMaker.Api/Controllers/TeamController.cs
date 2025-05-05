@@ -45,6 +45,35 @@ public class TeamController(ILogger<TeamController> logger, ITeamServiceFacade t
         }
     }
 
+    [HttpGet(Name = nameof(GetAllTeamsAsync))]
+    public async Task<IActionResult> GetAllTeamsAsync()
+    {
+        try
+        {
+            var result = await _teamServiceFacade.GetAllTeamsAsync();
+
+            if (!result.IsSuccess) return NotFound(new ProblemDetails()
+            {
+                Title = "Teams not found",
+                Detail = result.Message,
+                Status = StatusCodes.Status404NotFound
+            });
+
+            return Ok(result.Data!);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"An unexpected error occurred while trying to get all teams. {ex.Message}");
+            return StatusCode(500, new ProblemDetails
+            {
+                Title = "Internal Server Error",
+                Detail = "An unexpected error occured. Please try again later",
+                Status = StatusCodes.Status500InternalServerError
+            });
+        }
+    }
+
+
     [HttpGet("id/{teamId}", Name = nameof(GetTeamByIdAsync))]
     public async Task<IActionResult> GetTeamByIdAsync(string teamId)
     {
