@@ -1,15 +1,17 @@
-﻿using MatchMaker.Core.Services;
+﻿using MatchMaker.Core.Interfaces;
+using MatchMaker.Core.Services;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
 namespace MatchMaker.Domain.Middlewares;
 
-public class JwtMiddleware(ILogger<JwtMiddleware> logger, RequestDelegate next, JwtOptions jwtOptions)
+public class JwtMiddleware(ILogger<JwtMiddleware> logger, RequestDelegate next, JwtOptions jwtOptions, ITokenService tokenService)
 {
     private readonly ILogger<JwtMiddleware> _logger = logger;
     private readonly RequestDelegate _next = next;
     private readonly JwtOptions _jwtOptions = jwtOptions;
+    private readonly ITokenService _tokenService = tokenService;
 
     public async Task Invoke(HttpContext context)
     {
@@ -20,7 +22,8 @@ public class JwtMiddleware(ILogger<JwtMiddleware> logger, RequestDelegate next, 
             try
             {
                 var token = authHeader.Substring(7);
-                var principal = ValidateToken(token);
+                //var principal = ValidateToken(token);
+                var principal = _tokenService.DecryptToken(token);
 
 
                 if (principal != null)

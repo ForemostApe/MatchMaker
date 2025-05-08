@@ -20,7 +20,7 @@ const getAllGames = async () => {
 
 const getGameById = async (gameId) => {
     try {
-        const response = await api.get(`Game/${gameId}`)
+        const response = await api.get(`Game/id/${gameId}`)
         return response.data;
     } catch (error) {
         if (error.response) {

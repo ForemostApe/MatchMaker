@@ -29,16 +29,15 @@ namespace MatchMaker.Domain
             var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? new[] { "http://localhost:5173" };
             builder.Services.AddCors(options =>
             {
-                    options.AddPolicy("Development", policy =>
-                    {
-                        policy.WithOrigins(allowedOrigins)
-                              .AllowAnyMethod()
-                              .AllowAnyHeader()
-                              .AllowCredentials()
-                              .SetPreflightMaxAge(TimeSpan.FromSeconds(86400));
-                    });
+                options.AddPolicy("Development", policy =>
+                {
+                    policy.WithOrigins(allowedOrigins)
+                          .AllowAnyMethod()
+                          .AllowAnyHeader()
+                          .AllowCredentials()
+                          .SetPreflightMaxAge(TimeSpan.FromSeconds(86400));
                 });
-
+            });
 
             var app = builder.Build();
 

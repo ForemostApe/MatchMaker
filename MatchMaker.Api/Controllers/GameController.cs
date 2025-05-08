@@ -1,5 +1,6 @@
 ﻿using MatchMaker.Core.Interfaces;
 using MatchMaker.Domain.DTOs.Games;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MatchMaker.Api.Controllers
@@ -40,7 +41,7 @@ namespace MatchMaker.Api.Controllers
                 });
             }
         }
-
+        [Authorize]
         [HttpGet(Name = nameof(GetAllGamesAsync))]
         public async Task<IActionResult> GetAllGamesAsync()
         {

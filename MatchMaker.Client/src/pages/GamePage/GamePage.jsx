@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 export default function GamePage() {
@@ -48,9 +48,11 @@ export default function GamePage() {
             {game.homeTeam} vs {game.awayTeam}
           </h2>
           <p className="text-gray-600">
-            Datum: {new Date(game.date).toLocaleDateString()}<br />
-            Tid: {game.time}<br />
-            Plats: {game.place}
+            Datum: {game.startTime ? new Date(game.startTime).toLocaleDateString() : "Saknas"}<br />
+            Tid: {game.startTime && game.endTime
+            ? `${new Date(game.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - ${new Date(game.endTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
+            : "Saknas"}<br />
+            Plats: {game.location || "Saknas"}
           </p>
         </div>
 

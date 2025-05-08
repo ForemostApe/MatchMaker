@@ -1,5 +1,7 @@
+// context/AuthContext.js
 import { createContext, useContext, useEffect, useState } from "react";
 import authService from "../../services/authService";
+import { setAccessToken, clearAccessToken } from "../../services/tokenStore"; // 👈 import memory store
 
 const AuthContext = createContext();
 
@@ -12,33 +14,32 @@ export const AuthProvider = ({ children }) => {
     try {
       setIsLoading(true);
       const response = await authService.refresh();
-      
-      console.log("Refresh response structure:", response);
-      
-      // Handle both possible response structures
+
       const responseData = response?.data || response;
-      
+
       if (!responseData?.accessToken) {
         console.warn("Refresh failed - no token in response", response);
         setUser(null);
+        clearAccessToken(); // 👈 clear token in memory
         return;
       }
 
+      setAccessToken(responseData.accessToken); // 👈 set token in memory
       setUser({
         ...(responseData.user || {}),
-        accessToken: responseData.accessToken
+        accessToken: responseData.accessToken,
       });
       setError(null);
     } catch (err) {
       console.error("Refresh error:", err);
       setUser(null);
+      clearAccessToken();
       setError(err.response?.data?.message || "Session refresh failed");
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Initialize auth state
   useEffect(() => {
     let isMounted = true;
 
@@ -52,7 +53,9 @@ export const AuthProvider = ({ children }) => {
 
     initializeAuth();
 
-    return () => { isMounted = false; };
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const login = async (credentials) => {
@@ -60,11 +63,12 @@ export const AuthProvider = ({ children }) => {
       setIsLoading(true);
       const response = await authService.login(credentials);
       const responseData = response?.data || response;
-      
+
       if (responseData?.accessToken) {
+        setAccessToken(responseData.accessToken); // 👈 set token in memory
         setUser({
           ...(responseData.user || {}),
-          accessToken: responseData.accessToken
+          accessToken: responseData.accessToken,
         });
         setError(null);
       }
@@ -82,6 +86,7 @@ export const AuthProvider = ({ children }) => {
       setIsLoading(true);
       await authService.logout();
       setUser(null);
+      clearAccessToken(); // 👈 clear token on logout
       setError(null);
     } catch (err) {
       setError(err.response?.data?.message || "Logout failed");

@@ -58,8 +58,7 @@ namespace MatchMaker.Domain.Controllers
                     return Unauthorized(result);
                 }
 
-                _logger.LogInformation("User successfully logged in.");
-                Response.Headers.Append("Authorization", "Bearer" + result.Data!.AccessToken);
+                Response.Headers.Append("Authorization", "Bearer " + result.Data!.AccessToken);
                 return Ok(result);
 
             }
