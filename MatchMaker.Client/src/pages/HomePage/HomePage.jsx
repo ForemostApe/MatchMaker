@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, parseISO } from "date-fns";
+import { sv } from 'date-fns/locale';
 import gameService from "../../services/gameService";
 import teamService from "../../services/teamService";
 
@@ -74,7 +75,7 @@ const HomePage = () => {
             Prev
           </button>
           <h2 className="text-lg sm:text-2xl font-bold">
-            {format(currentMonth, "MMMM yyyy")}
+            {format(currentMonth, "MMMM yyyy").charAt(0).toUpperCase() + format(currentMonth, "MMMM yyyy", { locale: sv }).slice(1)}
           </h2>
           <button
             onClick={goToNextMonth}
@@ -85,7 +86,7 @@ const HomePage = () => {
         </div>
 
         <div className="grid grid-cols-7 gap-2 sm:gap-4 text-center text-sm sm:text-base font-semibold text-gray-700 mb-2 sm:mb-4">
-          {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day) => (
+          {["Mån", "Tis", "Ons", "Tor", "Fre", "Lör", "Sön"].map((day) => (
             <div key={day}>{day}</div>
           ))}
         </div>
@@ -130,7 +131,7 @@ const HomePage = () => {
 
       <div className="w-full max-w-4xl bg-white rounded-lg shadow-md p-4 sm:p-6">
         <h3 className="text-md sm:text-xl font-bold mb-4">
-          Games in {format(currentMonth, "MMMM yyyy")}
+          Matcher i {format(currentMonth, "MMMM yyyy", { locale: sv })}
         </h3>
         {gamesInMonth.length > 0 ? (
           <ul className="space-y-4">
