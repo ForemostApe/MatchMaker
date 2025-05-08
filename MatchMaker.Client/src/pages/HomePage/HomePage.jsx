@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   format,
   startOfMonth,
@@ -12,38 +12,15 @@ import {
   isSameDay,
   parseISO,
 } from "date-fns";
-
-const mockBookings = [
-  {
-    id: 1,
-    date: "2025-04-15",
-    homeTeam: "Beckomberga Maniacs",
-    awayTeam: "Ösmo Breadwinners",
-    time: "18:00",
-    place: "Globen Force Dome",
-  },
-  {
-    id: 2,
-    date: "2025-04-21",
-    homeTeam: "Salem Laserbadgers",
-    awayTeam: "Tungelsta Loverboys",
-    time: "20:00",
-    place: "Kungsängen Grillad Kyckling Arena",
-  },
-  {
-    id: 3,
-    date: "2025-05-01",
-    homeTeam: "Salem Laserbadgers",
-    awayTeam: "Tungelsta Loverboys",
-    time: "17:00",
-    place: "Kungsängen Grillad Kyckling Arena",
-  },
-];
+import { useNavigate } from "react-router-dom";
+import gameService from "../../services/gameService";
 
 export default function HomePage() {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(null);
-
+  const [bookings, setBookings] = useState([]);
+  const navigate = useNavigate();
+  
   const monthStart = startOfMonth(currentMonth);
   const monthEnd = endOfMonth(monthStart);
   const startDate = startOfWeek(monthStart, { weekStartsOn: 1 });
@@ -55,7 +32,6 @@ export default function HomePage() {
   const generateDates = () => {
     const dates = [];
     let day = startDate;
-
     while (day <= endDate) {
       dates.push(day);
       day = addDays(day, 1);
@@ -63,15 +39,36 @@ export default function HomePage() {
     return dates;
   };
 
-  const bookingsInMonth = mockBookings.filter(
-    (b) => format(parseISO(b.date), "yyyy-MM") === format(currentMonth, "yyyy-MM")
+  const fetchBookings = async () => {
+    try {
+      const allGames = await gameService.getAllGames();
+      setBookings(allGames);
+    } catch (error) {
+      console.error("Failed to fetch bookings:", error);
+      setBookings([]);
+    }
+  };
+
+  useEffect(() => {
+    fetchBookings();
+  }, [currentMonth]);
+
+  const bookingsInMonth = bookings.filter(
+    (b) =>
+      format(parseISO(b.date), "yyyy-MM") ===
+      format(currentMonth, "yyyy-MM")
   );
 
   const bookingsByDay = bookingsInMonth.reduce((acc, booking) => {
-    acc[booking.date] = acc[booking.date] || [];
-    acc[booking.date].push(booking);
+    const date = format(parseISO(booking.date), "yyyy-MM-dd");
+    acc[date] = acc[date] || [];
+    acc[date].push(booking);
     return acc;
   }, {});
+
+  const handleBookingClick = (bookingId) => {
+    navigate(`/games/${bookingId}`);
+  };
 
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
@@ -111,19 +108,22 @@ export default function HomePage() {
             const isSelected = selectedDate && isSameDay(day, selectedDate);
 
             return (
-              <button
+              <div
                 key={dayStr}
-                onClick={() => setSelectedDate(day)}
-                className={`border rounded-lg p-2 h-20 text-left text-xs sm:text-sm relative transition
+                className={`border rounded-lg p-2 h-20 text-left text-xs sm:text-sm relative transition cursor-pointer
                   ${!isSameMonth(day, currentMonth) ? "text-gray-400" : ""}
                   ${isSelected ? "bg-blue-100 border-blue-400" : "hover:bg-gray-100"}
                 `}
+                onClick={() => {
+                  setSelectedDate(day);
+                  if (isBooked) handleBookingClick(isBooked[0].id);
+                }}
               >
                 <div>{format(day, "d")}</div>
                 {isBooked && (
                   <span className="absolute bottom-1 left-1 w-2 h-2 bg-red-500 rounded-full" />
                 )}
-              </button>
+              </div>
             );
           })}
         </div>
@@ -138,13 +138,14 @@ export default function HomePage() {
             {bookingsInMonth.map((booking) => (
               <li
                 key={booking.id}
-                className="border rounded p-3 bg-white shadow-sm text-sm md:text-base"
+                onClick={() => handleBookingClick(booking.id)}
+                className="border rounded p-3 bg-white shadow-sm text-sm md:text-base cursor-pointer hover:bg-gray-100 transition"
               >
                 <p className="font-semibold">
                   {booking.homeTeam} vs {booking.awayTeam}
                 </p>
                 <p>
-                  {booking.date} at {booking.time}
+                  {format(parseISO(booking.date), "yyyy-MM-dd")} at {booking.time}
                 </p>
                 <p className="text-gray-600">{booking.place}</p>
               </li>

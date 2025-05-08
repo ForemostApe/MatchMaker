@@ -26,4 +26,37 @@ public class GameService(IGameRepo gameRepo) : IGameService
             throw;
         }
     }
+
+    public async Task<Result<List<Game>>> GetAllGamesAsync()
+    {
+        try
+        {
+            var result = await _gameRepo.GetAllGamesAsync();
+            if (result.Count == 0) return Result<List<Game>>.Failure("Couldn't find any games.");
+
+            return Result<List<Game>>.Success(result, "Games successfully found.");
+        }
+        catch
+        {
+            throw;
+        }
+    }
+
+    public async Task<Result<Game>> GetGameByIdAsync(string gameId)
+    {
+        ArgumentNullException.ThrowIfNull(gameId);
+
+        try
+        {
+            var result = await _gameRepo.GetGameByIdAsync(gameId);
+
+            if (result == null) return Result<Game>.Failure("Couldn't find game.");
+
+            return Result <Game>.Success(result, "Game successfully found.");
+        }
+        catch
+        {
+            throw;
+        }
+    }
 }

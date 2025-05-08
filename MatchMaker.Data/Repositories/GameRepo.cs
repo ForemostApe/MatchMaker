@@ -2,6 +2,7 @@
 using MatchMaker.Domain.Entities;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
+using System.Data;
 
 namespace MatchMaker.Data.Repositories;
 
@@ -12,6 +13,31 @@ public class GameRepo(ILogger<GameRepo> logger, IMongoDatabase database) : Repos
         try
         {
             return await InsertOneAsync(newGame);
+        }
+        catch
+        {
+            throw;
+        }
+    }
+
+    public async Task<List<Game>> GetAllGamesAsync()
+    {
+        try
+        {
+            return await FindAllAsync();
+        }
+        catch
+        {
+            throw;
+        }
+    }
+
+    public async Task<Game> GetGameByIdAsync(string gameId)
+    {
+        try
+        {
+            var filter = Builders<Game>.Filter.Eq(g => g.Id, gameId);
+            return await FindOneAsync(filter);
         }
         catch
         {

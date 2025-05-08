@@ -1,13 +1,13 @@
 import api from "./axiosConfig";
 
-const getAllTeams = async () => {
+const getAllGames = async () => {
     try {
-        const response = await api.get("/Team/");
+        const response = await api.get("/Game/");
         return response.data;
     } catch (error) {
         if (error.response) {
             console.error('Error response: ', error.response.data);
-            throw new Error(error.response.data.title || 'Failed to fetch teams');
+            throw new Error(error.response.data.title || 'Failed to fetch games');
         } else if (error.request) {
             console.error('No response: ', error.request);
             throw new Error('No response from server');
@@ -18,14 +18,14 @@ const getAllTeams = async () => {
     }
 }
 
-const getTeamById = async (teamId) => {
+const getGameById = async (gameId) => {
     try {
-        const response = await api.get(`Team/${teamId}`)
+        const response = await api.get(`Game/${gameId}`)
         return response.data;
     } catch (error) {
         if (error.response) {
             console.error('Error response: ', error.response.data);
-            throw new Error(error.response.data.title || 'Failed to fetch team');
+            throw new Error(error.response.data.title || 'Failed to fetch game');
         } else if (error.request) {
             console.error('No response: ', error.request);
             throw new Error('No response from server');
@@ -37,6 +37,6 @@ const getTeamById = async (teamId) => {
 }
 
 export default {
-    getAllTeams,
-    getTeamById
+    getAllGames,
+    getGameById
 }

@@ -24,7 +24,7 @@ public class TeamServiceFacade(IMapper mapper, ITeamService teamService) : ITeam
 
             if (!result.IsSuccess) return Result<TeamDTO>.Failure(result.Message);
 
-            TeamDTO teamDTO = _mapper.Map<TeamDTO>(result.Data!);
+            var teamDTO = _mapper.Map<TeamDTO>(result.Data!);
 
             return Result<TeamDTO>.Success(teamDTO, result.Message);
         }
@@ -81,9 +81,9 @@ public class TeamServiceFacade(IMapper mapper, ITeamService teamService) : ITeam
 
             if (!result.IsSuccess) return Result<TeamDTO>.Failure(result.Message);
 
-            TeamDTO teamDTO = _mapper.Map<TeamDTO>(result.Data!);
+            var team = _mapper.Map<TeamDTO>(result.Data!);
 
-            return Result<TeamDTO>.Success(teamDTO, result.Message);
+            return Result<TeamDTO>.Success(team, result.Message);
         }
         catch
         {
@@ -107,9 +107,9 @@ public class TeamServiceFacade(IMapper mapper, ITeamService teamService) : ITeam
 
             if (!result.IsSuccess) return Result<TeamDTO>.Failure(result.Message);
 
-            var teamDTO = result.Data!.Adapt<TeamDTO>();
+            var team = result.Data!.Adapt<TeamDTO>();
 
-            return Result<TeamDTO>.Success(teamDTO, result.Message);
+            return Result<TeamDTO>.Success(team, result.Message);
         }
         catch
         {

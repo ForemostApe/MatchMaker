@@ -30,4 +30,38 @@ public class GameServiceFacade(IGameService gameService, IMapper mapper) : IGame
             throw;
         }
     }
+
+    public async Task<Result<List<GameDTO>>> GetAllGamesAsync()
+    {
+        try
+        {
+            var result = await _gameService.GetAllGamesAsync();
+            if (!result.IsSuccess) return Result<List<GameDTO>>.Failure(result.Message);
+
+            var games = _mapper.Map<List<GameDTO>>(result.Data!);
+            return Result<List<GameDTO>>.Success(games, result.Message);
+        }
+        catch
+        {
+            throw;
+        }
+    }
+
+    public async Task<Result<GameDTO>> GetGameByIdAsync(string gameId)
+    {
+        ArgumentException.ThrowIfNullOrEmpty(gameId);
+
+        try
+        {
+            var result = await _gameService.GetGameByIdAsync(gameId);
+            if(!result.IsSuccess) return Result<GameDTO>.Failure(result.Message);
+
+            var game = _mapper.Map<GameDTO>(result.Data!);
+            return Result<GameDTO>.Success(game, result.Message);
+        }
+        catch
+        {
+            throw;
+        }
+    }
 }

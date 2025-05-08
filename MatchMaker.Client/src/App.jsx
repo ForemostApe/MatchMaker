@@ -7,6 +7,7 @@ import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
 import { AuthProvider, useAuth } from './context/AuthContext/AuthContext';
 import RegistrationPage from './pages/RegistrationPage/RegistrationPage';
 import VerifyEmailPage from './pages/VerifyEmailPage/VerifyEmailPage';
+import GamePage from './pages/GamePage/GamePage';
 
 const ProtectedRouteWrapper = ({ children }) => {
   const { user } = useAuth();
@@ -27,7 +28,8 @@ const router = createBrowserRouter([
           } 
         },
         { path: 'register', element: <RegistrationPage /> },
-        { path: "/verify-email", element: <VerifyEmailPage />},
+        { path: '/verify-email', element: <VerifyEmailPage />},
+        { path: 'game', element: <GamePage />},
         { path: 'home', element: 
           <ProtectedRouteWrapper>
             <HomePage />

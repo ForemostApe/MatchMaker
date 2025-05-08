@@ -6,4 +6,6 @@ namespace MatchMaker.Core.Interfaces;
 public interface IGameService
 {
     Task<Result<Game>> CreateGameAsync(Game newGame);
+    Task<Result<List<Game>>> GetAllGamesAsync();
+    Task<Result<Game>> GetGameByIdAsync(string gameId);
 }

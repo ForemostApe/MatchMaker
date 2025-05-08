@@ -19,7 +19,12 @@ namespace MatchMaker.Api.Controllers
             try
             {
                 var result = await _gameServiceFacade.CreateGameAsync(newGame);
-                if (!result.IsSuccess) return BadRequest(result.Message);
+                if (!result.IsSuccess) return BadRequest(new ProblemDetails()
+                {
+                    Title = "Couldn't create game.",
+                    Detail = result.Message ?? "Couldn't create game.",
+                    Status = StatusCodes.Status400BadRequest
+                });
 
                 return CreatedAtRoute(nameof(GetGameByIdAsync), new { gameId = result.Data!.Id }, result.Data);
 
@@ -36,10 +41,60 @@ namespace MatchMaker.Api.Controllers
             }
         }
 
+        [HttpGet(Name = nameof(GetAllGamesAsync))]
+        public async Task<IActionResult> GetAllGamesAsync()
+        {
+            try
+            {
+                var result = await _gameServiceFacade.GetAllGamesAsync();
+                if (!result.IsSuccess) return NotFound(new ProblemDetails()
+                {
+                    Title = "Games not found.",
+                    Detail = result.Message ?? "No games were found.",
+                    Status = StatusCodes.Status404NotFound
+                });
+
+                return Ok(result.Data);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"An unexpected error occurred while trying to find all games {ex.Message}");
+                return StatusCode(500, new ProblemDetails
+                {
+                    Title = "Internal Server Error",
+                    Detail = "An unexpected error occured. Please try again later",
+                    Status = StatusCodes.Status500InternalServerError
+                });
+            }
+        }
+
         [HttpGet("id/{gameId}", Name = nameof(GetGameByIdAsync))]
         public async Task<IActionResult> GetGameByIdAsync(string gameId)
         {
-            return Ok();
+            ArgumentException.ThrowIfNullOrEmpty(gameId);
+
+            try
+            {
+                var result = await _gameServiceFacade.GetGameByIdAsync(gameId);
+                if (!result.IsSuccess) return NotFound(new ProblemDetails
+                {
+                    Title = "Game not found",
+                    Detail = result.Message ?? "The specified team was not found.",
+                    Status = StatusCodes.Status404NotFound
+                });
+
+                return Ok(result.Data);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"An unexpected error occurred while trying to create game {ex.Message}");
+                return StatusCode(500, new ProblemDetails
+                {
+                    Title = "Internal Server Error",
+                    Detail = "An unexpected error occured. Please try again later",
+                    Status = StatusCodes.Status500InternalServerError
+                });
+            }
         }
     }
 }
