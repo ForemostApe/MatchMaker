@@ -1,62 +1,67 @@
-import React, { useEffect, useState } from "react";
-import {
-  startOfMonth,
-  endOfMonth,
-  eachDayOfInterval,
-  format,
-  isSameMonth,
-  isSameDay,
-  parseISO,
-} from "date-fns";
-import gameService from "../../services/gameService";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, parseISO } from "date-fns";
+import gameService from "../../services/gameService";
+import teamService from "../../services/teamService";
 
 const HomePage = () => {
-  const [bookings, setBookings] = useState([]);
+  const [games, setGames] = useState([]);
+  const [teams, setTeams] = useState({});
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchBookings = async () => {
+    const fetchGamesAndTeams = async () => {
       try {
-        const games = await gameService.getAllGames();
-        console.log("Fetched games:", games); // Ensure all games are fetched
-        setBookings(games);
+        const fetchedGames = await gameService.getAllGames();
+        setGames(fetchedGames);
+
+        const teamIds = [...new Set(fetchedGames.map((game) => [game.homeTeamId, game.awayTeamId]).flat())];
+
+        const teamPromises = teamIds.map((teamId) => teamService.getTeamById(teamId));
+        const teamData = await Promise.all(teamPromises);
+
+        const teamsMap = teamData.reduce((acc, team) => {
+          acc[team.id] = team;
+          return acc;
+        }, {});
+        setTeams(teamsMap);
       } catch (error) {
-        console.error("Error fetching bookings:", error);
+        console.error("Error fetching games and teams:", error);
       }
     };
-  
-    fetchBookings();
+
+    fetchGamesAndTeams();
   }, []);
 
-  const handleBookingClick = (bookingId) => {
-    navigate(`/games/${bookingId}`);
+  const handleGameClick = (gameId) => {
+    navigate(`/games/${gameId}`);
+  };
+
+  const goToPreviousMonth = () => {
+    setCurrentMonth((prevMonth) => new Date(prevMonth.setMonth(prevMonth.getMonth() - 1)));
+  };
+
+  const goToNextMonth = () => {
+    setCurrentMonth((prevMonth) => new Date(prevMonth.setMonth(prevMonth.getMonth() + 1)));
   };
 
   const start = startOfMonth(currentMonth);
   const end = endOfMonth(currentMonth);
   const days = eachDayOfInterval({ start, end });
 
-  const bookingsInMonth = bookings.filter(
-    (booking) => booking.date && isSameMonth(parseISO(booking.date), currentMonth)
-  );
+  const gamesInMonth = games.filter((game) => {
+    const gameDate = game.startTime ? parseISO(game.startTime) : null;
+    return gameDate && isSameMonth(gameDate, currentMonth);
+  });
 
-  const goToPreviousMonth = () => {
-    setCurrentMonth((prevMonth) => {
-      const newDate = new Date(prevMonth);
-      newDate.setMonth(prevMonth.getMonth() - 1);
-      return newDate;
-    });
-  };
-
-  const goToNextMonth = () => {
-    setCurrentMonth((prevMonth) => {
-      const newDate = new Date(prevMonth);
-      newDate.setMonth(prevMonth.getMonth() + 1);
-      return newDate;
-    });
+  // Helper function to get the status of the game (Booked, Planned, Cancelled)
+  const getGameStatus = (game) => {
+    if (game.status === "booked") return "green";
+    if (game.status === "planned") return "yellow";
+    if (game.status === "cancelled") return "red";
+    return "gray"; // default if no status
   };
 
   return (
@@ -89,9 +94,8 @@ const HomePage = () => {
         <div className="grid grid-cols-7 gap-2 sm:gap-4">
           {days.map((day) => {
             const dayStr = format(day, "yyyy-MM-dd");
-            const isBooked = bookingsInMonth.filter(
-              (booking) =>
-                booking.date && isSameDay(parseISO(booking.date), day)
+            const isBooked = gamesInMonth.filter((game) =>
+              isSameDay(parseISO(game.startTime), day)
             );
             const isSelected = isSameDay(day, selectedDate);
 
@@ -105,13 +109,15 @@ const HomePage = () => {
                 onClick={() => {
                   setSelectedDate(day);
                   if (isBooked.length > 0) {
-                    handleBookingClick(isBooked[0].id);
+                    handleGameClick(isBooked[0].id);
                   }
                 }}
               >
                 <div>{format(day, "d")}</div>
                 {isBooked.length > 0 && (
-                  <span className="absolute bottom-1 left-1 w-2 h-2 bg-red-500 rounded-full" />
+                  <span
+                    className={`absolute bottom-1 left-1 w-2 h-2 rounded-full ${getGameStatus(isBooked[0])}`}
+                  />
                 )}
               </div>
             );
@@ -123,27 +129,29 @@ const HomePage = () => {
         <h3 className="text-md sm:text-xl font-bold mb-4">
           Games in {format(currentMonth, "MMMM yyyy")}
         </h3>
-        {bookingsInMonth.length > 0 ? (
+        {gamesInMonth.length > 0 ? (
           <ul className="space-y-4">
-            {bookingsInMonth.map((booking) => (
-              <li
-                key={booking.id}
-                onClick={() => handleBookingClick(booking.id)}
-                className="border rounded p-3 bg-white shadow-sm text-sm md:text-base cursor-pointer hover:bg-gray-100 transition"
-              >
-                <p className="font-semibold">
-                  {booking.homeTeam} vs {booking.awayTeam}
-                </p>
-                <p>
-                  {booking.date
-                    ? `${format(parseISO(booking.date), "yyyy-MM-dd")} at ${
-                        booking.time || "unknown time"
-                      }`
-                    : "Unknown date"}
-                </p>
-                <p className="text-gray-600">{booking.place || "Unknown place"}</p>
-              </li>
-            ))}
+            {gamesInMonth.map((game) => {
+              const homeTeam = teams[game.homeTeamId] || { name: "Unknown Home Team" };
+              const awayTeam = teams[game.awayTeamId] || { name: "Unknown Away Team" };
+              return (
+                <li
+                  key={game.id}
+                  onClick={() => handleGameClick(game.id)}
+                  className="border rounded p-3 bg-white shadow-sm text-sm md:text-base cursor-pointer hover:bg-gray-100 transition"
+                >
+                  <p className="font-semibold">
+                    {homeTeam.teamName} vs {awayTeam.teamName}
+                  </p>
+                  <p>
+                    {format(parseISO(game.startTime), "yyyy-MM-dd")} Kl.{" "}
+                    {format(parseISO(game.startTime), "HH:mm")} -{" "}
+                    {format(parseISO(game.endTime), "HH:mm")}
+                  </p>
+                  <p className="text-gray-600">{game.place}</p>
+                </li>
+              );
+            })}
           </ul>
         ) : (
           <p className="text-gray-600 text-sm sm:text-base">No games this month.</p>

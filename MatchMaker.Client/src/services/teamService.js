@@ -20,7 +20,7 @@ const getAllTeams = async () => {
 
 const getTeamById = async (teamId) => {
     try {
-        const response = await api.get(`Team/${teamId}`)
+        const response = await api.get(`Team/id/${teamId}`)
         return response.data;
     } catch (error) {
         if (error.response) {
