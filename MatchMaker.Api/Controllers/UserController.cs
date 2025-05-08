@@ -12,7 +12,7 @@ public class UserController(ILogger<UserController> logger, IUserServiceFacade u
     private readonly IUserServiceFacade _userServiceFacade = userServiceFacade;
 
     [HttpPost]
-    public async Task<IActionResult> CreateUserAsync(CreateUserDTO newUser)
+    public async Task<IActionResult> CreateUserAsync([FromBody] CreateUserDTO newUser)
     {
         try
         {
@@ -32,19 +32,6 @@ public class UserController(ILogger<UserController> logger, IUserServiceFacade u
 
             var baseUrl = $"{Request.Scheme}://{Request.Host}";
             var manualUri = $"{baseUrl}/api/User/{result.Data!.Id}";
-
-            if (manualUri == null)
-            {
-                _logger.LogError("Failed to generate URI for user with ID: {UserId}", result.Data!.Id);
-                return StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetails
-                {
-                    Title = "Failed to generate URI",
-                    Detail = "Failed to generate the URI for the created user.",
-                    Status = StatusCodes.Status500InternalServerError
-                });
-            }
-
-            _logger.LogInformation("User successfully created with user-Id: {UserId}", result.Data!.Id);
 
             return Created(manualUri, result.Data.Id);
         }
@@ -137,7 +124,7 @@ public class UserController(ILogger<UserController> logger, IUserServiceFacade u
     }
 
     [HttpPatch]
-    public async Task<IActionResult> UpdateUserAsync(UpdateUserDTO updatedUser)
+    public async Task<IActionResult> UpdateUserAsync([FromBody] UpdateUserDTO updatedUser)
     {
         try
         {

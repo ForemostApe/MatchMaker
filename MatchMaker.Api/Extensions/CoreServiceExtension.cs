@@ -52,6 +52,10 @@ public static class CoreServiceExtension
         services.AddScoped<ITeamService, TeamService>();
         services.AddScoped<ITeamRepo, TeamRepo>();
 
+        services.AddScoped<IGameServiceFacade, GameServiceFacade>();
+        services.AddScoped<IGameService, GameService>();
+        services.AddScoped<IGameRepo, GameRepo>();
+
         services.AddSingleton(config);
 
         services.AddDistributedMemoryCache(); //Check out how to use this properly later on.

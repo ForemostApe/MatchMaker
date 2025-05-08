@@ -77,7 +77,14 @@ namespace MatchMaker.Core.Facades
                 _logger.LogInformation("Attempting to login user with email {email}", loginDTO.Email);
 
                 var user = await _userService.GetUserByEmailAsync(loginDTO.Email);
-                if (user == null || !BCrypt.Net.BCrypt.Verify(loginDTO.Password, user.Data!.PasswordHash))
+
+                if (user == null)
+                {
+                    _logger.LogError("User not found.");
+                    return Result<AuthenticationDTO>.Failure("Invalid email-address or password.");
+                }
+
+                if (user.Data == null || !BCrypt.Net.BCrypt.Verify(loginDTO.Password, user.Data!.PasswordHash))
                 {
                     _logger.LogError("Invalid email-address or password.");
 

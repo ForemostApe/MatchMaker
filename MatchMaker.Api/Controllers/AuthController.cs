@@ -35,7 +35,12 @@ namespace MatchMaker.Domain.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occured while trying to verify user-email.");
-                return StatusCode(500, ex.Message);
+                return StatusCode(500, new ProblemDetails
+                {
+                    Title = "Internal Server Error",
+                    Detail = "An unexpected error occured. Please try again later",
+                    Status = StatusCodes.Status500InternalServerError
+                });
             }
         }
 
@@ -53,15 +58,19 @@ namespace MatchMaker.Domain.Controllers
                     return Unauthorized(result);
                 }
 
-                _logger.LogInformation("User successfully logged in.");
-                Response.Headers.Append("Authorization", "Bearer" + result.Data!.AccessToken);
+                Response.Headers.Append("Authorization", "Bearer " + result.Data!.AccessToken);
                 return Ok(result);
 
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occured while trying to log in user.");
-                return StatusCode(500, "An error occured while trying to log in user.");
+                return StatusCode(500, new ProblemDetails
+                {
+                    Title = "Internal Server Error",
+                    Detail = "An unexpected error occured. Please try again later",
+                    Status = StatusCodes.Status500InternalServerError
+                });
             }
         }
 
@@ -83,7 +92,12 @@ namespace MatchMaker.Domain.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An unexpected error occured when trying to delete session-cookie.");
-                return StatusCode(500, "An unexpected error occured.");
+                return StatusCode(500, new ProblemDetails
+                {
+                    Title = "Internal Server Error",
+                    Detail = "An unexpected error occured. Please try again later",
+                    Status = StatusCodes.Status500InternalServerError
+                });
             }
         }
 
@@ -116,7 +130,12 @@ namespace MatchMaker.Domain.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error refreshing token.");
-                return StatusCode(500, "An error occurred while refreshing the token.");
+                return StatusCode(500, new ProblemDetails
+                {
+                    Title = "Internal Server Error",
+                    Detail = "An unexpected error occured. Please try again later",
+                    Status = StatusCodes.Status500InternalServerError
+                });
             }
         }
     }

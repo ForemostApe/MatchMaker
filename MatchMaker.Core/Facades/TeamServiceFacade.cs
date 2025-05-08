@@ -24,9 +24,26 @@ public class TeamServiceFacade(IMapper mapper, ITeamService teamService) : ITeam
 
             if (!result.IsSuccess) return Result<TeamDTO>.Failure(result.Message);
 
-            TeamDTO teamDTO = _mapper.Map<TeamDTO>(result.Data!);
+            var teamDTO = _mapper.Map<TeamDTO>(result.Data!);
 
             return Result<TeamDTO>.Success(teamDTO, result.Message);
+        }
+        catch
+        {
+            throw;
+        }
+    }
+
+    public async Task<Result<List<TeamDTO>>> GetAllTeamsAsync()
+    {
+        try
+        {
+            var result = await _teamService.GetAllTeamsAsync();
+            if (!result.IsSuccess) return Result<List<TeamDTO>>.Failure(result.Message);
+
+            var teams = _mapper.Map<List<TeamDTO>>(result.Data!);
+            return Result<List<TeamDTO>>.Success(teams, result.Message);
+
         }
         catch
         {
@@ -64,9 +81,9 @@ public class TeamServiceFacade(IMapper mapper, ITeamService teamService) : ITeam
 
             if (!result.IsSuccess) return Result<TeamDTO>.Failure(result.Message);
 
-            TeamDTO teamDTO = _mapper.Map<TeamDTO>(result.Data!);
+            var team = _mapper.Map<TeamDTO>(result.Data!);
 
-            return Result<TeamDTO>.Success(teamDTO, result.Message);
+            return Result<TeamDTO>.Success(team, result.Message);
         }
         catch
         {
@@ -90,9 +107,9 @@ public class TeamServiceFacade(IMapper mapper, ITeamService teamService) : ITeam
 
             if (!result.IsSuccess) return Result<TeamDTO>.Failure(result.Message);
 
-            var teamDTO = result.Data!.Adapt<TeamDTO>();
+            var team = result.Data!.Adapt<TeamDTO>();
 
-            return Result<TeamDTO>.Success(teamDTO, result.Message);
+            return Result<TeamDTO>.Success(team, result.Message);
         }
         catch
         {

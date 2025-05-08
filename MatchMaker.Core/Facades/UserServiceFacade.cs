@@ -31,7 +31,7 @@ public class UserServiceFacade(ILogger<UserServiceFacade> logger, IMapper mapper
             string verificationToken = await _tokenService.GenerateVerificationToken(result.Data!);
             await _emailService.CreateEmailAsync(result.Data!.Email, EmailService.EmailType.UserCreated, verificationToken);
 
-            UserDTO createdUser = _mapper.Map<UserDTO>(user);
+            var createdUser = _mapper.Map<UserDTO>(result.Data);
 
             return Result<UserDTO>.Success(createdUser, result.Message);
         }

@@ -32,7 +32,6 @@ namespace MatchMaker.Core.Services
                 switch (tokenType)
                 {
                     case "verification":
-                        claims.Add(new Claim(ClaimTypes.NameIdentifier, user.Id));
                         claims.Add(new Claim(ClaimTypes.Email, user.Email));
                         claims.Add(new Claim("token_usage", "verification"));
                         break;

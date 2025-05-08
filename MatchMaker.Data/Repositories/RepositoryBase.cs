@@ -43,6 +43,11 @@ public class RepositoryBase<T>(ILogger<RepositoryBase<T>> logger, IMongoDatabase
         return await HandleMongoOperationAsync(() => _collection.Find(filter).FirstOrDefaultAsync(cancellationToken), $"An unexpected error occured when trying to find a document in {_collection.CollectionNamespace.CollectionName}.");
     }
 
+    public async Task<List<T>> FindAllAsync(CancellationToken cancellationToken = default)
+    {
+        return await HandleMongoOperationAsync(() => _collection.Find(FilterDefinition<T>.Empty).ToListAsync(cancellationToken), $"An error occurred while retrieving all documents from the {_collection.CollectionNamespace.CollectionName} collection.");
+    }
+
     public async Task<UpdateResult> UpdateOneAsync(FilterDefinition<T> filter, UpdateDefinition<T> update, CancellationToken cancellationToken = default)
     {
         return await HandleMongoOperationAsync(() => _collection.UpdateOneAsync(filter, update, cancellationToken: cancellationToken), $"An error occurred while updating a document in the {_collection.CollectionNamespace.CollectionName} collection.");
