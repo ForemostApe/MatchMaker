@@ -56,12 +56,11 @@ const HomePage = () => {
     return gameDate && isSameMonth(gameDate, currentMonth);
   });
 
-  // Helper function to get the status of the game (Booked, Planned, Cancelled)
   const getGameStatus = (game) => {
-    if (game.status === "booked") return "green";
-    if (game.status === "planned") return "yellow";
-    if (game.status === "cancelled") return "red";
-    return "gray"; // default if no status
+    if (game.gameStatus === 3) return "green"; 
+    if (game.gameStatus === 2) return "yellow";
+    if (game.gameStatus === 1) return "red";
+    return "gray";
   };
 
   return (
@@ -86,7 +85,7 @@ const HomePage = () => {
         </div>
 
         <div className="grid grid-cols-7 gap-2 sm:gap-4 text-center text-sm sm:text-base font-semibold text-gray-700 mb-2 sm:mb-4">
-          {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
+          {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day) => (
             <div key={day}>{day}</div>
           ))}
         </div>
@@ -94,30 +93,34 @@ const HomePage = () => {
         <div className="grid grid-cols-7 gap-2 sm:gap-4">
           {days.map((day) => {
             const dayStr = format(day, "yyyy-MM-dd");
-            const isBooked = gamesInMonth.filter((game) =>
+            const gamesOnDay = gamesInMonth.filter((game) =>
               isSameDay(parseISO(game.startTime), day)
             );
             const isSelected = isSameDay(day, selectedDate);
 
             return (
               <div
-                key={dayStr}
+                key={`${dayStr}-${gamesOnDay.length > 0 ? 'booked' : 'no-game'}`}
                 className={`border rounded-lg p-2 h-20 text-left text-xs sm:text-sm relative transition cursor-pointer
                   ${!isSameMonth(day, currentMonth) ? "text-gray-400" : ""}
                   ${isSelected ? "bg-blue-100 border-blue-400" : "hover:bg-gray-100"}
                 `}
                 onClick={() => {
                   setSelectedDate(day);
-                  if (isBooked.length > 0) {
-                    handleGameClick(isBooked[0].id);
+                  if (gamesOnDay.length > 0) {
+                    handleGameClick(gamesOnDay[0].id);
                   }
                 }}
               >
                 <div>{format(day, "d")}</div>
-                {isBooked.length > 0 && (
-                  <span
-                    className={`absolute bottom-1 left-1 w-2 h-2 rounded-full ${getGameStatus(isBooked[0])}`}
-                  />
+                {gamesOnDay.length > 0 && (
+                  gamesOnDay.map((game) => (
+                    <span
+                      key={game.id}
+                      className={"absolute bottom-2 left-2 w-2 h-2 rounded-full"}
+                      style={{ backgroundColor: `${getGameStatus(game)}` }} 
+                    />
+                  ))
                 )}
               </div>
             );
