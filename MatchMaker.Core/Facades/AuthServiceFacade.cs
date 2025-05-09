@@ -143,7 +143,7 @@ namespace MatchMaker.Core.Facades
         {
             try
             {
-                _cookieFactory.ExpireCookie();
+                _cookieFactory.DeleteCookie("refreshToken");
                 _sessionManager.ClearSession();
 
                 return Result<string>.Success("Cookie successfully deleted");
