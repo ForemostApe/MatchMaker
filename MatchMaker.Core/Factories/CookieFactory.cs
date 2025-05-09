@@ -22,9 +22,11 @@ public class CookieFactory(IHttpContextAccessor httpContextAccessor) : ICookieFa
         response.Cookies.Append(tokenName, token, cookieOptions);
     }
 
-    public void ExpireCookie()
+    public void DeleteCookie(string tokenName)
     {
         var response = _httpContextAccessor.HttpContext?.Response ?? throw new InvalidOperationException("HTTP response is not available.");
+
+        response.Cookies.Delete(tokenName);
 
         var cookieOptions = new CookieOptions()
         {
@@ -34,6 +36,6 @@ public class CookieFactory(IHttpContextAccessor httpContextAccessor) : ICookieFa
             Expires = DateTime.UtcNow.AddDays(-1)
         };
 
-        response.Cookies.Append("auth-token", string.Empty, cookieOptions);
+        response.Cookies.Append(tokenName, string.Empty, cookieOptions);
     }
 }

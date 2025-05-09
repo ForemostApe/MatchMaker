@@ -1,7 +1,6 @@
-// context/AuthContext.js
 import { createContext, useContext, useEffect, useState } from "react";
 import authService from "../../services/authService";
-import { setAccessToken, clearAccessToken } from "../../services/tokenStore"; // 👈 import memory store
+import { setAccessToken, clearAccessToken } from "../../services/tokenStore";
 
 const AuthContext = createContext();
 
@@ -14,17 +13,16 @@ export const AuthProvider = ({ children }) => {
     try {
       setIsLoading(true);
       const response = await authService.refresh();
-
       const responseData = response?.data || response;
 
       if (!responseData?.accessToken) {
         console.warn("Refresh failed - no token in response", response);
         setUser(null);
-        clearAccessToken(); // 👈 clear token in memory
+        clearAccessToken();
         return;
       }
 
-      setAccessToken(responseData.accessToken); // 👈 set token in memory
+      setAccessToken(responseData.accessToken);
       setUser({
         ...(responseData.user || {}),
         accessToken: responseData.accessToken,
@@ -65,7 +63,7 @@ export const AuthProvider = ({ children }) => {
       const responseData = response?.data || response;
 
       if (responseData?.accessToken) {
-        setAccessToken(responseData.accessToken); // 👈 set token in memory
+        setAccessToken(responseData.accessToken);
         setUser({
           ...(responseData.user || {}),
           accessToken: responseData.accessToken,
@@ -86,8 +84,9 @@ export const AuthProvider = ({ children }) => {
       setIsLoading(true);
       await authService.logout();
       setUser(null);
-      clearAccessToken(); // 👈 clear token on logout
+      clearAccessToken();
       setError(null);
+      navigate("/");
     } catch (err) {
       setError(err.response?.data?.message || "Logout failed");
     } finally {
