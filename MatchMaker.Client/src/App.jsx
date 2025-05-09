@@ -1,7 +1,8 @@
 import './App.css';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext/AuthContext';
-import Layout from './layout/layout';
+import AuthLayout from './layout/AuthLayout';
+import PublicLayout from './layout/PublicLayout';
 import HomePage from './pages/HomePage/HomePage';
 import LoginPage from './pages/LoginPage/LoginPage';
 import RegistrationPage from './pages/RegistrationPage/RegistrationPage';
@@ -11,7 +12,6 @@ import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
 
 const ProtectedRouteWrapper = ({ children }) => {
   const { user, isLoading } = useAuth();
-  
   if (isLoading) return <div>Loading...</div>;
 
   return (
@@ -24,17 +24,30 @@ const ProtectedRouteWrapper = ({ children }) => {
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <Layout />,
+    element: <PublicLayout />,
     children: [
       { index: true, element: <LoginPage /> },
       { path: 'register', element: <RegistrationPage /> },
-      { path: '/verify-email', element: <VerifyEmailPage /> },
-      { path: 'game/:gameId', element: <GamePage /> },
+      { path: 'verify-email', element: <VerifyEmailPage /> },
+    ],
+  },
+  {
+    path: '/',
+    element: <AuthLayout />,
+    children: [
       {
         path: 'home',
         element: (
           <ProtectedRouteWrapper>
             <HomePage />
+          </ProtectedRouteWrapper>
+        ),
+      },
+      {
+        path: 'game/:gameId',
+        element: (
+          <ProtectedRouteWrapper>
+            <GamePage />
           </ProtectedRouteWrapper>
         ),
       },
