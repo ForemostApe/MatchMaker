@@ -8,6 +8,7 @@ import LoginPage from './pages/LoginPage/LoginPage';
 import RegistrationPage from './pages/RegistrationPage/RegistrationPage';
 import VerifyEmailPage from './pages/VerifyEmailPage/VerifyEmailPage';
 import GamePage from './pages/GamePage/GamePage';
+import ProfilePage from './pages/ProfilePage/ProfilePage';
 import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
 
 const ProtectedRouteWrapper = ({ children }) => {
@@ -51,6 +52,14 @@ const router = createBrowserRouter([
           </ProtectedRouteWrapper>
         ),
       },
+      {
+        path: 'profile/:userId',
+        element: (
+          <ProtectedRouteWrapper>
+            <ProfilePage />
+          </ProtectedRouteWrapper>
+        ),
+      }
     ],
   },
 ]);

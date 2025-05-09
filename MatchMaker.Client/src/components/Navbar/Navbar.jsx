@@ -23,7 +23,7 @@ if (isLoading) {
       <div className="container mx-auto flex justify-between items-center">
         <div className="flex space-x-4">
           <Link to="/" className="text-white">Home</Link>
-          {user && <Link to="/profile" className="text-white">Profile</Link>}
+          {user && <Link to="/profile/:userId" className="text-white">Profile</Link>}
           {user?.role === 'Admin' && (
             <Link to="/admin" className="text-white">Admin</Link>
           )}
