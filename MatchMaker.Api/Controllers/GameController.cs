@@ -13,7 +13,7 @@ namespace MatchMaker.Api.Controllers
         private readonly IGameServiceFacade _gameServiceFacade = gameServiceFacade;
 
         [HttpPost]
-        public async Task<IActionResult> CreateGameAsync(CreateGameDTO newGame)
+        public async Task<IActionResult> CreateGameAsync([FromBody] CreateGameDTO newGame)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
@@ -89,6 +89,69 @@ namespace MatchMaker.Api.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"An unexpected error occurred while trying to create game {ex.Message}");
+                return StatusCode(500, new ProblemDetails
+                {
+                    Title = "Internal Server Error",
+                    Detail = "An unexpected error occured. Please try again later",
+                    Status = StatusCodes.Status500InternalServerError
+                });
+            }
+        }
+
+        [HttpPatch(Name = nameof(UpdateGameAsync))]
+        public async Task<IActionResult> UpdateGameAsync([FromBody] UpdateGameDTO updatedGame)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            try
+            {
+                var result = await _gameServiceFacade.UpdateGameAsync(updatedGame);
+
+                if (!result.IsSuccess)
+                {
+                    return NotFound(new ProblemDetails
+                    {
+                        Title = "Game not found",
+                        Detail = result.Message,
+                        Status = StatusCodes.Status404NotFound
+                    });
+                }
+
+                return Ok(result.Data!);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"An unexpected error occurred while trying to update game {ex.Message}");
+                return StatusCode(500, new ProblemDetails
+                {
+                    Title = "Internal Server Error",
+                    Detail = "An unexpected error occured. Please try again later",
+                    Status = StatusCodes.Status500InternalServerError
+                });
+            }
+        }
+
+        [HttpDelete(Name = nameof(DeleteGameAsync))]
+        public async Task<IActionResult> DeleteGameAsync(string gameId)
+        {
+            ArgumentException.ThrowIfNullOrEmpty(gameId);
+
+            try
+            {
+                var result = await _gameServiceFacade.DeleteGameAsync(gameId);
+
+                if (!result.IsSuccess) return NotFound(new ProblemDetails()
+                {
+                    Title = "Game not found",
+                    Detail = result.Message,
+                    Status = StatusCodes.Status404NotFound
+                });
+
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"An unexpected error occurred while trying to delete game {ex.Message}");
                 return StatusCode(500, new ProblemDetails
                 {
                     Title = "Internal Server Error",

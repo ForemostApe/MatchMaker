@@ -44,4 +44,45 @@ public class GameRepo(ILogger<GameRepo> logger, IMongoDatabase database) : Repos
             throw;
         }
     }
+
+    public async Task<UpdateResult> UpdateGameAsync(Game updatedGame)
+    {
+        try
+        {
+            var filter = Builders<Game>.Filter.Eq(g => g.Id, updatedGame.Id);
+            var update = Builders<Game>.Update
+                .Set(g => g.StartTime, updatedGame.StartTime)
+                .Set(g => g.EndTime, updatedGame.EndTime)
+                .Set(g => g.Location, updatedGame.Location)
+                .Set(g => g.RefereeId, updatedGame.RefereeId);
+
+            if (updatedGame.Conditions != null)
+            {
+                update = update.Set(g => g.Conditions.Court, updatedGame.Conditions.Court)
+                    .Set(g => g.Conditions.OffensiveConditions, updatedGame.Conditions.OffensiveConditions)
+                    .Set(g => g.Conditions.DefensiveConditions, updatedGame.Conditions.DefensiveConditions)
+                    .Set(g => g.Conditions.Specialists, updatedGame.Conditions.Specialists)
+                    .Set(g => g.Conditions.Penalties, updatedGame.Conditions.Penalties);
+            }
+
+            return await UpdateOneAsync(filter, update);
+        }
+        catch
+        {
+            throw;
+        }
+    }
+
+    public async Task<DeleteResult> DeleteGameAsync(string gameId)
+    {
+        try
+        {
+            var filter = Builders<Game>.Filter.Eq(g => g.Id, gameId);
+            return await DeleteOneAsync(filter);
+        }
+        catch
+        {
+            throw;
+        }
+    }
 }

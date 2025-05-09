@@ -59,4 +59,39 @@ public class GameService(IGameRepo gameRepo) : IGameService
             throw;
         }
     }
+
+    public async Task<Result<Game>> UpdateGameAsync(Game updatedGame)
+    {
+        ArgumentNullException.ThrowIfNull(updatedGame);
+
+        try
+        {
+            var result = await _gameRepo.UpdateGameAsync(updatedGame);
+
+            if (result.ModifiedCount <= 0) return Result<Game>.Failure("No changes were made.");
+
+            return Result<Game>.Success(updatedGame, "Game successfully updated.");
+        }
+        catch
+        {
+            throw;
+        }
+    }
+
+    public async Task<Result<Game>> DeleteGameAsync(string gameId)
+    {
+        ArgumentException.ThrowIfNullOrEmpty(gameId);
+
+        try
+        {
+            var result = await _gameRepo.DeleteGameAsync(gameId);
+            if (result.DeletedCount <= 0) return Result<Game>.Failure("Game not found.");
+
+            return Result<Game>.Success(null, "Game successfully deleted.");
+        }
+        catch
+        {
+            throw;
+        }
+    }
 }
