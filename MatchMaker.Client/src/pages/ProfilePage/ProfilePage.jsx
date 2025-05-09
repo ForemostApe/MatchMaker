@@ -40,23 +40,22 @@ const ProfilePage = () => {
 
         <div className="space-y-4 text-sm sm:text-base">
             <div>
-                <span className="font-semibold text-gray-700">E-post: </span>
-                <span>{user.email}</span>
+                <span className="font-bold">E-post: </span><span>{user.email}</span>
             </div>
             <div>
-                <span className="font-semibold text-gray-700">Förnamn: </span>
+                <span className="font-bold">Förnamn: </span>
                 <span>{user.firstName}</span>
             </div>
             <div>
-                <span className="font-semibold text-gray-700">Efternamn: </span>
+                <span className="font-bold">Efternamn: </span>
                 <span>{user.lastName}</span>
             </div>
             <div>
-                <span className="font-semibold text-gray-700">Roll: </span>
+                <span className="font-bold">Roll: </span>
                 <span>{user.userRole}</span>
             </div>
             <div>
-                <span className="font-semibold text-gray-700">Lagtillhörighet: </span>
+                <span className="font-bold">Lagtillhörighet: </span>
                 <span>{team ? team.teamName : "Inget tilldelat lag"}</span>
             </div>
         </div>
