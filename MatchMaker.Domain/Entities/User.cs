@@ -20,6 +20,8 @@ public class User : SchemaBase<User>
     public string FirstName { get; set; } = null!;
     public string LastName { get; set; } = null!;
     public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
+    
+    [BsonRepresentation(BsonType.String)]
     public UserRole UserRole { get; set; } = UserRole.Unspecified;
     
     [BsonRepresentation(BsonType.ObjectId)]
