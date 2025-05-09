@@ -24,5 +24,21 @@ public class GameMappingProfile : IRegister
                Specialists = src.Conditions.Specialists,
                Penalties = src.Conditions.Penalties
            });
+
+        config.NewConfig<UpdateGameDTO, Game>()
+           .Map(dest => dest.StartTime, src => src.StartTime)
+           .Map(dest => dest.EndTime, src => src.EndTime)
+           .Map(dest => dest.Location, src => src.Location)
+           .Map(dest => dest.RefereeId, src => src.RefereeId)
+           .Map(dest => dest.Conditions, src => new Conditions
+           {
+               Court = src.Conditions.Court,
+               OffensiveConditions = src.Conditions.OffensiveConditions,
+               DefensiveConditions = src.Conditions.DefensiveConditions,
+               Specialists = src.Conditions.Specialists,
+               Penalties = src.Conditions.Penalties
+           })
+            .IgnoreNullValues(true)
+            .IgnoreNonMapped(true);
     }
 }

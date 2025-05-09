@@ -127,10 +127,7 @@ public class TeamServiceFacade(IMapper mapper, ITeamService teamService) : ITeam
 
             if (!result.IsSuccess) return Result<TeamDTO>.Failure(result.Message);
 
-            TeamDTO teamDTO = _mapper.Map<TeamDTO>(result.Data!);
-
-            return Result<TeamDTO>.Success(teamDTO, result.Message);
-
+            return Result<TeamDTO>.Success(null, result.Message);
         }
         catch
         {

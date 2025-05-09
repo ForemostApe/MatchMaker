@@ -1,7 +1,10 @@
-﻿using MapsterMapper;
+﻿using Mapster;
+using MapsterMapper;
 using MatchMaker.Core.Interfaces;
+using MatchMaker.Core.Services;
 using MatchMaker.Domain.DTOs;
 using MatchMaker.Domain.DTOs.Games;
+using MatchMaker.Domain.DTOs.Teams;
 using MatchMaker.Domain.Entities;
 
 namespace MatchMaker.Core.Facades;
@@ -58,6 +61,49 @@ public class GameServiceFacade(IGameService gameService, IMapper mapper) : IGame
 
             var game = _mapper.Map<GameDTO>(result.Data!);
             return Result<GameDTO>.Success(game, result.Message);
+        }
+        catch
+        {
+            throw;
+        }
+    }
+
+    public async Task<Result<GameDTO>> UpdateGameAsync(UpdateGameDTO updatedGame)
+    {
+        ArgumentNullException.ThrowIfNull(updatedGame);
+
+        try
+        {
+            var existingGame = await _gameService.GetGameByIdAsync(updatedGame.Id);
+            if(!existingGame.IsSuccess) return Result<GameDTO>.Failure(existingGame.Message);
+
+            updatedGame.Adapt(existingGame.Data!);
+
+            var result = await _gameService.UpdateGameAsync(existingGame.Data!);
+
+            if (!result.IsSuccess) return Result<GameDTO>.Failure(result.Message);
+
+            var game = result.Data!.Adapt<GameDTO>();
+
+            return Result<GameDTO>.Success(game, result.Message);
+
+        }
+        catch
+        {
+            throw;
+        }
+    }
+
+    public async Task<Result<GameDTO>> DeleteGameAsync(string gameId)
+    {
+        ArgumentException.ThrowIfNullOrEmpty(gameId);
+        try
+        {
+            var result = await _gameService.DeleteGameAsync(gameId);
+
+            if (!result.IsSuccess) return Result<GameDTO>.Failure(result.Message);
+
+            return Result<GameDTO>.Success(null, result.Message);
         }
         catch
         {

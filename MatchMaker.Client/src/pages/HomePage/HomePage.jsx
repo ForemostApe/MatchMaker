@@ -65,7 +65,7 @@ const HomePage = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4 sm:p-8">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 rounded-lg p-4 sm:p-8">
       <div className="w-full max-w-4xl bg-white rounded-lg shadow-md p-4 sm:p-6 mb-8">
         <div className="flex justify-between items-center mb-4">
           <button

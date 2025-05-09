@@ -13,5 +13,5 @@ public class GameDTO
     public string? HomeTeamId { get; set; }
     public string? AwayTeamId { get; set; }
     public string? RefereeId { get; set; }
-    public Conditions Conditions { get; set; }
+    public Conditions? Conditions { get; set; }
 }
