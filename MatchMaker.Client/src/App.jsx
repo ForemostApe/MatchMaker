@@ -29,7 +29,7 @@ const router = createBrowserRouter([
         },
         { path: 'register', element: <RegistrationPage /> },
         { path: '/verify-email', element: <VerifyEmailPage />},
-        { path: 'game', element: <GamePage />},
+        { path: 'game/:gameId', element: <GamePage />},
         { path: 'home', element: 
           <ProtectedRouteWrapper>
             <HomePage />
