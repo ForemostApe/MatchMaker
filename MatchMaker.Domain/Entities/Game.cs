@@ -32,9 +32,9 @@ public class Game : SchemaBase<Game>
 
 public class Conditions
 {
-    public string Court { get; set; }
-    public string OffensiveConditions { get; set; }
-    public string DefensiveConditions { get; set; }
-    public string Specialists { get; set; }
-    public string Penalties { get; set; }
+    public string Court { get; set; } = null!;
+    public string OffensiveConditions { get; set; } = null!;
+    public string DefensiveConditions { get; set; } = null!;
+    public string Specialists { get; set; } = null!;
+    public string Penalties { get; set; } = null!;
 }
