@@ -91,8 +91,7 @@ namespace MatchMaker.Core.Facades
                     return Result<AuthenticationDTO>.Failure("Invalid email-address or password.");
                 }
 
-                _cookieFactory.DeleteCookie("refreshToken");
-                _sessionManager.ClearSession();
+                _sessionManager.ClearSession("refreshToken");
 
                 var accessToken = await _tokenService.GenerateAccessToken(user.Data!);
                 var refreshToken = await _tokenService.GenerateRefreshToken(user.Data);
@@ -146,8 +145,7 @@ namespace MatchMaker.Core.Facades
         {
             try
             {
-                _cookieFactory.DeleteCookie("refreshToken");
-                _sessionManager.ClearSession();
+                _sessionManager.ClearSession("refreshToken");
 
                 return Result<string>.Success("Cookie successfully deleted");
             }

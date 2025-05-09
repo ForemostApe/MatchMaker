@@ -2,5 +2,5 @@
 
 public interface ISessionManager
 {
-    void ClearSession();
+    void ClearSession(string tokenName);
 }
