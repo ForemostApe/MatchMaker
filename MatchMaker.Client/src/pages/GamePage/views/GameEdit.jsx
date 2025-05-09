@@ -1,34 +1,34 @@
-import { useState } from "react";
+import { useParams, useLocation } from "react-router-dom";
+import useGameData from "../../hooks/useGameData";
 
-export default function GameEdit({ game }) {
-  const [formData, setFormData] = useState({ ...game });
+const GameEdit = () => {
+  const { id } = useParams();
+  const location = useLocation();
+  const { game, homeTeam, awayTeam, loading, error } = useGameData(id, location);
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleSave = () => {
-    // Call API to save
-  };
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error loading game data.</p>;
 
   return (
-    <div className="space-y-2">
-      <input
-        name="homeTeam"
-        value={formData.homeTeam}
-        onChange={handleChange}
-        className="border p-2 w-full"
-      />
-      <input
-        name="awayTeam"
-        value={formData.awayTeam}
-        onChange={handleChange}
-        className="border p-2 w-full"
-      />
-      
-      <button onClick={handleSave} className="mt-4 bg-blue-500 text-white px-4 py-2 rounded">
-        Save Changes
-      </button>
+    <div className="p-4 max-w-3xl mx-auto bg-white shadow rounded">
+      <h1 className="text-xl font-bold mb-4">
+        Redigera {homeTeam.teamName} vs {awayTeam.teamName}
+      </h1>
+      <form>
+        <label className="block mb-2">
+          Plats:
+          <input
+            type="text"
+            defaultValue={game.location}
+            className="w-full border rounded p-2"
+          />
+        </label>
+        <button type="submit" className="mt-4 px-4 py-2 bg-blue-600 text-white rounded">
+          Spara ändringar
+        </button>
+      </form>
     </div>
   );
-}
+};
+
+export default GameEdit;

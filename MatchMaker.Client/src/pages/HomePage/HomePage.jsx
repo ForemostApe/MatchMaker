@@ -1,7 +1,15 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, parseISO } from "date-fns";
-import { sv } from 'date-fns/locale';
+import {
+  format,
+  startOfMonth,
+  endOfMonth,
+  eachDayOfInterval,
+  isSameMonth,
+  isSameDay,
+  parseISO
+} from "date-fns";
+import { sv } from "date-fns/locale";
 import gameService from "../../services/gameService";
 import teamService from "../../services/teamService";
 
@@ -18,8 +26,9 @@ const HomePage = () => {
         const fetchedGames = await gameService.getAllGames();
         setGames(fetchedGames);
 
-        const teamIds = [...new Set(fetchedGames.map((game) => [game.homeTeamId, game.awayTeamId]).flat())];
-
+        const teamIds = [
+          ...new Set(fetchedGames.flatMap((game) => [game.homeTeamId, game.awayTeamId]))
+        ];
         const teamPromises = teamIds.map((teamId) => teamService.getTeamById(teamId));
         const teamData = await Promise.all(teamPromises);
 
@@ -36,16 +45,28 @@ const HomePage = () => {
     fetchGamesAndTeams();
   }, []);
 
-  const handleGameClick = (gameId) => {
-    navigate(`/games/${gameId}`);
+  const handleGameClick = (game) => {
+    const homeTeam = teams[game.homeTeamId] || { name: "Unknown Home Team" };
+    const awayTeam = teams[game.awayTeamId] || { name: "Unknown Away Team" };
+    navigate(`/game/${game.id}`, {
+      state: {
+        game,
+        homeTeam,
+        awayTeam
+      }
+    });
   };
 
   const goToPreviousMonth = () => {
-    setCurrentMonth((prevMonth) => new Date(prevMonth.setMonth(prevMonth.getMonth() - 1)));
+    setCurrentMonth((prevMonth) =>
+      new Date(prevMonth.getFullYear(), prevMonth.getMonth() - 1)
+    );
   };
 
   const goToNextMonth = () => {
-    setCurrentMonth((prevMonth) => new Date(prevMonth.setMonth(prevMonth.getMonth() + 1)));
+    setCurrentMonth((prevMonth) =>
+      new Date(prevMonth.getFullYear(), prevMonth.getMonth() + 1)
+    );
   };
 
   const start = startOfMonth(currentMonth);
@@ -58,7 +79,7 @@ const HomePage = () => {
   });
 
   const getGameStatus = (game) => {
-    if (game.gameStatus === 3) return "green"; 
+    if (game.gameStatus === 3) return "green";
     if (game.gameStatus === 2) return "yellow";
     if (game.gameStatus === 1) return "red";
     return "gray";
@@ -72,16 +93,17 @@ const HomePage = () => {
             onClick={goToPreviousMonth}
             className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition"
           >
-            Prev
+            Föregående
           </button>
           <h2 className="text-lg sm:text-2xl font-bold">
-            {format(currentMonth, "MMMM yyyy").charAt(0).toUpperCase() + format(currentMonth, "MMMM yyyy", { locale: sv }).slice(1)}
+            {format(currentMonth, "MMMM yyyy", { locale: sv }).charAt(0).toUpperCase() +
+              format(currentMonth, "MMMM yyyy", { locale: sv }).slice(1)}
           </h2>
           <button
             onClick={goToNextMonth}
             className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition"
           >
-            Next
+            Nästkommande
           </button>
         </div>
 
@@ -101,7 +123,7 @@ const HomePage = () => {
 
             return (
               <div
-                key={`${dayStr}-${gamesOnDay.length > 0 ? 'booked' : 'no-game'}`}
+                key={`${dayStr}-${gamesOnDay.length > 0 ? "booked" : "no-game"}`}
                 className={`border rounded-lg p-2 h-20 text-left text-xs sm:text-sm relative transition cursor-pointer
                   ${!isSameMonth(day, currentMonth) ? "text-gray-400" : ""}
                   ${isSelected ? "bg-blue-100 border-blue-400" : "hover:bg-gray-100"}
@@ -109,20 +131,19 @@ const HomePage = () => {
                 onClick={() => {
                   setSelectedDate(day);
                   if (gamesOnDay.length > 0) {
-                    handleGameClick(gamesOnDay[0].id);
+                    handleGameClick(gamesOnDay[0]);
                   }
                 }}
               >
                 <div>{format(day, "d")}</div>
-                {gamesOnDay.length > 0 && (
+                {gamesOnDay.length > 0 &&
                   gamesOnDay.map((game) => (
                     <span
                       key={game.id}
-                      className={"absolute bottom-2 left-2 w-2 h-2 rounded-full"}
-                      style={{ backgroundColor: `${getGameStatus(game)}` }} 
+                      className="absolute bottom-2 left-2 w-2 h-2 rounded-full"
+                      style={{ backgroundColor: `${getGameStatus(game)}` }}
                     />
-                  ))
-                )}
+                  ))}
               </div>
             );
           })}
@@ -138,10 +159,11 @@ const HomePage = () => {
             {gamesInMonth.map((game) => {
               const homeTeam = teams[game.homeTeamId] || { name: "Unknown Home Team" };
               const awayTeam = teams[game.awayTeamId] || { name: "Unknown Away Team" };
+
               return (
                 <li
                   key={game.id}
-                  onClick={() => handleGameClick(game.id)}
+                  onClick={() => handleGameClick(game)}
                   className="border rounded p-3 bg-white shadow-sm text-sm md:text-base cursor-pointer hover:bg-gray-100 transition"
                 >
                   <p className="font-semibold">
@@ -158,7 +180,7 @@ const HomePage = () => {
             })}
           </ul>
         ) : (
-          <p className="text-gray-600 text-sm sm:text-base">No games this month.</p>
+          <p className="text-gray-600 text-sm sm:text-base">Inga matcher planerade.</p>
         )}
       </div>
     </div>

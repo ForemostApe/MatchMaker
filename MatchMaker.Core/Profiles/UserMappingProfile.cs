@@ -11,7 +11,7 @@ public class UserMappingProfile : IRegister
         config.NewConfig<CreateUserDTO, User>()
             .Map(dest => dest.PasswordHash, src => src.Password)
             .Map(dest => dest.CreatedDate, src => DateTime.UtcNow)
-            .Map(dest => dest.UserRole, src => "Guest");
+            .Map(dest => dest.UserRole, src => UserRole.Unspecified);
 
         config.NewConfig<UpdateUserDTO, User>()
             .Map(dest => dest.Id, src => src.Id)

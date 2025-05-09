@@ -1,16 +1,20 @@
-import { createBrowserRouter, RouterProvider, Route } from 'react-router-dom'
-import Layout from './layout/layout'
-import HomePage from './pages/HomePage/HomePage';
-import './App.css'
-import LoginPage from './pages/LoginPage/LoginPage';
-import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
+import './App.css';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext/AuthContext';
+import AuthLayout from './layout/AuthLayout';
+import PublicLayout from './layout/PublicLayout';
+import HomePage from './pages/HomePage/HomePage';
+import LoginPage from './pages/LoginPage/LoginPage';
 import RegistrationPage from './pages/RegistrationPage/RegistrationPage';
 import VerifyEmailPage from './pages/VerifyEmailPage/VerifyEmailPage';
 import GamePage from './pages/GamePage/GamePage';
+import ProfilePage from './pages/ProfilePage/ProfilePage';
+import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
 
 const ProtectedRouteWrapper = ({ children }) => {
-  const { user } = useAuth();
+  const { user, isLoading } = useAuth();
+  if (isLoading) return <div>Loading...</div>;
+
   return (
     <ProtectedRoute isAllowed={!!user} redirectPath="/">
       {children}
@@ -21,22 +25,43 @@ const ProtectedRouteWrapper = ({ children }) => {
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <Layout />,
+    element: <PublicLayout />,
     children: [
-        { index: true, element: <LoginPage />, loader: async () => {
-            return null; 
-          } 
-        },
-        { path: 'register', element: <RegistrationPage /> },
-        { path: '/verify-email', element: <VerifyEmailPage />},
-        { path: 'game', element: <GamePage />},
-        { path: 'home', element: 
+      { index: true, element: <LoginPage /> },
+      { path: 'register', element: <RegistrationPage /> },
+      { path: 'verify-email', element: <VerifyEmailPage /> },
+    ],
+  },
+  {
+    path: '/',
+    element: <AuthLayout />,
+    children: [
+      {
+        path: 'home',
+        element: (
           <ProtectedRouteWrapper>
             <HomePage />
-          </ProtectedRouteWrapper> 
-        },
-    ]
-  }
+          </ProtectedRouteWrapper>
+        ),
+      },
+      {
+        path: 'game/:gameId',
+        element: (
+          <ProtectedRouteWrapper>
+            <GamePage />
+          </ProtectedRouteWrapper>
+        ),
+      },
+      {
+        path: 'profile/:userId',
+        element: (
+          <ProtectedRouteWrapper>
+            <ProfilePage />
+          </ProtectedRouteWrapper>
+        ),
+      }
+    ],
+  },
 ]);
 
 function App() {
@@ -44,7 +69,7 @@ function App() {
     <AuthProvider>
       <RouterProvider router={router} />
     </AuthProvider>
-  )
+  );
 }
 
-export default App
+export default App;
