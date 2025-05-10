@@ -1,11 +1,9 @@
 import { useEffect, useState } from "react";
-import { format } from "date-fns";
-import { sv } from "date-fns/locale";
 import { useAuth } from "../../context/AuthContext/AuthContext";
 import teamService from "../../services/teamService";
 
 const ProfilePage = () => {
-  const { user, isLoading } = useAuth(); // Use the AuthContext
+  const { user, isLoading } = useAuth();
   const [team, setTeam] = useState(null);
 
   useEffect(() => {

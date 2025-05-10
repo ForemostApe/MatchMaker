@@ -20,14 +20,14 @@ const Navbar = () => {
     <nav className="bg-gray-800 p-4">
       <div className="container mx-auto flex justify-between items-center">
         <div className="flex space-x-4">
-          <Link to="/home" className="text-white">Home</Link>
+          <Link to="/home" className="text-white">Hem</Link>
 
           {!isLoading && user?.userRole === 'Coach' && (
-            <Link to="/game/create" className="text-white">Create Game</Link>
+            <Link to="/game/create" className="text-white">Skapa match</Link>
           )}
 
           {!isLoading && user && (
-            <Link to={profileLink} className="text-white">Profile</Link>
+            <Link to={profileLink} className="text-white">Profil</Link>
           )}
 
           {!isLoading && user?.userRole === 'Admin' && (
@@ -38,7 +38,7 @@ const Navbar = () => {
         <div className="hidden md:block">
           {!isLoading && user && (
             <button className="text-white" onClick={handleLogoutClick}>
-              Logout
+              Logga ut
             </button>
           )}
         </div>
@@ -56,14 +56,14 @@ const Navbar = () => {
 
       {isMenuOpen && (
         <div className="flex flex-col space-y-2">
-          <Link to="/home" className="text-white">Home</Link>
+          <Link to="/home" className="text-white">Hem</Link>
 
-          {!isLoading && user?.role === 'Coach' && (
-            <Link to="/game/create" className="text-white">Create Game</Link>
+          {!isLoading && user?.userRole === 'Coach' && (
+            <Link to="/game/create" className="text-white">Skapa match</Link>
           )}
 
           {!isLoading && user && (
-            <Link to={profileLink} className="text-white">Profile</Link>
+            <Link to={profileLink} className="text-white">Profil</Link>
           )}
 
           {!isLoading && user?.role === 'Admin' && (
@@ -72,7 +72,7 @@ const Navbar = () => {
 
           {!isLoading && user && (
             <button className="text-white" onClick={handleLogoutClick}>
-              Logout
+              Logga ut
             </button>
           )}
         </div>

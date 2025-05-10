@@ -172,7 +172,6 @@ const HomePage = () => {
                   <p>
                     {format(parseISO(game.startTime), "yyyy-MM-dd")} Kl.{" "}
                     {format(parseISO(game.startTime), "HH:mm")} -{" "}
-                    {format(parseISO(game.endTime), "HH:mm")}
                   </p>
                   <p className="text-gray-600">{game.place}</p>
                 </li>

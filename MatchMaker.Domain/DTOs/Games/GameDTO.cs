@@ -6,7 +6,6 @@ public class GameDTO
 {
     public string Id { get; set; } = null!;
     public DateTime StartTime { get; set; }
-    public DateTime EndTime { get; set; }
     public string? GameType { get; set; }
     public string? Location { get; set; }
     public GameStatus GameStatus { get; set; }

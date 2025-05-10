@@ -3,7 +3,7 @@ import { useAuth } from "../../context/AuthContext/AuthContext";
 import teamService from "../../services/teamService";
 import gameService from "../../services/gameService";
 
-const CreateGame = ({ onSubmit }) => {
+const CreateGame = () => {
     const { user } = useAuth();
     const [startTime, setStartTime] = useState("");
     const [gameType, setGameType] = useState("");
