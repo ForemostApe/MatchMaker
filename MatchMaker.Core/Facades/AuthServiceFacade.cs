@@ -101,7 +101,7 @@ namespace MatchMaker.Core.Facades
                 AuthenticationDTO result = new AuthenticationDTO()
                 {
                     AccessToken = accessToken,
-                    User = _mapper.Map<AuthenticatedUserDTO>(user)
+                    User = _mapper.Map<AuthenticatedUserDTO>(user.Data)
                 };
 
                 return Result<AuthenticationDTO>.Success(result, "User successfully authenticated.");
