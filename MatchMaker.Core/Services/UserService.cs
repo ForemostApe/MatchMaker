@@ -35,7 +35,7 @@ public class UserService(ILogger<UserService> logger, IUserRepo userRepo, IAuthS
 
     public async Task<Result<User>> GetUserByEmailAsync(string email)
     {
-        ArgumentNullException.ThrowIfNull(email);
+        ArgumentNullException.ThrowIfNullOrWhiteSpace(email);
 
         try
         {
@@ -52,7 +52,7 @@ public class UserService(ILogger<UserService> logger, IUserRepo userRepo, IAuthS
 
     public async Task<Result<User>> GetUserByIdAsync(string userId)
     {
-        ArgumentNullException.ThrowIfNull(userId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(userId);
 
         try
         {
@@ -60,6 +60,21 @@ public class UserService(ILogger<UserService> logger, IUserRepo userRepo, IAuthS
             if (user == null) return Result<User>.Failure("Failed to find user.");
 
             return Result<User>.Success(user, "User successfully found.");
+        }
+        catch
+        {
+            throw;
+        }
+    }
+
+    public async Task<Result<List<User>>> GetUsersByRoleAsync(UserRole parsedRole)
+    {
+        try
+        {
+            var users = await _userRepo.GetUsersByRole(parsedRole);
+            if (users.Count <= 0) return Result<List<User>>.Failure($"Failed to find any users with the role {parsedRole}");
+
+            return Result<List<User>>.Success(users, $"Users with role {parsedRole} successfully found.");
         }
         catch
         {

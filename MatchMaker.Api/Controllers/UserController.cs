@@ -1,5 +1,6 @@
 ﻿using MatchMaker.Core.Interfaces;
 using MatchMaker.Domain.DTOs.Users;
+using MatchMaker.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MatchMaker.Domain.Controllers;
@@ -114,6 +115,36 @@ public class UserController(ILogger<UserController> logger, IUserServiceFacade u
         catch (Exception ex)
         {
             _logger.LogError(ex, "An unexpected error occured while trying to get user {UserId}.", userId);
+            return StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetails
+            {
+                Title = "An unexpected error occurred",
+                Detail = "An unexpected error occurred while trying to fetch the user. Please try again later.",
+                Status = StatusCodes.Status500InternalServerError
+            });
+        }
+    }
+
+    [HttpGet("role/{userRole}")]
+    public async Task<IActionResult> GetUsersByRole(string userRole)
+    {
+        try
+        {
+            if (string.IsNullOrEmpty(userRole)) return BadRequest();
+
+            var result = await _userServiceFacade.GetUsersByRole(userRole);
+
+            if (!result.IsSuccess || result.Data == null) return NotFound(new ProblemDetails
+            {
+                Title = "Users not found",
+                Detail = result.Message ?? "Users with the specified role was not found.",
+                Status = StatusCodes.Status404NotFound
+            });
+
+            return Ok(result.Data);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An unexpected error occured while trying to get users with the role {userRole}.", userRole);
             return StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetails
             {
                 Title = "An unexpected error occurred",

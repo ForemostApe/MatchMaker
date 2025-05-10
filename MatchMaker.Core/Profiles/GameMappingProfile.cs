@@ -18,6 +18,7 @@ public class GameMappingProfile : IRegister
            .Map(dest => dest.Conditions, src => new Conditions
            {
                Court = src.Conditions.Court,
+               Timing = src.Conditions.Timing,
                OffensiveConditions = src.Conditions.OffensiveConditions,
                DefensiveConditions = src.Conditions.DefensiveConditions,
                Specialists = src.Conditions.Specialists,

@@ -45,6 +45,19 @@ public class UserRepo(ILogger<UserRepo> logger, IMongoDatabase database) : Repos
         }
     }
 
+    public async Task<List<User>> GetUsersByRole(UserRole parsedRole)
+    {
+        try
+        {
+            var filter = Builders<User>.Filter.Eq(u => u.UserRole, parsedRole);
+            return await FindAllAsync(filter);
+        }
+        catch
+        {
+            throw;
+        }
+    }
+
     public async Task<UpdateResult> UpdateUserAsync(User updatedUser)
     {
         try
