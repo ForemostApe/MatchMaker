@@ -7,6 +7,7 @@ public enum GameStatus
     Cancelled,
     Draft,
     Planned,
+    Signed,
     Booked,
     Completed,  
 }
@@ -27,6 +28,11 @@ public class Game : SchemaBase<Game>
 
     [BsonRepresentation(BsonType.ObjectId)]
     public string RefereeId { get; set; } = null!;
+    public bool IsCoachSigned { get; set; }
+    public DateTime? CoachSignedDate { get; set; }
+    public bool IsRefereeSigned { get; set; }
+    public DateTime? RefereeSignedDate { get; set; }
+
     public Conditions Conditions { get; set; } = null!;
 }
 
