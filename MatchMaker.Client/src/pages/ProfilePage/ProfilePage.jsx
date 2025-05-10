@@ -17,6 +17,15 @@ const ProfilePage = () => {
     teamAffiliation: "",
   });
 
+  const roleMapping = {
+    Admin: "Administratör",
+    Coach: "Tränare",
+    Referee: "Domare",
+    Functionary: "Funktionär",
+    Guest: "Gäst",
+    Unspecified: "Ej angiven",
+  };
+
 useEffect(() => {
   const loadData = async () => {
     try {
@@ -146,7 +155,7 @@ useEffect(() => {
                 <option value="Guest">Gäst</option>
               </select>
             ) : (
-              <span>{user.userRole}</span>
+              <span>{roleMapping[user.userRole] || user.userRole}</span>
             )}
           </div>
 

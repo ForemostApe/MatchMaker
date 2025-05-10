@@ -21,6 +21,7 @@ public class UserMappingProfile : IRegister
             .Map(dest => dest.TeamAffiliation, src => src.TeamAffiliation)
             .Map(dest => dest.UserRole, src => string.IsNullOrEmpty(src.UserRole) ? UserRole.Unspecified : Enum.IsDefined(typeof(UserRole), src.UserRole)
                  ? (UserRole)Enum.Parse(typeof(UserRole), src.UserRole, true) : UserRole.Unspecified)
+            .Ignore(dest => dest.PasswordHash)
             .IgnoreNonMapped(true)
             .IgnoreNullValues(true);
 
