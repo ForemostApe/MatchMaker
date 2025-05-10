@@ -18,6 +18,7 @@ public class UpdateGameDTO
 public class UpdateConditionsDTO
 {
     public string? Court { get; set; }
+    public string? Timing { get; set; }
     public string? OffensiveConditions { get; set; }
     public string? DefensiveConditions { get; set; }
     public string? Specialists { get; set; }

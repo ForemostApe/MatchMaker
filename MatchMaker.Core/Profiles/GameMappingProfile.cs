@@ -10,7 +10,6 @@ public class GameMappingProfile : IRegister
     {
         config.NewConfig<CreateGameDTO, Game>()
            .Map(dest => dest.StartTime, src => src.StartTime)
-           .Map(dest => dest.EndTime, src => src.EndTime)
            .Map(dest => dest.GameType, src => src.GameType)
            .Map(dest => dest.Location, src => src.Location)
            .Map(dest => dest.HomeTeamId, src => src.HomeTeamId)
@@ -27,12 +26,12 @@ public class GameMappingProfile : IRegister
 
         config.NewConfig<UpdateGameDTO, Game>()
            .Map(dest => dest.StartTime, src => src.StartTime)
-           .Map(dest => dest.EndTime, src => src.EndTime)
            .Map(dest => dest.Location, src => src.Location)
            .Map(dest => dest.RefereeId, src => src.RefereeId)
            .Map(dest => dest.Conditions, src => new Conditions
            {
                Court = src.Conditions.Court,
+               Timing = src.Conditions.Timing,
                OffensiveConditions = src.Conditions.OffensiveConditions,
                DefensiveConditions = src.Conditions.DefensiveConditions,
                Specialists = src.Conditions.Specialists,

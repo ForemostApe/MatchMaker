@@ -36,7 +36,26 @@ const getGameById = async (gameId) => {
     }
 }
 
+const createGame = async(gameData) => {
+    try {
+        const response = await api.post("/Game/", gameData);
+        return response.data;
+    } catch (error) {
+        if (error.response) {
+            console.error('Error response: ', error.response.data);
+            throw new Error(error.response.data.title || 'Failed to create game');
+        } else if (error.request) {
+            console.error('No response: ', error.request);
+            throw new Error('No response from server');
+        } else {
+            console.error('Request error: ', error.message);
+            throw new Error('Failed to make request');
+        }
+    }
+}
+
 export default {
     getAllGames,
-    getGameById
+    getGameById,
+    createGame
 }
