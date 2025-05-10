@@ -79,15 +79,15 @@ const HomePage = () => {
   });
 
   const getGameStatus = (game) => {
-    if (game.gameStatus === 3) return "green";
-    if (game.gameStatus === 2) return "yellow";
-    if (game.gameStatus === 1) return "red";
-    return "gray";
+    if (game.gameStatus === 3) return "#1bff00";
+    if (game.gameStatus === 2) return "#f3ff00";
+    if (game.gameStatus === 1) return "#ff0000";
+    return "#9e9e9e";
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 rounded-lg p-4 sm:p-8">
-      <div className="w-full max-w-4xl bg-white rounded-lg shadow-md p-4 sm:p-6 mb-8">
+    <div className="flex flex-col items-center min-h-screen p-4 sm:p-8">
+      <div className="w-full max-w-4xl bg-gray-50 rounded-lg shadow-md p-4 sm:p-6 mb-8">
         <div className="flex justify-between items-center mb-4">
           <button
             onClick={goToPreviousMonth}
@@ -126,7 +126,7 @@ const HomePage = () => {
                 key={`${dayStr}-${gamesOnDay.length > 0 ? "booked" : "no-game"}`}
                 className={`border rounded-lg p-2 h-20 text-left text-xs sm:text-sm relative transition cursor-pointer
                   ${!isSameMonth(day, currentMonth) ? "text-gray-400" : ""}
-                  ${isSelected ? "bg-blue-100 border-blue-400" : "hover:bg-gray-100"}
+                  ${isSelected ? "bg-red-100 border-red-400" : "hover:bg-red-50"}
                 `}
                 onClick={() => {
                   setSelectedDate(day);
