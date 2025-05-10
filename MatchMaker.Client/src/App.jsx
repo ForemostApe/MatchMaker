@@ -8,15 +8,16 @@ import LoginPage from './pages/LoginPage/LoginPage';
 import RegistrationPage from './pages/RegistrationPage/RegistrationPage';
 import VerifyEmailPage from './pages/VerifyEmailPage/VerifyEmailPage';
 import GamePage from './pages/GamePage/GamePage';
+import CreateGame from './pages/CreateGamePage/CreateGamePage';
 import ProfilePage from './pages/ProfilePage/ProfilePage';
 import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
 
-const ProtectedRouteWrapper = ({ children }) => {
+const ProtectedRouteWrapper = ({ children, allowedRoles = [] }) => {
   const { user, isLoading } = useAuth();
   if (isLoading) return <div>Loading...</div>;
 
   return (
-    <ProtectedRoute isAllowed={!!user} redirectPath="/">
+    <ProtectedRoute isAllowed={!!user} allowedRoles={allowedRoles} redirectPath="/">
       {children}
     </ProtectedRoute>
   );
@@ -59,7 +60,15 @@ const router = createBrowserRouter([
             <ProfilePage />
           </ProtectedRouteWrapper>
         ),
-      }
+      },
+      {
+        path: 'game/create',
+        element: (
+          <ProtectedRouteWrapper roles={['Coach']}>
+            <CreateGame />
+          </ProtectedRouteWrapper>
+        ),
+      },
     ],
   },
 ]);

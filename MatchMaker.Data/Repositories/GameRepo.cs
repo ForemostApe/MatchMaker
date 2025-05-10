@@ -52,7 +52,6 @@ public class GameRepo(ILogger<GameRepo> logger, IMongoDatabase database) : Repos
             var filter = Builders<Game>.Filter.Eq(g => g.Id, updatedGame.Id);
             var update = Builders<Game>.Update
                 .Set(g => g.StartTime, updatedGame.StartTime)
-                .Set(g => g.EndTime, updatedGame.EndTime)
                 .Set(g => g.Location, updatedGame.Location)
                 .Set(g => g.RefereeId, updatedGame.RefereeId);
 

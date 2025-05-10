@@ -7,7 +7,6 @@ public class UpdateGameDTO
     [BsonRepresentation(BsonType.ObjectId)]
     public string Id { get; set; } = null!;
     public DateTime? StartTime { get; set; }
-    public DateTime? EndTime { get; set; }
     public string? Location { get; set; }
 
     [BsonRepresentation(BsonType.ObjectId)]
@@ -18,6 +17,7 @@ public class UpdateGameDTO
 public class UpdateConditionsDTO
 {
     public string? Court { get; set; }
+    public string? Timing { get; set; }
     public string? OffensiveConditions { get; set; }
     public string? DefensiveConditions { get; set; }
     public string? Specialists { get; set; }

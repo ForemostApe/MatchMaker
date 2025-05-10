@@ -20,13 +20,17 @@ const Navbar = () => {
     <nav className="bg-gray-800 p-4">
       <div className="container mx-auto flex justify-between items-center">
         <div className="flex space-x-4">
-          <Link to="/" className="text-white">Home</Link>
+          <Link to="/home" className="text-white">Hem</Link>
 
-          {!isLoading && user && (
-            <Link to={profileLink} className="text-white">Profile</Link>
+          {!isLoading && user?.userRole === 'Coach' && (
+            <Link to="/game/create" className="text-white">Skapa match</Link>
           )}
 
-          {!isLoading && user?.role === 'Admin' && (
+          {!isLoading && user && (
+            <Link to={profileLink} className="text-white">Profil</Link>
+          )}
+
+          {!isLoading && user?.userRole === 'Admin' && (
             <Link to="/admin" className="text-white">Admin</Link>
           )}
         </div>
@@ -34,7 +38,7 @@ const Navbar = () => {
         <div className="hidden md:block">
           {!isLoading && user && (
             <button className="text-white" onClick={handleLogoutClick}>
-              Logout
+              Logga ut
             </button>
           )}
         </div>
@@ -51,24 +55,26 @@ const Navbar = () => {
       </div>
 
       {isMenuOpen && (
-        <div className="md:hidden bg-gray-800 p-4">
-          <div className="flex flex-col space-y-2">
-            <Link to="/" className="text-white">Home</Link>
+        <div className="flex flex-col space-y-2">
+          <Link to="/home" className="text-white">Hem</Link>
 
-            {!isLoading && user && (
-              <Link to={profileLink} className="text-white">Profile</Link>
-            )}
+          {!isLoading && user?.userRole === 'Coach' && (
+            <Link to="/game/create" className="text-white">Skapa match</Link>
+          )}
 
-            {!isLoading && user?.role === 'Admin' && (
-              <Link to="/admin" className="text-white">Admin</Link>
-            )}
+          {!isLoading && user && (
+            <Link to={profileLink} className="text-white">Profil</Link>
+          )}
 
-            {!isLoading && user && (
-              <button className="text-white" onClick={handleLogoutClick}>
-                Logout
-              </button>
-            )}
-          </div>
+          {!isLoading && user?.role === 'Admin' && (
+            <Link to="/admin" className="text-white">Admin</Link>
+          )}
+
+          {!isLoading && user && (
+            <button className="text-white" onClick={handleLogoutClick}>
+              Logga ut
+            </button>
+          )}
         </div>
       )}
     </nav>
