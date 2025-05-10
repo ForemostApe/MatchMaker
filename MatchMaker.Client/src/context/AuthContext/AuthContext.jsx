@@ -38,6 +38,11 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // This is the method your components can call to re-fetch the current user
+  const refreshUser = async () => {
+    await refresh();
+  };
+
   useEffect(() => {
     let isMounted = true;
 
@@ -95,7 +100,9 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, isLoading, error, login, logout, refresh }}>
+    <AuthContext.Provider
+      value={{ user, isLoading, error, login, logout, refresh, refreshUser }}
+    >
       {children}
     </AuthContext.Provider>
   );

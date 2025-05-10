@@ -84,14 +84,16 @@ public class UserServiceFacade(ILogger<UserServiceFacade> logger, IMapper mapper
 
         try
         {
-            var existingUser = await _userService.GetUserByEmailAsync(userUpdate.Email);
+            var existingUser = await _userService.GetUserByIdAsync(userUpdate.Id);
 
             if (!existingUser.IsSuccess) return Result<UserDTO>.Failure(existingUser.Message);
 
-            if (existingUser.Data != null && !existingUser.Data!.Id.Equals(userUpdate.Id))
-            {
-                return Result<UserDTO>.Failure("Email already exists.");
-            }            
+            
+            //Det här är fel! Ska kolla så att inte mailadressen redan finns och inget annat!!!
+            //if (existingUser.Data != null && !existingUser.Data!.Email.Equals(userUpdate.Email))
+            //{
+            //    return Result<UserDTO>.Failure("Email already exists.");
+            //}            
 
             userUpdate.Adapt(existingUser.Data);
             

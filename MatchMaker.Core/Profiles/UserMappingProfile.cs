@@ -15,11 +15,13 @@ public class UserMappingProfile : IRegister
 
         config.NewConfig<UpdateUserDTO, User>()
             .Map(dest => dest.Id, src => src.Id)
-            .Map(dest => dest.PasswordHash, src => src.PasswordHash)
             .Map(dest => dest.Email, src => src.Email)
             .Map(dest => dest.FirstName, src => src.FirstName)
             .Map(dest => dest.LastName, src => src.LastName)
-            .Map(dest => dest.UserRole, src => src.UserRole)
+            .Map(dest => dest.TeamAffiliation, src => src.TeamAffiliation)
+            .Map(dest => dest.UserRole, src => string.IsNullOrEmpty(src.UserRole) ? UserRole.Unspecified : Enum.IsDefined(typeof(UserRole), src.UserRole)
+                 ? (UserRole)Enum.Parse(typeof(UserRole), src.UserRole, true) : UserRole.Unspecified)
+            .IgnoreNonMapped(true)
             .IgnoreNullValues(true);
 
         config.NewConfig<User, UpdateUserDTO>()
@@ -27,10 +29,10 @@ public class UserMappingProfile : IRegister
             .Map(dest => dest.Email, src => src.Email)
             .Map(dest => dest.FirstName, src => src.FirstName)
             .Map(dest => dest.LastName, src => src.LastName)
+            .Map(dest => dest.TeamAffiliation, src => src.TeamAffiliation)
             .Map(dest => dest.UserRole, src => src.UserRole)
             .IgnoreNonMapped(true)
             .IgnoreNullValues(true);
-
 
         config.NewConfig<User, UserDTO>()
             .Map(dest => dest.Id, src => src.Id)
@@ -38,6 +40,7 @@ public class UserMappingProfile : IRegister
             .Map(dest => dest.FirstName, src => src.FirstName)
             .Map(dest => dest.LastName, src => src.LastName)
             .Map(dest => dest.CreatedDate, src => src.CreatedDate)
+            .Map(dest => dest.TeamAffiliation, src => src.TeamAffiliation)
             .Map(dest => dest.UserRole, src => src.UserRole)
             .IgnoreNonMapped(true)
             .IgnoreNullValues(true);
@@ -47,6 +50,7 @@ public class UserMappingProfile : IRegister
             .Map(dest => dest.Email, src => src.Email)
             .Map(dest => dest.FirstName, src => src.FirstName)
             .Map(dest => dest.LastName, src => src.LastName)
+            .Map(dest => dest.TeamAffiliation, src => src.TeamAffiliation)
             .Map(dest => dest.UserRole, src => src.UserRole)
             .IgnoreNonMapped(true)
             .IgnoreNullValues(true);

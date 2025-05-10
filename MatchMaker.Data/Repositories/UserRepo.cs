@@ -55,6 +55,7 @@ public class UserRepo(ILogger<UserRepo> logger, IMongoDatabase database) : Repos
                 .Set(u => u.Email, updatedUser.Email)
                 .Set(u => u.FirstName, updatedUser.FirstName)
                 .Set(u => u.LastName, updatedUser.LastName)
+                .Set(u => u.TeamAffiliation, updatedUser.TeamAffiliation)
                 .Set(u => u.UserRole, updatedUser.UserRole)
                 .Set(u => u.IsVerified, updatedUser.IsVerified);
 
