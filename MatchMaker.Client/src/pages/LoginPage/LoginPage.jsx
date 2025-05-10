@@ -33,9 +33,9 @@ const LoginPage = () => {
         <div className="min-h-screen flex items-center justify-center flex-col gap-4">
             <LoginForm onSubmit={handleLogin} />
             <div className="text-sm text-gray-600">
-                Don't have an account?{" "}
+                Har du inget konto?{" "}
                 <Link to="/register" className="text-blue-600 hover:underline">
-                    Register here
+                    Registera dig här
                 </Link>
             </div>
         </div>

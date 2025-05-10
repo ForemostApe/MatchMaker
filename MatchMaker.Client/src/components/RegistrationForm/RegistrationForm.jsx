@@ -8,16 +8,25 @@ const RegistrationForm = ({ onSubmit }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    if (!isValidEmail(email) || !isValidName(firstName) || !isValidName(lastName)) {
+      alert("Invalid input detected.");
+      return;
+    }
+
     onSubmit({ email, password, firstName, lastName });
   };
 
+  const isValidEmail = (email) => /\S+@\S+\.\S+/.test(email);
+  const isValidName = (name) => /^[A-Za-z\s]+$/.test(name);
+
   return (
     <form onSubmit={handleSubmit} className="max-w-md mx-auto p-6">
-      <h2 className="text-2xl font-bold mb-4 text-gray-800">Register</h2>
+      <h2 className="text-2xl font-bold mb-4 text-gray-800">Registrera konto</h2>
 
       <div className="mb-4">
         <label htmlFor="email" className="block text-gray-700 mb-2">
-          Email
+          Email-adress
         </label>
         <input
           type="email"
@@ -31,7 +40,7 @@ const RegistrationForm = ({ onSubmit }) => {
 
       <div className="mb-4">
         <label htmlFor="password" className="block text-gray-700 mb-2">
-          Password
+          Lösenord
         </label>
         <input
           type="password"
@@ -45,7 +54,7 @@ const RegistrationForm = ({ onSubmit }) => {
 
       <div className="mb-4">
         <label htmlFor="firstName" className="block text-gray-700 mb-2">
-          First Name
+          Förnamn
         </label>
         <input
           type="text"
@@ -59,7 +68,7 @@ const RegistrationForm = ({ onSubmit }) => {
 
       <div className="mb-6">
         <label htmlFor="lastName" className="block text-gray-700 mb-2">
-          Last Name
+          Efternamn
         </label>
         <input
           type="text"
@@ -75,7 +84,7 @@ const RegistrationForm = ({ onSubmit }) => {
         type="submit"
         className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors"
       >
-        Register
+        Registrera
       </button>
     </form>
   );
