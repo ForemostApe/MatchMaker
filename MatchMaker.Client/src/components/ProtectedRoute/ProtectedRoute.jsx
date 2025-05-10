@@ -3,12 +3,11 @@ import { useAuth } from '../../context/AuthContext/AuthContext';
 
 const ProtectedRoute = ({ children, isAllowed, redirectPath = '/' }) => {
   const { user, isLoading } = useAuth();
-  
+
   if (isLoading) {
     return <div>Loading authentication...</div>;
-  }
-
-  if (!isAllowed) {
+  }  
+  if (!isAllowed || !user) {
     return <Navigate to={redirectPath} replace />;
   }
 

@@ -18,21 +18,19 @@ const LoginPage = () => {
         try {
             setLoading(true);
             await login(credentials);
-            navigate('/home');
         } catch (error) {
-            alert('Login failed.') || 'Login failed.'
-        }
-        finally {
+            alert('Login failed.') || 'Login failed.';
+        } finally {
             setLoading(false);
         }
     };
 
-    if (user) {
+    if (user || loading) {
         return null;
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center">
+        <div className="min-h-screen flex items-center justify-center flex-col gap-4">
             <LoginForm onSubmit={handleLogin} />
             <div className="text-sm text-gray-600">
                 Don't have an account?{" "}

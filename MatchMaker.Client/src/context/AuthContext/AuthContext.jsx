@@ -8,10 +8,9 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-
+  
   const refresh = async () => {
     try {
-      setIsLoading(true);
       const response = await authService.refresh();
       const responseData = response?.data || response;
 
@@ -33,33 +32,12 @@ export const AuthProvider = ({ children }) => {
       setUser(null);
       clearAccessToken();
       setError(err.response?.data?.message || "Session refresh failed");
-    } finally {
-      setIsLoading(false);
     }
   };
 
-  // This is the method your components can call to re-fetch the current user
   const refreshUser = async () => {
     await refresh();
   };
-
-  useEffect(() => {
-    let isMounted = true;
-
-    const initializeAuth = async () => {
-      try {
-        await refresh();
-      } finally {
-        if (isMounted) setIsLoading(false);
-      }
-    };
-
-    initializeAuth();
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
 
   const login = async (credentials) => {
     try {
@@ -91,7 +69,6 @@ export const AuthProvider = ({ children }) => {
       setUser(null);
       clearAccessToken();
       setError(null);
-      navigate("/");
     } catch (err) {
       setError(err.response?.data?.message || "Logout failed");
     } finally {
@@ -99,11 +76,32 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  useEffect(() => {
+    let isMounted = true;
+
+    const initializeAuth = async () => {
+      try {
+        setIsLoading(true);
+        await refresh();
+      } catch (e) {
+        console.error("Initialization failed", e);
+      } finally {
+        if (isMounted) setIsLoading(false);
+      }
+    };
+
+    initializeAuth();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   return (
     <AuthContext.Provider
       value={{ user, isLoading, error, login, logout, refresh, refreshUser }}
     >
-      {children}
+      {isLoading ? <div>Loading auth...</div> : children}
     </AuthContext.Provider>
   );
 };
