@@ -2,22 +2,26 @@
 using MailKit.Security;
 using MatchMaker.Core.Interfaces;
 using MatchMaker.Domain.Configurations;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using MimeKit;
 
 namespace MatchMaker.Core.Services;
 
-public class EmailService(ILogger<EmailService> logger, SmtpSettings smtpSettings, ILinkFactory linkFactory, IEmailTemplateEngine emailTemplateEngine) : IEmailService
+public class EmailService(ILogger<EmailService> logger, SmtpSettings smtpSettings, ILinkFactory linkFactory, IEmailTemplateEngine emailTemplateEngine, ClientSettings clientSettings) : IEmailService
 {
     private readonly ILogger<EmailService> _logger = logger;
     private readonly SmtpSettings _smtpSettings = smtpSettings;
     private readonly ILinkFactory _linkFactory = linkFactory;
     private readonly IEmailTemplateEngine _emailTemplateEngine = emailTemplateEngine;
+    private readonly ClientSettings _clientSettings = clientSettings;
 
     public enum EmailType
     {
         UserCreated,
-        PasswordReset
+        PasswordReset,
+        GameNotification
     }
 
     public async Task CreateEmailAsync(string email, EmailType mailType, string? token = null)
@@ -45,6 +49,12 @@ public class EmailService(ILogger<EmailService> logger, SmtpSettings smtpSetting
                     templateName = "PasswordResetTemplate";
                     emailSubject = "Begäran att återställa MatchMaker-lösenord.";
                     templateModel = new { resetPassword_link = !string.IsNullOrEmpty(email) ? _linkFactory.CreateResetPasswordLink(email!) : throw new ArgumentNullException("Email is null when trying create reset password-link.") };
+                    break;
+
+                case EmailType.GameNotification:
+                    templateName = "GameNotificationTemplate";
+                    emailSubject = "En planerad match inväntar bedömning.";
+                    templateModel = new { login_link = !string.IsNullOrEmpty(email) ? _clientSettings.BaseURL : throw new ArgumentNullException("Email is null when trying create reset password-link.") };
                     break;
 
                 default:

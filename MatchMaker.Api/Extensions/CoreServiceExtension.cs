@@ -21,13 +21,8 @@ public static class CoreServiceExtension
         services.AddMapster();
 
         services.Configure<ClientSettings>(configuration.GetSection("FrontendClient"));
-
-        var clientSettings = configuration.GetSection("FrontendClient").Get<ClientSettings>() ?? throw new ArgumentNullException("Couldn't get frontend-client settings.");
-        
-        string clientUrl = env.IsDevelopment() ? clientSettings.DevelopmentURL : clientSettings.ProductionURL;
-        if (string.IsNullOrEmpty(clientUrl)) throw new InvalidOperationException("Frontend URL is not configured.");
-
-        services.AddScoped<ILinkFactory>(_ => new LinkFactory(_.GetRequiredService<ILogger<LinkFactory>>(), clientUrl));
+        var clientSettings = configuration.GetSection("FrontendClient").Get<ClientSettings>() ?? throw new ArgumentNullException("Couldn't get BaseURL settings.");
+        services.AddSingleton(clientSettings);
 
         services.AddHttpContextAccessor();
 
@@ -46,7 +41,8 @@ public static class CoreServiceExtension
 
         services.AddTransient<IEmailService, EmailService>();
         services.AddSingleton<IEmailTemplateEngine, EmailTemplateEngine>();
-        services.AddScoped<ILinkFactory>(_ => new LinkFactory(_.GetRequiredService<ILogger<LinkFactory>>(), clientUrl));
+        
+        services.AddScoped<ILinkFactory>(_ => new LinkFactory(_.GetRequiredService<ILogger<LinkFactory>>(), clientSettings.BaseURL));
 
         services.AddScoped<ITeamServiceFacade, TeamServiceFacade>();
         services.AddScoped<ITeamService, TeamService>();
