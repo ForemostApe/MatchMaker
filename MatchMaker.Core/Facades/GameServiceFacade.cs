@@ -1,10 +1,8 @@
 ﻿using Mapster;
 using MapsterMapper;
 using MatchMaker.Core.Interfaces;
-using MatchMaker.Core.Services;
 using MatchMaker.Domain.DTOs;
 using MatchMaker.Domain.DTOs.Games;
-using MatchMaker.Domain.DTOs.Teams;
 using MatchMaker.Domain.Entities;
 
 namespace MatchMaker.Core.Facades;
@@ -24,6 +22,8 @@ public class GameServiceFacade(IGameService gameService, IMapper mapper) : IGame
 
             var result = await _gameService.CreateGameAsync(game);
             if (!result.IsSuccess) return Result<GameDTO>.Failure(result.Message);
+
+
 
             var createdGame = _mapper.Map<GameDTO>(result.Data!);
             return Result<GameDTO>.Success(createdGame, result.Message);
