@@ -7,10 +7,12 @@ using MatchMaker.Domain.Entities;
 
 namespace MatchMaker.Core.Facades;
 
-public class GameServiceFacade(IGameService gameService, IMapper mapper) : IGameServiceFacade
+public class GameServiceFacade(IGameService gameService, IMapper mapper, IEmailService emailService, IUserService userService) : IGameServiceFacade
 {
     private readonly IGameService _gameService = gameService;
     private readonly IMapper _mapper = mapper;
+    private readonly IEmailService _emailService = emailService;
+    private readonly IUserService _userService = userService;
 
     public async Task<Result<GameDTO>> CreateGameAsync(CreateGameDTO newGame)
     {
@@ -22,6 +24,7 @@ public class GameServiceFacade(IGameService gameService, IMapper mapper) : IGame
 
             var result = await _gameService.CreateGameAsync(game);
             if (!result.IsSuccess) return Result<GameDTO>.Failure(result.Message);
+
 
 
 

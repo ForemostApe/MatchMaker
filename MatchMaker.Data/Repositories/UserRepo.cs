@@ -45,12 +45,23 @@ public class UserRepo(ILogger<UserRepo> logger, IMongoDatabase database) : Repos
         }
     }
 
-    public async Task<List<User>> GetUsersByRole(UserRole parsedRole)
+    public async Task<List<User>> GetUsersByRole(UserRole parsedRole, string? teamId = null)
     {
         try
         {
-            var filter = Builders<User>.Filter.Eq(u => u.UserRole, parsedRole);
-            return await FindAllAsync(filter);
+            var filters = new List<FilterDefinition<User>>
+            {
+                Builders<User>.Filter.Eq(u => u.UserRole, parsedRole)
+            };
+
+            if (!string.IsNullOrEmpty(teamId))
+            {
+                filters.Add(Builders<User>.Filter.Eq(u => u.TeamAffiliation, teamId));
+            }
+
+            var combinedFilter = Builders<User>.Filter.And(filters);
+
+            return await FindAllAsync(combinedFilter);
         }
         catch
         {

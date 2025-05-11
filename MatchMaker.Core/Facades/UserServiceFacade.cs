@@ -79,7 +79,7 @@ public class UserServiceFacade(ILogger<UserServiceFacade> logger, IMapper mapper
         }
     }
 
-    public async Task<Result<List<UserDTO>>> GetUsersByRole(string userRole)
+    public async Task<Result<List<UserDTO>>> GetUsersByRole(string userRole, string? teamId = null)
     {
         ArgumentException.ThrowIfNullOrEmpty(userRole);
 
@@ -87,7 +87,7 @@ public class UserServiceFacade(ILogger<UserServiceFacade> logger, IMapper mapper
         {
             if (!Enum.TryParse<UserRole>(userRole, true, out var parsedRole)) throw new ArgumentException($"Invalid user role: {userRole}");
 
-            var result = await _userService.GetUsersByRoleAsync(parsedRole);
+            var result = await _userService.GetUsersByRoleAsync(parsedRole, teamId);
             if (!result.IsSuccess) return Result<List<UserDTO>>.Failure(result.Message);
 
             var users = _mapper.Map<List<UserDTO>>(result.Data!);
@@ -99,6 +99,7 @@ public class UserServiceFacade(ILogger<UserServiceFacade> logger, IMapper mapper
             throw;
         }
     }
+
     public async Task<Result<UserDTO>> UpdateUserAsync(UpdateUserDTO userUpdate)
     {
         ArgumentNullException.ThrowIfNull(userUpdate);      
