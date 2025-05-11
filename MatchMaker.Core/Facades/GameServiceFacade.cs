@@ -25,8 +25,11 @@ public class GameServiceFacade(IGameService gameService, IMapper mapper, IEmailS
             var result = await _gameService.CreateGameAsync(game);
             if (!result.IsSuccess) return Result<GameDTO>.Failure(result.Message);
 
+            var awayTeamCoach = await _userService.GetUsersByRoleAsync(UserRole.Coach, newGame.AwayTeamId);
 
+            if (!awayTeamCoach.IsSuccess) return Result<GameDTO>.Failure(result.Message);
 
+            await _emailService.CreateEmailAsync(awayTeamCoach.Data![0].Email, Services.EmailService.EmailType.GameNotification); //Refactor in the future, might need more roles to separate main-coach from help-coaches.
 
             var createdGame = _mapper.Map<GameDTO>(result.Data!);
             return Result<GameDTO>.Success(createdGame, result.Message);
