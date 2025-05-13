@@ -61,10 +61,9 @@
 </head>
 <body>
     <div class="container">
-        <h1>Ditt konto är skapat!</h1>
-        <p>Välkommen till vad nu den här appen kan tänkas heta när den är klar.</p>
-        <p>Vänligen klicka länken nedan för att verifiera din mailadress.</p>
-        <a href="{{ verification_link }}" target="_blank">Klicka här för att verifiera din mailadress.</a>
+        <h1>En match har planerats!</h1>
+        <p>V�nligen logga in och granska den matchbokning som skickats till dig.</p>
+        <a href="{{ login_link }}" target="_blank">Klicka h�r f�r att �ppna hemsidan.</a>
     </div>
 </body>
 </html>

@@ -67,12 +67,12 @@ public class UserService(ILogger<UserService> logger, IUserRepo userRepo, IAuthS
         }
     }
 
-    public async Task<Result<List<User>>> GetUsersByRoleAsync(UserRole parsedRole)
+    public async Task<Result<List<User>>> GetUsersByRoleAsync(UserRole parsedRole, string? teamId = null)
     {
         try
         {
-            var users = await _userRepo.GetUsersByRole(parsedRole);
-            if (users.Count <= 0) return Result<List<User>>.Failure($"Failed to find any users with the role {parsedRole}");
+            var users = await _userRepo.GetUsersByRole(parsedRole, teamId);
+            if (users.Count <= 0) return Result<List<User>>.Failure($"Failed to find any users with the role {parsedRole}" + (teamId != null ? $" in team {teamId}" : ""));
 
             return Result<List<User>>.Success(users, $"Users with role {parsedRole} successfully found.");
         }

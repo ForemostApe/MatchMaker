@@ -2,6 +2,7 @@ using MatchMaker.Api.Extensions;
 using MatchMaker.Domain.Extensions;
 using MatchMaker.Domain.Middlewares;
 using Microsoft.IdentityModel.Logging;
+using System;
 
 namespace MatchMaker.Domain
 {
@@ -17,7 +18,9 @@ namespace MatchMaker.Domain
                 options.ValidateOnBuild = true;
             });
 
-            if (builder.Environment.IsDevelopment()) builder.WebHost.ConfigureKestrelServer();
+            #if DEBUG
+                builder.WebHost.ConfigureKestrelServer();
+            #endif
 
             builder.Services.AddMongoDb(builder.Configuration);
             builder.Services.AddCoreServices(builder.Configuration, builder.Environment);
@@ -27,9 +30,18 @@ namespace MatchMaker.Domain
             builder.Services.AddRateLimiting(builder.Configuration);
 
             var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? new[] { "http://localhost:5173" };
+
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("Development", policy =>
+                {
+                    policy.WithOrigins(allowedOrigins)
+                          .AllowAnyMethod()
+                          .AllowAnyHeader()
+                          .AllowCredentials()
+                          .SetPreflightMaxAge(TimeSpan.FromSeconds(86400));
+                });
+                options.AddPolicy("Staging", policy =>
                 {
                     policy.WithOrigins(allowedOrigins)
                           .AllowAnyMethod()
@@ -59,21 +71,21 @@ namespace MatchMaker.Domain
             app.UseHttpsRedirection();
 
             //Check what this actually does. Tied to Kestrel and security-headers.
-            if (app.Environment.IsDevelopment()) app.Use(async (context, next) =>
-            {
-                context.Response.Headers.Add("X-Content-Type-Options", "nosniff");
-                await next();
-            });
+            //if (app.Environment.IsDevelopment()) app.Use(async (context, next) =>
+            //{
+            //    context.Response.Headers.Add("X-Content-Type-Options", "nosniff");
+            //    await next();
+            //});
 
             app.UseRateLimiter();
             app.UseStaticFiles();
+            app.MapHealthChecks("/health");
             app.UseRouting();
             app.UseSession();
-            app.UseCors("Development");
+            app.UseCors(app.Environment.IsDevelopment() ? "Development" : "Staging");
             app.UseAuthentication();
             app.UseAuthorization();
             app.UseMiddleware<JwtMiddleware>();
-            app.MapHealthChecks("/health"); //Check what this does.
             app.MapControllers();
             app.MapFallbackToFile("index.html");
 

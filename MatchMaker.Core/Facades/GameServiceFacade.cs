@@ -1,18 +1,18 @@
 ﻿using Mapster;
 using MapsterMapper;
 using MatchMaker.Core.Interfaces;
-using MatchMaker.Core.Services;
 using MatchMaker.Domain.DTOs;
 using MatchMaker.Domain.DTOs.Games;
-using MatchMaker.Domain.DTOs.Teams;
 using MatchMaker.Domain.Entities;
 
 namespace MatchMaker.Core.Facades;
 
-public class GameServiceFacade(IGameService gameService, IMapper mapper) : IGameServiceFacade
+public class GameServiceFacade(IGameService gameService, IMapper mapper, IEmailService emailService, IUserService userService) : IGameServiceFacade
 {
     private readonly IGameService _gameService = gameService;
     private readonly IMapper _mapper = mapper;
+    private readonly IEmailService _emailService = emailService;
+    private readonly IUserService _userService = userService;
 
     public async Task<Result<GameDTO>> CreateGameAsync(CreateGameDTO newGame)
     {
@@ -24,6 +24,12 @@ public class GameServiceFacade(IGameService gameService, IMapper mapper) : IGame
 
             var result = await _gameService.CreateGameAsync(game);
             if (!result.IsSuccess) return Result<GameDTO>.Failure(result.Message);
+
+            var awayTeamCoach = await _userService.GetUsersByRoleAsync(UserRole.Coach, newGame.AwayTeamId);
+
+            if (!awayTeamCoach.IsSuccess) return Result<GameDTO>.Failure(result.Message);
+
+            await _emailService.CreateEmailAsync(awayTeamCoach.Data![0].Email, Services.EmailService.EmailType.GameNotification); //Refactor in the future, might need more roles to separate main-coach from help-coaches.
 
             var createdGame = _mapper.Map<GameDTO>(result.Data!);
             return Result<GameDTO>.Success(createdGame, result.Message);

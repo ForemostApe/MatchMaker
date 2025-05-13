@@ -2,6 +2,5 @@
 
 public class ClientSettings
 {
-    public string DevelopmentURL { get; set; } = null!;
-    public string ProductionURL { get; set; } = null!;
+    public string BaseURL { get; set; } = null!;
 }

@@ -1,6 +1,5 @@
 ﻿using MatchMaker.Core.Interfaces;
 using MatchMaker.Domain.DTOs.Users;
-using MatchMaker.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MatchMaker.Domain.Controllers;
@@ -125,13 +124,13 @@ public class UserController(ILogger<UserController> logger, IUserServiceFacade u
     }
 
     [HttpGet("role/{userRole}")]
-    public async Task<IActionResult> GetUsersByRole(string userRole)
+    public async Task<IActionResult> GetUsersByRole(string userRole, string? teamId = null)
     {
         try
         {
             if (string.IsNullOrEmpty(userRole)) return BadRequest();
 
-            var result = await _userServiceFacade.GetUsersByRole(userRole);
+            var result = await _userServiceFacade.GetUsersByRole(userRole, teamId);
 
             if (!result.IsSuccess || result.Data == null) return NotFound(new ProblemDetails
             {
