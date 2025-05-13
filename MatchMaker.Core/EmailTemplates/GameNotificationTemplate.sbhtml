@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="sv">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -62,7 +62,7 @@
 <body>
     <div class="container">
         <h1>En match har planerats!</h1>
-        <p>Vänligen logga in och granska den matchboknings som skickats till dig.</p>
+        <p>Vänligen logga in och granska den matchbokning som skickats till dig.</p>
         <a href="{{ login_link }}" target="_blank">Klicka här för att öppna hemsidan.</a>
     </div>
 </body>

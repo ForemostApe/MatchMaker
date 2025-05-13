@@ -1,5 +1,15 @@
 import api from "./axiosConfig";
 
+const register = async (formData) => {
+  const response = await api.post("/User/", {
+    Password: formData.password,
+    Email: formData.email,
+    FirstName: formData.firstName,
+    LastName: formData.lastName
+  });
+  return response.data;
+}
+
 const getAllUsers = async () => {
   try {
     const response = await api.get("User/");

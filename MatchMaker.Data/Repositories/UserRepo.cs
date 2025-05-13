@@ -19,11 +19,11 @@ public class UserRepo(ILogger<UserRepo> logger, IMongoDatabase database) : Repos
         }
     }
 
-    public async Task<User?> GetUserByIdAsync(string userId)
+    public async Task<User?> GetUserByEmailAsync(string email)
     {
         try
         {
-            var filter = Builders<User>.Filter.Eq(u => u.Id, userId);
+            var filter = Builders<User>.Filter.Regex(u => u.Email, new MongoDB.Bson.BsonRegularExpression($"^{email}$", "i"));
             return await FindOneAsync(filter);
         }
         catch
@@ -32,11 +32,11 @@ public class UserRepo(ILogger<UserRepo> logger, IMongoDatabase database) : Repos
         }
     }
 
-    public async Task<User?> GetUserByEmailAsync(string email)
+    public async Task<User?> GetUserByIdAsync(string userId)
     {
         try
         {
-            var filter = Builders<User>.Filter.Regex(u => u.Email, new MongoDB.Bson.BsonRegularExpression($"^{email}$", "i"));
+            var filter = Builders<User>.Filter.Eq(u => u.Id, userId);
             return await FindOneAsync(filter);
         }
         catch

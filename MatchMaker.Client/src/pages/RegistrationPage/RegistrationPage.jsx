@@ -1,7 +1,7 @@
 import RegistrationForm from "../../components/RegistrationForm/RegistrationForm";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import authService from "../../services/authService";
+import userService from "../../services/userService";
 
 const RegistrationPage = () => {
   const navigate = useNavigate();
@@ -10,7 +10,7 @@ const RegistrationPage = () => {
   const handleRegister = async (formData) => {
     try {
       setLoading(true);
-      await authService.register(formData);
+      await userService.register(formData);
       alert("Registration successful!");
       navigate("/");
     } catch (error) {

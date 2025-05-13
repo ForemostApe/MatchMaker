@@ -1,6 +1,5 @@
 ﻿using MatchMaker.Core.Interfaces;
 using MatchMaker.Domain.DTOs.Users;
-using MatchMaker.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MatchMaker.Domain.Controllers;
