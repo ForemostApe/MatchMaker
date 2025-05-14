@@ -76,7 +76,7 @@ const CreateGame = () => {
       alert("Game created successfully!");
     } catch (error) {
       console.error("Error creating game:", error);
-      alert("There was an error creating the game.");
+      alert(error.message);
     }
   };
 
