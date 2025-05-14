@@ -75,7 +75,7 @@ public class UserService(ILogger<UserService> logger, IUserRepo userRepo) : IUse
         ArgumentNullException.ThrowIfNull(userId);
 
         var result = await _userRepo.DeleteUserAsync(userId);
-        return result.DeletedCount <= 0 
+        return result.DeletedCount > 0 
             ? Result<User>.Success(null, "Successfully deleted user.")
             : Result<User>.Failure("Failed to delete user.");
     }

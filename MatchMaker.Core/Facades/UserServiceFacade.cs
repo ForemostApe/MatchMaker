@@ -22,7 +22,7 @@ public class UserServiceFacade(IMapper mapper, IUserService userService, IEmailS
         ArgumentNullException.ThrowIfNull(newUser);
 
         var existingUser = await _userService.GetUserByEmailAsync(newUser.Email);
-        if (existingUser != null)
+        if (existingUser.IsSuccess)
         {
             return Result<UserDTO>.Failure(
                 "User already exists.",

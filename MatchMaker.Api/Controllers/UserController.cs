@@ -20,15 +20,12 @@ public class UserController(ILogger<UserController> logger, IUserServiceFacade u
 
             var result = await _userServiceFacade.CreateUserAsync(newUser);
 
-            if (!result.IsSuccess)
+            if (!result.IsSuccess) return StatusCode(result.GetStatusCodeOrDefault(), new ProblemDetails()
             {
-                return Conflict(new ProblemDetails
-                {
-                    Title = "User creation failed",
-                    Detail = result.Message,
-                    Status = StatusCodes.Status409Conflict
-                });
-            }
+                Title = result.Title,
+                Detail = result.Message,
+                Status = result.StatusCode
+            });
 
             var baseUrl = $"{Request.Scheme}://{Request.Host}";
             var manualUri = $"{baseUrl}/api/User/{result.Data!.Id}";
@@ -72,11 +69,11 @@ public class UserController(ILogger<UserController> logger, IUserServiceFacade u
 
             var result = await _userServiceFacade.GetUserByEmailAsync(email);
 
-            if (!result.IsSuccess || result.Data == null) return NotFound(new ProblemDetails
+            if (!result.IsSuccess) return StatusCode(result.GetStatusCodeOrDefault(), new ProblemDetails()
             {
-                Title = "User not found",
-                Detail = result.Message ?? "The specified user was not found.",
-                Status = StatusCodes.Status404NotFound
+                Title = result.Title,
+                Detail = result.Message,
+                Status = result.StatusCode
             });
 
             return Ok(result.Data);
@@ -102,11 +99,11 @@ public class UserController(ILogger<UserController> logger, IUserServiceFacade u
 
             var result = await _userServiceFacade.GetUserByIdAsync(userId);
 
-            if (!result.IsSuccess || result.Data == null) return NotFound(new ProblemDetails
+            if (!result.IsSuccess) return StatusCode(result.GetStatusCodeOrDefault(), new ProblemDetails()
             {
-                Title = "User not found",
-                Detail = result.Message ?? "The specified user was not found.",
-                Status = StatusCodes.Status404NotFound
+                Title = result.Title,
+                Detail = result.Message,
+                Status = result.StatusCode
             });
 
             return Ok(result.Data);
@@ -132,11 +129,11 @@ public class UserController(ILogger<UserController> logger, IUserServiceFacade u
 
             var result = await _userServiceFacade.GetUsersByRole(userRole, teamId);
 
-            if (!result.IsSuccess || result.Data == null) return NotFound(new ProblemDetails
+            if (!result.IsSuccess) return StatusCode(result.GetStatusCodeOrDefault(), new ProblemDetails()
             {
-                Title = "Users not found",
-                Detail = result.Message ?? "Users with the specified role was not found.",
-                Status = StatusCodes.Status404NotFound
+                Title = result.Title,
+                Detail = result.Message,
+                Status = result.StatusCode
             });
 
             return Ok(result.Data);
@@ -162,11 +159,11 @@ public class UserController(ILogger<UserController> logger, IUserServiceFacade u
 
             var result = await _userServiceFacade.UpdateUserAsync(updatedUser);
 
-            if (!result.IsSuccess || result.Data == null) return NotFound(new ProblemDetails()
+            if (!result.IsSuccess) return StatusCode(result.GetStatusCodeOrDefault(), new ProblemDetails()
             {
-                Title = "User not found",
-                Detail = result.Message ?? "The specified user was not found.",
-                Status = StatusCodes.Status404NotFound
+                Title = result.Title,
+                Detail = result.Message,
+                Status = result.StatusCode
             });
 
             return Ok(result.Data);
@@ -200,11 +197,11 @@ public class UserController(ILogger<UserController> logger, IUserServiceFacade u
 
             var result = await _userServiceFacade.DeleteUserAsync(userId);
 
-            if(!result.IsSuccess) return BadRequest(new ProblemDetails
+            if (!result.IsSuccess) return StatusCode(result.GetStatusCodeOrDefault(), new ProblemDetails()
             {
-                Title = "Failed to delete user",
+                Title = result.Title,
                 Detail = result.Message,
-                Status = StatusCodes.Status400BadRequest
+                Status = result.StatusCode
             });
 
             return NoContent();
