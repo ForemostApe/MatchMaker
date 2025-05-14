@@ -182,25 +182,55 @@ public class GameServiceFacade(IGameService gameService, IMapper mapper, IEmailS
                 StatusCodes.Status400BadRequest
             );
         }
-    
+
     public async Task<Result<GameDTO>> HandleRefereeResponseAsync(GameResponseDTO response)
     {
         ArgumentNullException.ThrowIfNull(response);
 
-        try
+        var existingGame = await _gameService.GetGameByIdAsync(response.GameId);
+        if (!existingGame.IsSuccess || existingGame.Data is null)
         {
-            var result = await _gameService.HandleRefereeResponseAsync(response);
-            if (!result.IsSuccess) return Result<GameDTO>.Failure(result.Message);
-
-            //Setup a mail that informs that booking is completed to coaches.
-            //await _emailService.CreateEmailAsync(referee.Data.Email, Services.EmailService.EmailType.GameNotification); 
-
-            var game = _mapper.Map<GameDTO>(result.Data!);
-            return Result<GameDTO>.Success(game, result.Message);
+            return Result<GameDTO>.Failure(
+                "Game not found",
+                existingGame.Message,
+                StatusCodes.Status404NotFound
+            );
         }
-        catch
+
+        Game game = existingGame.Data;
+
+        if (!response.Accepted)
         {
-            throw;
+            game.GameStatus = GameStatus.Draft;
+            game.IsRefereeSigned = false;
+
+            response.Adapt(game);
+
+            var declineResult = await _gameService.UpdateGameAsync(game);
+
+            if (!declineResult.IsSuccess)
+            {
+                return Result<GameDTO>.Failure(
+                    "Failed to register declined booking",
+                    declineResult.Message,
+                    StatusCodes.Status400BadRequest
+                    );
+            }
+
+            return Result<GameDTO>.Success(_mapper.Map<GameDTO>(game), "Referee declined the game.");
         }
+
+        game.IsRefereeSigned = true;
+        game.RefereeSignedDate = DateTime.UtcNow;
+        game.GameStatus = game.IsCoachSigned ? GameStatus.Booked : GameStatus.Signed;
+
+        var acceptedResult = await _gameService.UpdateGameAsync(game);
+        return acceptedResult.IsSuccess
+            ? Result<GameDTO>.Success(_mapper.Map<GameDTO>(game), "Referee successfully signed the game.")
+            : Result<GameDTO>.Failure(
+                "Failed to update game.",
+                acceptedResult.Message,
+                StatusCodes.Status400BadRequest
+            );
     }
 }
