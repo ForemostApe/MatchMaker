@@ -11,6 +11,6 @@ public interface IGameService
     Task<Result<Game>> GetGameByIdAsync(string gameId);
     Task<Result<Game>> UpdateGameAsync(Game updatedGame);
     Task<Result<Game>> DeleteGameAsync(string gameId);
-    Task<Result<Game>> HandleCoachResponseAsync(GameResponseDTO response);
+    //Task<Result<Game>> HandleCoachResponseAsync(GameResponseDTO response);
     Task<Result<Game>> HandleRefereeResponseAsync(GameResponseDTO response);
 }

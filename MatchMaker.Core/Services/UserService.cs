@@ -69,17 +69,8 @@ public class UserService(ILogger<UserService> logger, IUserRepo userRepo, IAuthS
 
     public async Task<Result<List<User>>> GetUsersByRoleAsync(UserRole parsedRole, string? teamId = null)
     {
-        try
-        {
             var users = await _userRepo.GetUsersByRole(parsedRole, teamId);
-            if (users.Count <= 0) return Result<List<User>>.Failure($"Failed to find any users with the role {parsedRole}" + (teamId != null ? $" in team {teamId}" : ""));
-
-            return Result<List<User>>.Success(users, $"Users with role {parsedRole} successfully found.");
-        }
-        catch
-        {
-            throw;
-        }
+            return users.Count != 0 ? Result<List<User>>.Success(users, $"Users with role {parsedRole} successfully found.") : Result<List<User>>.Failure($"Failed to find any users with the role {parsedRole}" + (teamId != null ? $" in team {teamId}" : ""));
     }
 
     public async Task<Result<User>> UpdateUserAsync(User updatedUser)

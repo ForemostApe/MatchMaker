@@ -13,108 +13,69 @@ public class GameService(IGameRepo gameRepo) : IGameService
     {
         ArgumentNullException.ThrowIfNull(newGame);
 
-        try
-        {
-            var result = await _gameRepo.CreateGameAsync(newGame);
-
-            if (result == null) return Result<Game>.Failure("Couldn't create game.");
-
-            return Result<Game>.Success(result, "Game successfully created.");
-        }
-
-        catch
-        {
-            throw;
-        }
+        var result = await _gameRepo.CreateGameAsync(newGame);
+        return result != null 
+            ? Result<Game>.Success(result, "Game successfully created.")
+            : Result<Game>.Failure("Couldn't create game.");
     }
 
     public async Task<Result<List<Game>>> GetAllGamesAsync()
     {
-        try
-        {
-            var result = await _gameRepo.GetAllGamesAsync();
-            if (result.Count == 0) return Result<List<Game>>.Failure("Couldn't find any games.");
-
-            return Result<List<Game>>.Success(result, "Games successfully found.");
-        }
-        catch
-        {
-            throw;
-        }
+        var result = await _gameRepo.GetAllGamesAsync();
+        return result.Count != 0
+            ? Result<List<Game>>.Success(result, "Games successfully found.")
+            : Result<List<Game>>.Failure("Couldn't find any games.");
     }
 
     public async Task<Result<Game>> GetGameByIdAsync(string gameId)
     {
         ArgumentNullException.ThrowIfNull(gameId);
 
-        try
-        {
-            var result = await _gameRepo.GetGameByIdAsync(gameId);
-
-            if (result == null) return Result<Game>.Failure("Couldn't find game.");
-
-            return Result <Game>.Success(result, "Game successfully found.");
-        }
-        catch
-        {
-            throw;
-        }
+        var result = await _gameRepo.GetGameByIdAsync(gameId);
+        return result != null 
+            ? Result<Game>.Success(result, "Game successfully found.") 
+            : Result<Game>.Failure("Couldn't find game.");
     }
 
     public async Task<Result<Game>> UpdateGameAsync(Game updatedGame)
     {
         ArgumentNullException.ThrowIfNull(updatedGame);
 
-        try
-        {
-            var result = await _gameRepo.UpdateGameAsync(updatedGame);
-
-            if (result.ModifiedCount <= 0) return Result<Game>.Failure("No changes were made.");
-
-            return Result<Game>.Success(updatedGame, "Game successfully updated.");
-        }
-        catch
-        {
-            throw;
-        }
+        var result = await _gameRepo.UpdateGameAsync(updatedGame);
+        return result.ModifiedCount > 0 
+            ? Result<Game>.Success(updatedGame, "Game successfully updated.") 
+            : Result<Game>.Failure("No changes were made.");
     }
 
     public async Task<Result<Game>> DeleteGameAsync(string gameId)
     {
         ArgumentException.ThrowIfNullOrEmpty(gameId);
 
-        try
-        {
-            var result = await _gameRepo.DeleteGameAsync(gameId);
-            if (result.DeletedCount <= 0) return Result<Game>.Failure("Game not found.");
-
-            return Result<Game>.Success(null, "Game successfully deleted.");
-        }
-        catch
-        {
-            throw;
-        }
+        var result = await _gameRepo.DeleteGameAsync(gameId);
+        return result.DeletedCount > 0 
+            ? Result<Game>.Success(null, "Game successfully deleted.") 
+            : Result<Game>.Failure("Game not found.");
     }
 
-    public async Task<Result<Game>> HandleCoachResponseAsync(GameResponseDTO response)
-    {
-        var game = await _gameRepo.GetGameByIdAsync(response.GameId);
-        if (game == null) return Result<Game>.Failure("Game not found.");
+    //public async Task<Result<Game>> HandleCoachResponseAsync(GameResponseDTO response)
+    //{
+    //    if (!response.Accepted)
+    //    {
+    //        game.GameStatus = GameStatus.Draft;
+    //        var declinedResult = await _gameRepo.UpdateGameAsync(game);
+    //        return declinedResult.ModifiedCount > 0 
+    //            ? Result<Game>.Success(game, "Coach declined the game.") 
+    //            : Result<Game>.Failure("Failed to update game.");
+    //    }
 
-        if (!response.Accepted)
-        {
-            game.GameStatus = GameStatus.Draft;
-            await _gameRepo.UpdateGameAsync(game);
-            return Result<Game>.Failure("Coach rejected the game.");
-        }
+    //    game.IsCoachSigned = true;
+    //    game.CoachSignedDate = DateTime.UtcNow;
+    //    game.GameStatus = game.IsRefereeSigned ? GameStatus.Booked : GameStatus.Signed;
 
-        game.IsCoachSigned = true;
-        game.CoachSignedDate = DateTime.UtcNow;
-        game.GameStatus = game.IsRefereeSigned ? GameStatus.Booked : GameStatus.Signed;
+    //    var acceptedResult = await _gameRepo.UpdateGameAsync(game);
+    //    return acceptedResult.ModifiedCount > 0 ? Result<Game>.Success(game, "Coach successfully signed the game.") : Result<Game>.Failure("Failed to update game.");
+    //}
 
-        var updateResult = await _gameRepo.UpdateGameAsync(game);
-        return updateResult.ModifiedCount > 0 ? Result<Game>.Success(game, "Coach successfully signed the game.") : Result<Game>.Failure("Failed to update game.");
-    }
     public async Task<Result<Game>> HandleRefereeResponseAsync(GameResponseDTO response)
     {
         var game = await _gameRepo.GetGameByIdAsync(response.GameId);
