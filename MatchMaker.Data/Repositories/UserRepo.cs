@@ -9,14 +9,8 @@ public class UserRepo(ILogger<UserRepo> logger, IMongoDatabase database) : Repos
 {
     public async Task<User> CreateUserAsync(User newUser)
     {
-        try
-        {
-            return await InsertOneAsync(newUser);
-        }
-        catch
-        {
-            throw;
-        }
+
+        return await InsertOneAsync(newUser);
     }
 
     public async Task<User?> GetUserByEmailAsync(string email)

@@ -21,7 +21,7 @@ public class GameService(IGameRepo gameRepo) : IGameService
     public async Task<Result<List<Game>>> GetAllGamesAsync()
     {
         var result = await _gameRepo.GetAllGamesAsync();
-        return result.Count != 0
+        return result.Count > 0
             ? Result<List<Game>>.Success(result, "Games successfully found.")
             : Result<List<Game>>.Failure("Couldn't find any games.");
     }
