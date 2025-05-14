@@ -1,4 +1,5 @@
 ﻿using MatchMaker.Domain.DTOs;
+using MatchMaker.Domain.DTOs.Games;
 using MatchMaker.Domain.Entities;
 
 namespace MatchMaker.Core.Interfaces;
@@ -10,4 +11,6 @@ public interface IGameService
     Task<Result<Game>> GetGameByIdAsync(string gameId);
     Task<Result<Game>> UpdateGameAsync(Game updatedGame);
     Task<Result<Game>> DeleteGameAsync(string gameId);
+    Task<Result<Game>> HandleCoachResponseAsync(GameResponseDTO response);
+    Task<Result<Game>> HandleRefereeResponseAsync(GameResponseDTO response);
 }

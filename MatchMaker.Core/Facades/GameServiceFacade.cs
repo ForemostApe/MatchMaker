@@ -4,6 +4,7 @@ using MatchMaker.Core.Interfaces;
 using MatchMaker.Domain.DTOs;
 using MatchMaker.Domain.DTOs.Games;
 using MatchMaker.Domain.Entities;
+using System.Security.Claims;
 
 namespace MatchMaker.Core.Facades;
 
@@ -86,11 +87,9 @@ public class GameServiceFacade(IGameService gameService, IMapper mapper, IEmailS
             updatedGame.Adapt(existingGame.Data!);
 
             var result = await _gameService.UpdateGameAsync(existingGame.Data!);
-
             if (!result.IsSuccess) return Result<GameDTO>.Failure(result.Message);
 
             var game = result.Data!.Adapt<GameDTO>();
-
             return Result<GameDTO>.Success(game, result.Message);
 
         }
@@ -103,13 +102,56 @@ public class GameServiceFacade(IGameService gameService, IMapper mapper, IEmailS
     public async Task<Result<GameDTO>> DeleteGameAsync(string gameId)
     {
         ArgumentException.ThrowIfNullOrEmpty(gameId);
+
         try
         {
             var result = await _gameService.DeleteGameAsync(gameId);
-
             if (!result.IsSuccess) return Result<GameDTO>.Failure(result.Message);
 
             return Result<GameDTO>.Success(null, result.Message);
+        }
+        catch
+        {
+            throw;
+        }
+    }
+
+    public async Task<Result<GameDTO>> HandleCoachResponseAsync(GameResponseDTO response)
+    {
+        ArgumentNullException.ThrowIfNull(response);
+
+        try
+        {
+            var result = await _gameService.HandleCoachResponseAsync(response);
+            if (!result.IsSuccess) return Result<GameDTO>.Failure(result.Message);
+
+            var referee = await _userService.GetUserByIdAsync(response.RefereeId);
+
+            await _emailService.CreateEmailAsync(referee.Data.Email, Services.EmailService.EmailType.GameNotification);
+
+            var game = _mapper.Map<GameDTO>(result.Data!);
+            return Result<GameDTO>.Success(game, result.Message);
+        }
+        catch
+        {
+            throw;
+        }
+    }
+
+    public async Task<Result<GameDTO>> HandleRefereeResponseAsync(GameResponseDTO response)
+    {
+        ArgumentNullException.ThrowIfNull(response);
+
+        try
+        {
+            var result = await _gameService.HandleRefereeResponseAsync(response);
+            if (!result.IsSuccess) return Result<GameDTO>.Failure(result.Message);
+
+            //Setup a mail that informs that booking is completed to coaches.
+            //await _emailService.CreateEmailAsync(referee.Data.Email, Services.EmailService.EmailType.GameNotification); 
+
+            var game = _mapper.Map<GameDTO>(result.Data!);
+            return Result<GameDTO>.Success(game, result.Message);
         }
         catch
         {
