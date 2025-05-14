@@ -3,6 +3,8 @@ using MongoDB.Bson;
 using System.Runtime.Serialization;
 
 namespace MatchMaker.Domain.Entities;
+
+
 public enum GameStatus
 {
     Cancelled,
@@ -30,6 +32,8 @@ public class Game : SchemaBase<Game>
     public DateTime StartTime { get; set; }
     public string GameType { get; set; } = null!;
     public string Location { get; set; } = null!;
+
+    [BsonRepresentation(BsonType.String)]
     public GameStatus GameStatus { get; set; } = GameStatus.Draft;
 
     [BsonRepresentation(BsonType.ObjectId)]
