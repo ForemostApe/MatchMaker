@@ -137,4 +137,25 @@ public class GameServiceFacade(IGameService gameService, IMapper mapper, IEmailS
             throw;
         }
     }
+
+    public async Task<Result<GameDTO>> HandleRefereeResponseAsync(GameResponseDTO response)
+    {
+        ArgumentNullException.ThrowIfNull(response);
+
+        try
+        {
+            var result = await _gameService.HandleRefereeResponseAsync(response);
+            if (!result.IsSuccess) return Result<GameDTO>.Failure(result.Message);
+
+            //Setup a mail that informs that booking is completed to coaches.
+            //await _emailService.CreateEmailAsync(referee.Data.Email, Services.EmailService.EmailType.GameNotification); 
+
+            var game = _mapper.Map<GameDTO>(result.Data!);
+            return Result<GameDTO>.Success(game, result.Message);
+        }
+        catch
+        {
+            throw;
+        }
+    }
 }

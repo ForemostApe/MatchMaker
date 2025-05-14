@@ -163,15 +163,44 @@ namespace MatchMaker.Api.Controllers
         }
 
 
-
-        [HttpPost("response/coach", Name = nameof(GameResponseAsync))]
-        public async Task<IActionResult> GameResponseAsync([FromBody] GameResponseDTO response)
+        [HttpPost("response/coach", Name = nameof(HandleCoachResponseAsync))]
+        public async Task<IActionResult> HandleCoachResponseAsync([FromBody] GameResponseDTO response)
         {
             ArgumentNullException.ThrowIfNull(response);
 
             try
             {
                 var result = await _gameServiceFacade.HandleCoachResponseAsync(response);
+
+                if (!result.IsSuccess) return NotFound(new ProblemDetails()
+                {
+                    Title = "Game not found",
+                    Detail = result.Message,
+                    Status = StatusCodes.Status404NotFound
+                });
+
+                return Ok(result.Data);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"An unexpected error occurred while trying to respond to game {ex.Message}");
+                return StatusCode(500, new ProblemDetails
+                {
+                    Title = "Internal Server Error",
+                    Detail = "An unexpected error occured. Please try again later",
+                    Status = StatusCodes.Status500InternalServerError
+                });
+            }
+        }
+
+        [HttpPost("response/referee", Name = nameof(HandleRefereeResponseAsync))]
+        public async Task<IActionResult> HandleRefereeResponseAsync([FromBody] GameResponseDTO response)
+        {
+            ArgumentNullException.ThrowIfNull(response);
+
+            try
+            {
+                var result = await _gameServiceFacade.HandleRefereeResponseAsync(response);
 
                 if (!result.IsSuccess) return NotFound(new ProblemDetails()
                 {

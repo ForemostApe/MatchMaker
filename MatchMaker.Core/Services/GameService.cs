@@ -110,7 +110,7 @@ public class GameService(IGameRepo gameRepo) : IGameService
 
         game.IsCoachSigned = true;
         game.CoachSignedDate = DateTime.UtcNow;
-        game.GameStatus = GameStatus.Planned;
+        game.GameStatus = game.IsRefereeSigned ? GameStatus.Booked : GameStatus.Planned;
 
         var updateResult = await _gameRepo.UpdateGameAsync(game);
         return updateResult.ModifiedCount > 0 ? Result<Game>.Success(game, "Coach successfully signed the game.") : Result<Game>.Failure("Failed to update game.");
@@ -129,7 +129,6 @@ public class GameService(IGameRepo gameRepo) : IGameService
 
         game.IsRefereeSigned = true;
         game.RefereeSignedDate = DateTime.UtcNow;
-
         game.GameStatus = game.IsCoachSigned ? GameStatus.Booked : GameStatus.Planned;
 
         var updateResult = await _gameRepo.UpdateGameAsync(game);

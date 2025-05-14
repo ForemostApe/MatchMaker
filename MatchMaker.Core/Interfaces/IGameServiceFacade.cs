@@ -11,5 +11,6 @@ namespace MatchMaker.Core.Interfaces
         Task<Result<GameDTO>> UpdateGameAsync(UpdateGameDTO updatedGame);
         Task<Result<GameDTO>> DeleteGameAsync(string gameId);
         Task<Result<GameDTO>> HandleCoachResponseAsync(GameResponseDTO response);
+        Task<Result<GameDTO>> HandleRefereeResponseAsync(GameResponseDTO response);
     }
 }
