@@ -2,6 +2,7 @@
 using MatchMaker.Domain.DTOs.Games;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace MatchMaker.Api.Controllers
 {
@@ -117,7 +118,7 @@ namespace MatchMaker.Api.Controllers
                     });
                 }
 
-                return Ok(result.Data!);
+                return Ok(result.Data);
             }
             catch (Exception ex)
             {
@@ -152,6 +153,38 @@ namespace MatchMaker.Api.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"An unexpected error occurred while trying to delete game {ex.Message}");
+                return StatusCode(500, new ProblemDetails
+                {
+                    Title = "Internal Server Error",
+                    Detail = "An unexpected error occured. Please try again later",
+                    Status = StatusCodes.Status500InternalServerError
+                });
+            }
+        }
+
+
+
+        [HttpPost("response/coach", Name = nameof(GameResponseAsync))]
+        public async Task<IActionResult> GameResponseAsync([FromBody] GameResponseDTO response)
+        {
+            ArgumentNullException.ThrowIfNull(response);
+
+            try
+            {
+                var result = await _gameServiceFacade.HandleCoachResponseAsync(response);
+
+                if (!result.IsSuccess) return NotFound(new ProblemDetails()
+                {
+                    Title = "Game not found",
+                    Detail = result.Message,
+                    Status = StatusCodes.Status404NotFound
+                });
+
+                return Ok(result.Data);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"An unexpected error occurred while trying to respond to game {ex.Message}");
                 return StatusCode(500, new ProblemDetails
                 {
                     Title = "Internal Server Error",

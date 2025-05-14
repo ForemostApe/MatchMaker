@@ -10,5 +10,6 @@ namespace MatchMaker.Core.Interfaces
         Task<Result<GameDTO>> GetGameByIdAsync(string gameId);
         Task<Result<GameDTO>> UpdateGameAsync(UpdateGameDTO updatedGame);
         Task<Result<GameDTO>> DeleteGameAsync(string gameId);
+        Task<Result<GameDTO>> HandleCoachResponseAsync(GameResponseDTO response);
     }
 }

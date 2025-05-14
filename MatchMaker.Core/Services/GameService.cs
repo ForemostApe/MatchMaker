@@ -1,6 +1,7 @@
 ﻿using MatchMaker.Core.Interfaces;
 using MatchMaker.Data.Interfaces;
 using MatchMaker.Domain.DTOs;
+using MatchMaker.Domain.DTOs.Games;
 using MatchMaker.Domain.Entities;
 
 namespace MatchMaker.Core.Services;
@@ -93,5 +94,45 @@ public class GameService(IGameRepo gameRepo) : IGameService
         {
             throw;
         }
+    }
+
+    public async Task<Result<Game>> HandleCoachResponseAsync(GameResponseDTO response)
+    {
+        var game = await _gameRepo.GetGameByIdAsync(response.GameId);
+        if (game == null) return Result<Game>.Failure("Game not found.");
+
+        if (!response.Accepted)
+        {
+            game.GameStatus = GameStatus.Draft;
+            await _gameRepo.UpdateGameAsync(game);
+            return Result<Game>.Failure("Coach rejected the game.");
+        }
+
+        game.IsCoachSigned = true;
+        game.CoachSignedDate = DateTime.UtcNow;
+        game.GameStatus = GameStatus.Planned;
+
+        var updateResult = await _gameRepo.UpdateGameAsync(game);
+        return updateResult.ModifiedCount > 0 ? Result<Game>.Success(game, "Coach successfully signed the game.") : Result<Game>.Failure("Failed to update game.");
+    }
+    public async Task<Result<Game>> HandleRefereeResponseAsync(GameResponseDTO response)
+    {
+        var game = await _gameRepo.GetGameByIdAsync(response.GameId);
+        if (game == null) return Result<Game>.Failure("Game not found.");
+
+        if (!response.Accepted)
+        {
+            game.GameStatus = GameStatus.Draft;
+            await _gameRepo.UpdateGameAsync(game);
+            return Result<Game>.Failure("Referee rejected the game.");
+        }
+
+        game.IsRefereeSigned = true;
+        game.RefereeSignedDate = DateTime.UtcNow;
+
+        game.GameStatus = game.IsCoachSigned ? GameStatus.Booked : GameStatus.Planned;
+
+        var updateResult = await _gameRepo.UpdateGameAsync(game);
+        return updateResult.ModifiedCount > 0 ? Result<Game>.Success(game, "Referee successfully signed the game.") : Result<Game>.Failure("Failed to update game.");
     }
 }

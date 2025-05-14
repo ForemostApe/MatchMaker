@@ -53,7 +53,11 @@ public class GameRepo(ILogger<GameRepo> logger, IMongoDatabase database) : Repos
             var update = Builders<Game>.Update
                 .Set(g => g.StartTime, updatedGame.StartTime)
                 .Set(g => g.Location, updatedGame.Location)
-                .Set(g => g.RefereeId, updatedGame.RefereeId);
+                .Set(g => g.RefereeId, updatedGame.RefereeId)
+                .Set(g => g.IsCoachSigned, updatedGame.IsCoachSigned)
+                .Set(g => g.CoachSignedDate, updatedGame.CoachSignedDate)
+                .Set(g => g.IsRefereeSigned, updatedGame.IsRefereeSigned)
+                .Set(g => g.RefereeSignedDate, updatedGame.RefereeSignedDate);
 
             if (updatedGame.Conditions != null)
             {
