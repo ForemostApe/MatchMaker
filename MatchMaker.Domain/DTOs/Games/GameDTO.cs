@@ -8,7 +8,7 @@ public class GameDTO
     public DateTime StartTime { get; set; }
     public string? GameType { get; set; }
     public string? Location { get; set; }
-    public GameStatus GameStatus { get; set; }
+    public string? GameStatus { get; set; }
     public string? HomeTeamId { get; set; }
     public string? AwayTeamId { get; set; }
     public string? RefereeId { get; set; }
