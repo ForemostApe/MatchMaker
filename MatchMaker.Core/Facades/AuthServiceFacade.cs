@@ -23,22 +23,22 @@ namespace MatchMaker.Core.Facades
             {
                 if (string.IsNullOrWhiteSpace(token))
                 {
-                    return Result<bool>.Failure("Token cannot be empty");
+                    return Result<bool>.Failure("Token får inte vara tom.");
                 }
 
                 var principal = _tokenService.DecryptToken(token);
                 if (principal == null)
                 {
-                    return Result<bool>.Failure("Invalid or expired verification token");
+                    return Result<bool>.Failure("Ogiltig eller utgången verifikationstoken");
                 }
 
-                var userId = principal.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? throw new UnauthorizedAccessException($"User-Id claim is missing.");
-                var userEmail = principal.FindFirst(ClaimTypes.Email)?.Value ?? throw new UnauthorizedAccessException($"User-email claim is missing.");
-                var tokenUsage = principal.FindFirst("token_usage")?.Value ?? throw new UnauthorizedAccessException($"Token-claim is missing.");
+                var userId = principal.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? throw new UnauthorizedAccessException($"User-Id claim saknas.");
+                var userEmail = principal.FindFirst(ClaimTypes.Email)?.Value ?? throw new UnauthorizedAccessException($"User-email claim saknas.");
+                var tokenUsage = principal.FindFirst("token_usage")?.Value ?? throw new UnauthorizedAccessException($"Token-claim is saknas.");
 
                 if (tokenUsage != "verification")
                 {
-                    return Result<bool>.Failure("This token is not for email-verification");
+                    return Result<bool>.Failure("Tillhandhahållen token är inte avsedd för email-verifikation.");
                 }
 
                 var user = await _userService.GetUserByIdAsync(userId);
@@ -49,24 +49,24 @@ namespace MatchMaker.Core.Facades
 
                 if (user.Data!.Email.ToLower() != userEmail.ToLower())
                 {
-                    return Result<bool>.Failure("Email does not match verification token");
+                    return Result<bool>.Failure("Email-adressen matchar inte email-adressen i tillhandahållen token.");
                 }
 
                 if (user.Data!.IsVerified)
                 {
-                    return Result<bool>.Success(true, "Email already verified");
+                    return Result<bool>.Success(true, "Email-adressen är redan verifierad.");
                 }
 
                 user.Data!.IsVerified = true;
 
                 var updateResult = await _userService.VerifyEmailAsync(user.Data!);
 
-                return Result<bool>.Success(true, "Email successfully verified");
+                return Result<bool>.Success(true, "Email-adressen har verifierats.");
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Unexpected error during email-verification.");
-                throw new ApplicationException("An unexpected error occurred. Please try again later.");
+                throw new ApplicationException("Ett oväntat fel uppstod. Vänligen försök igen senare.");
             }
         }
 
@@ -74,42 +74,34 @@ namespace MatchMaker.Core.Facades
         {
             try
             {
-                _logger.LogInformation("Attempting to login user with email {email}", loginDTO.Email);
+                var userResult = await _userService.GetUserByEmailAsync(loginDTO.Email);
 
-                var user = await _userService.GetUserByEmailAsync(loginDTO.Email);
+                if (!userResult.IsSuccess || userResult.Data == null) return Result<AuthenticationDTO>.Failure("Felaktig email-adress eller felaktigt lösenord.");
 
-                if (user == null)
-                {
-                    _logger.LogError("User not found.");
-                    return Result<AuthenticationDTO>.Failure("Invalid email-address or password.");
-                }
+                var user = userResult.Data;
 
-                if (user.Data == null || !BCrypt.Net.BCrypt.Verify(loginDTO.Password, user.Data!.PasswordHash))
-                {
-                    _logger.LogError("Invalid email-address or password.");
+                if (!BCrypt.Net.BCrypt.Verify(loginDTO.Password, user.PasswordHash)) return Result<AuthenticationDTO>.Failure("Felaktig email-adress eller felaktigt lösenord.");
 
-                    return Result<AuthenticationDTO>.Failure("Invalid email-address or password.");
-                }
+                if (!user.IsVerified) return Result<AuthenticationDTO>.Failure("Vänligen verifiera din email-adress för att kunna logga in.");
 
                 _sessionManager.ClearSession("refreshToken");
 
-                var accessToken = await _tokenService.GenerateAccessToken(user.Data!);
-                var refreshToken = await _tokenService.GenerateRefreshToken(user.Data);
+                var accessToken = await _tokenService.GenerateAccessToken(user);
+                var refreshToken = await _tokenService.GenerateRefreshToken(user);
                 _cookieFactory.CreateHttpOnlyCookie("refreshToken", refreshToken);
-                _logger.LogInformation("Token created: {token}", accessToken);
 
                 AuthenticationDTO result = new AuthenticationDTO()
                 {
                     AccessToken = accessToken,
-                    User = _mapper.Map<AuthenticatedUserDTO>(user.Data)
+                    User = _mapper.Map<AuthenticatedUserDTO>(user)
                 };
 
-                return Result<AuthenticationDTO>.Success(result, "User successfully authenticated.");
+                return Result<AuthenticationDTO>.Success(result, "Du är nu inloggad.");
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Unexpected error during login.");
-                throw new ApplicationException("An unexpected error occurred. Please try again later.");
+                throw new ApplicationException("Ett oväntat fel uppstod. Vänligen försök igen senare.");
             }
         }
 
@@ -117,9 +109,7 @@ namespace MatchMaker.Core.Facades
         {
             try
             {
-                var user = await _tokenService.ValidateRefreshToken(refreshToken);
-
-                if (user == null) throw new UnauthorizedAccessException("Invalid refresh token.");
+                var user = await _tokenService.ValidateRefreshToken(refreshToken) ?? throw new UnauthorizedAccessException("Ogiltig refresh-token.");
 
                 var newAccessToken = await _tokenService.GenerateAccessToken(user);
                 var newRefreshToken = await _tokenService.GenerateRefreshToken(user);
@@ -131,13 +121,13 @@ namespace MatchMaker.Core.Facades
                     User = _mapper.Map<AuthenticatedUserDTO>(user)
                 };
 
-                return Result<AuthenticationDTO>.Success(result, "User successfully reauthenticated.");
+                return Result<AuthenticationDTO>.Success(result, "Token förnyades och användaren är åter autentiserad.");
 
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error refreshing token.");
-                throw new ApplicationException("An unexpected error occurred trying to refresh token. Please try again later.");
+                throw new ApplicationException("Ett fel uppstod vid förnyelse av token. Vänligen försök igen senare.");
             }
         }
 
@@ -147,12 +137,12 @@ namespace MatchMaker.Core.Facades
             {
                 _sessionManager.ClearSession("refreshToken");
 
-                return Result<string>.Success("Cookie successfully deleted");
+                return Result<string>.Success("Du har loggats ut.");
             }
             catch (Exception ex)
             {
-                _logger.LogError("Couldn't delete cookie.");
-                throw new InvalidOperationException("An error occured while trying to logout user.", ex);
+                _logger.LogError(ex, "Couldn't delete cookie.");
+                throw new InvalidOperationException("Ett fel uppstod vid utloggning.");
             }
         }
     }
