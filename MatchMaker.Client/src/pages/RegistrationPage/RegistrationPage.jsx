@@ -10,7 +10,7 @@ const RegistrationPage = () => {
   const handleRegister = async (formData) => {
     try {
       setLoading(true);
-      await userService.register(formData);
+      await userService.registerUser(formData);
       alert("Registration successful!");
       navigate("/");
     } catch (error) {

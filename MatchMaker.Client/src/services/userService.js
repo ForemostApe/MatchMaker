@@ -1,6 +1,6 @@
 import api from "./axiosConfig";
 
-const register = async (formData) => {
+const registerUser = async (formData) => {
   const response = await api.post("/User/", {
     Password: formData.password,
     Email: formData.email,
@@ -82,6 +82,7 @@ const updateUser = (profileData) => {
 };
 
 export default {
+  registerUser,
   getAllUsers,
   getUserById,
   getUsersByRole,
