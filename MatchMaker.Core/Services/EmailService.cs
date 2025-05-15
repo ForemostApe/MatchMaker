@@ -2,9 +2,7 @@
 using MailKit.Security;
 using MatchMaker.Core.Interfaces;
 using MatchMaker.Domain.Configurations;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using MimeKit;
 
 namespace MatchMaker.Core.Services;
