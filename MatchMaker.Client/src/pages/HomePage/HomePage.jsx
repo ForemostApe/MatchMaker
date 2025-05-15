@@ -4,10 +4,10 @@ import gameService from "../../services/gameService";
 import teamService from "../../services/teamService";
 import { parseISO, isSameMonth } from "date-fns";
 import { useAuth } from "../../context/AuthContext/AuthContext";
-import Calendar from "../../components/Calendar/Calendar";
-import GameList from "../../components/GameList/GameList";
-import MonthSelector from "../../components/MonthSelector/MonthSelector";
-import PendingGamesList from "../../components/PendingGamesList/PendingGamesList";
+import Calendar from "./Components/Calendar";
+import GameList from "./Components/GameList";
+import MonthSelector from "./Components/MonthSelector";
+import PendingGamesList from "./Components/PendingGamesList";
 
 const HomePage = () => {
   const { user } = useAuth();

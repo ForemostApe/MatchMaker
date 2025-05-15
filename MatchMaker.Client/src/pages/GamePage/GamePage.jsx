@@ -1,68 +1,122 @@
 import { useParams, useLocation } from "react-router-dom";
+import { useState, useEffect } from "react";
 import useGameData from "../../hooks/useGameData";
-import { format, parseISO } from "date-fns";
-import { sv } from "date-fns/locale";
-import Calendar from "../../components/Calendar/Calendar";
+import GameHeader from "./Components/GameHeader";
+import GameConditions from "./Components/GameConditions";
+import GameDetails from "./Components/GameDetails";
+import { useAuth } from "../../context/AuthContext/AuthContext";
 import gameService from "../../services/gameService";
-import teamService from "../../services/teamService";
-import GameList from "../../components/GameList/GameList";
-import MonthSelector from "../../components/GameList/GameList";
 
 const GamePage = () => {
   const { id } = useParams();
   const location = useLocation();
   const { game, homeTeam, awayTeam, loading, error } = useGameData(id, location);
+  const { user } = useAuth();
+
+  const [editing, setEditing] = useState(false);
+  const [formState, setFormState] = useState(null);
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState(null);
+
+  const canEdit = user.userRole === "Coach" && user.teamAffiliation === game?.homeTeamId;
+
+  useEffect(() => {
+    if (game) {
+      setFormState({
+        startTime: game.startTime,
+        location: game.location,
+        gameType: game.gameType,
+        conditions: { ...game.conditions }
+      });
+    }
+  }, [game]);
+
+  const toggleEditing = () => {
+    if (!editing) {
+      setFormState({
+        startTime: game.startTime,
+        location: game.location,
+        gameType: game.gameType,
+        conditions: { ...game.conditions }
+      });
+    }
+    setEditing(prev => !prev);
+    setSaveError(null);
+  };
+
+  const handleCancel = () => {
+    toggleEditing();
+  };
+
+  const handleSave = async () => {
+    setSaving(true);
+    setSaveError(null);
+    try {
+      await gameService.updateGame({
+        id: game.id,
+        startTime: formState.startTime,
+        location: formState.location,
+        gameType: formState.gameType,
+        conditions: formState.conditions
+      });
+      setEditing(false);
+    } catch (err) {
+      setSaveError(err.message);
+    } finally {
+      setSaving(false);
+    }
+  };
 
   if (loading) return <p>Loading...</p>;
-  if (error) return <p>Error loading game data.</p>;
+  if (error || !formState) return <p>Error loading game data.</p>;
 
   return (
     <div className="p-4 max-w-3xl mx-auto bg-white shadow rounded">
-      <div className="flex flex-row justify justify-between p-0">
-        <div className="w-30 h-30 bg-red-500">
-          Logo
+      <GameHeader homeTeam={homeTeam} awayTeam={awayTeam} game={game} />
+
+      <GameDetails
+        editing={editing}
+        canEdit={canEdit}
+        formState={formState}
+        setFormState={setFormState}
+      />
+
+      <GameConditions
+        editing={editing}
+        canEdit={canEdit}
+        formState={formState}
+        setFormState={setFormState}
+      />
+
+      {canEdit && (
+        <div className="flex gap-2 mt-4">
+          {!editing ? (
+            <button
+              className="px-4 py-2 bg-blue-600 text-white rounded"
+              onClick={toggleEditing}
+            >
+              Redigera
+            </button>
+          ) : (
+            <>
+              <button
+                className="px-4 py-2 bg-green-600 text-white rounded disabled:opacity-50"
+                onClick={handleSave}
+                disabled={saving}
+              >
+                {saving ? "Sparar..." : "Spara"}
+              </button>
+              <button
+                className="px-4 py-2 bg-gray-500 text-white rounded"
+                onClick={handleCancel}
+              >
+                Avbryt
+              </button>
+              {saveError && <p className="text-red-600">{saveError}</p>}
+            </>
+          )}
         </div>
-        <div className="flex flex-col text-center justify-between border-solid h-auto">
-            <div className="border-solid"><h1 className="text-xl font-bold">{homeTeam.teamName} vs {awayTeam.teamName}</h1></div>
-            <div className="border-solid"><h2 className="text-xl font-bold">{format(parseISO(game.startTime), "EEEE d MMMM", { locale: sv }).replace(/^\w/, c => c.toUpperCase())}</h2></div>
-            <div className="border-solid"><h2 className="text-xl font-bold">{game.location}, Kl. {format(parseISO(game.startTime), "HH:mm")}</h2></div>
-        </div>
-        <div className="w-30 h-30 bg-red-500">
-          Logo
-        </div>
-      </div>
-      <div>
-        <div className="m-1 mt-5">
-          <span><h3 className="font-bold">Spelplan:</h3></span> 
-          <div>
-            {game.conditions.court}
-          </div>
-        </div>
-        <div className="m-1 mt-5">
-          <span><h3 className="font-bold">Offensiva överrenskommelser:</h3></span> 
-          <div>
-            {game.conditions.offensiveConditions}
-          </div>
-        </div>
-        <div className="m-1 mt-5">
-          <span><h3 className="font-bold">Defensiva överrensskommelser:</h3></span> 
-          <div>
-            {game.conditions.defensiveConditions}
-          </div>
-        </div>
-        <div className="m-1 mt-5">
-          <span><h3 className="font-bold">Specialister:</h3></span> 
-            <div>
-              {game.conditions.specialists}
-            </div>
-          </div>
-        <div className="m-1 mt-5">
-          <span><h3 className="font-bold">Bestraffningar:</h3></span>
-            <div>
-              {game.conditions.penalties}
-            </div>
-          </div>
-      </div>
+      )}
     </div>
   );
 };

@@ -201,7 +201,7 @@ public class GameServiceFacade(IGameService gameService, IMapper mapper, IEmailS
 
         if (!response.Accepted)
         {
-            game.GameStatus = GameStatus.Draft;
+            game.GameStatus = GameStatus.Signed;
             game.IsRefereeSigned = false;
 
             response.Adapt(game);
