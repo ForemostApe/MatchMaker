@@ -54,8 +54,28 @@ const createGame = async(gameData) => {
     }
 }
 
+const submitCoachResponse = async (gameId, accepted) => {
+    try {
+        const response = await api.post(`/Game/${gameId}/coach-response`, { accepted });
+        return response.data;
+    } catch (error) {
+        handleServiceError(error, 'Failed to submit coach response');
+    }
+};
+
+const submitRefereeResponse = async (gameId, accepted) => {
+    try {
+        const response = await api.post(`/Game/${gameId}/referee-response`, { accepted });
+        return response.data;
+    } catch (error) {
+        handleServiceError(error, 'Failed to submit referee response');
+    }
+};
+
 export default {
     getAllGames,
     getGameById,
-    createGame
+    createGame,
+    submitCoachResponse,
+    submitRefereeResponse
 }
