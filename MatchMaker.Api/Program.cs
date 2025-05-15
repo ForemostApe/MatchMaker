@@ -20,7 +20,9 @@ namespace MatchMaker.Domain
 
             #if DEBUG
                 builder.WebHost.ConfigureKestrelServer();
-            #endif
+#endif
+
+            builder.Host.UseSerilogLogging(builder.Configuration);
 
             builder.Services.AddMongoDb(builder.Configuration);
             builder.Services.AddCoreServices(builder.Configuration, builder.Environment);
@@ -50,6 +52,8 @@ namespace MatchMaker.Domain
                           .SetPreflightMaxAge(TimeSpan.FromSeconds(86400));
                 });
             });
+
+            builder.Host.UseSerilogLogging(builder.Configuration);
 
             var app = builder.Build();
 
