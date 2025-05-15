@@ -54,7 +54,6 @@ namespace MatchMaker.Domain.Controllers
                 var result = await _authServiceFacade.LoginAsync(loginDTO);
                 if (result.Data == null)
                 {
-                    _logger.LogWarning("Invalid email-address or password.");
                     return Unauthorized(result);
                 }
 
