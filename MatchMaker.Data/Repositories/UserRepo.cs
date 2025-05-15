@@ -1,6 +1,7 @@
 ﻿using MatchMaker.Data.Interfaces;
 using MatchMaker.Domain.Entities;
 using Microsoft.Extensions.Logging;
+using MongoDB.Bson;
 using MongoDB.Driver;
 
 namespace MatchMaker.Data.Repositories;
@@ -27,17 +28,16 @@ public class UserRepo(ILogger<UserRepo> logger, IMongoDatabase database) : Repos
     public async Task<List<User>> GetUsersByRole(UserRole parsedRole, string? teamId = null)
     {
         var filters = new List<FilterDefinition<User>>
-            {
-                Builders<User>.Filter.Eq(u => u.UserRole, parsedRole)
-            };
+    {
+        Builders<User>.Filter.Eq(u => u.UserRole, parsedRole)
+    };
 
         if (!string.IsNullOrEmpty(teamId))
         {
-            filters.Add(Builders<User>.Filter.Eq(u => u.TeamAffiliation, teamId));
+            filters.Add(Builders<User>.Filter.Eq("TeamAffiliation", new ObjectId(teamId)));
         }
 
         var combinedFilter = Builders<User>.Filter.And(filters);
-
         return await FindAllAsync(combinedFilter);
     }
 

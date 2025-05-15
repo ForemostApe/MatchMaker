@@ -40,5 +40,8 @@ public class GameMappingProfile : IRegister
            })
             .IgnoreNullValues(true)
             .IgnoreNonMapped(true);
+
+        config.NewConfig<Game, GameDTO>()
+            .Map(dest => dest.GameStatus, src => src.GameStatus.ToString());
     }
 }
