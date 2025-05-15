@@ -9,81 +9,39 @@ public class TeamRepo(ILogger<TeamRepo> logger, IMongoDatabase database) : Repos
 {
     public async Task<Team> CreateTeamAsync(Team newTeam)
     {
-        try
-        {
-            return await InsertOneAsync(newTeam);
-        }
-        catch
-        {
-            throw;
-        }
+        return await InsertOneAsync(newTeam);
     }
 
     public async Task<List<Team>> GetAllTeamsAsync()
     {
-        try
-        {
-            return await FindAllAsync();
-        }
-        catch
-        {
-            throw;
-        }
+        return await FindAllAsync();
     }
 
     public async Task<Team?> GetTeamByIdAsync(string teamId)
     {
-        try
-        {
-            var filter = Builders<Team>.Filter.Eq(t => t.Id, teamId);
-            return await FindOneAsync(filter);
-        }
-        catch
-        {
-            throw;
-        }
+        var filter = Builders<Team>.Filter.Eq(t => t.Id, teamId);
+        return await FindOneAsync(filter);
     }
 
     public async Task<Team?> GetTeamByNameAsync(string teamName)
     {
-        try
-        {
-            var filter = Builders<Team>.Filter.Regex(t => t.TeamName, new MongoDB.Bson.BsonRegularExpression($"^{teamName}$", "i"));
-            return await FindOneAsync(filter);
-        }
-        catch
-        {
-            throw;
-        }
+        var filter = Builders<Team>.Filter.Regex(t => t.TeamName, new MongoDB.Bson.BsonRegularExpression($"^{teamName}$", "i"));
+        return await FindOneAsync(filter);
     }
 
     public async Task<UpdateResult> UpdateTeamAsync(Team updatedTeam)
     {
-        try
-        {
-            var filter = Builders<Team>.Filter.Eq(t => t.Id, updatedTeam.Id);
-            var update = Builders<Team>.Update
-                .Set(t => t.TeamName, updatedTeam.TeamName)
-                .Set(t => t.TeamLogo, updatedTeam.TeamLogo);
+        var filter = Builders<Team>.Filter.Eq(t => t.Id, updatedTeam.Id);
+        var update = Builders<Team>.Update
+            .Set(t => t.TeamName, updatedTeam.TeamName)
+            .Set(t => t.TeamLogo, updatedTeam.TeamLogo);
 
-            return await UpdateOneAsync(filter, update);
-        }
-        catch
-        {
-            throw;
-        }
+        return await UpdateOneAsync(filter, update);
     }
 
     public async Task<DeleteResult> DeleteTeamAsync(string teamId)
     {
-        try
-        {
-            var filter = Builders<Team>.Filter.Eq(t => t.Id, teamId);
-            return await DeleteOneAsync(filter);
-        }
-        catch
-        {
-            throw;
-        }
+        var filter = Builders<Team>.Filter.Eq(t => t.Id, teamId);
+        return await DeleteOneAsync(filter);
     }
 }
