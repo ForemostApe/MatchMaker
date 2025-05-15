@@ -16,122 +16,69 @@ public class TeamServiceFacade(IMapper mapper, ITeamService teamService) : ITeam
     {
         ArgumentNullException.ThrowIfNull(newTeam);
 
-        try
-        {
-            var team = _mapper.Map<Team>(newTeam);
+        var team = _mapper.Map<Team>(newTeam);
+        var result = await _teamService.CreateTeamAsync(team);
 
-            var result = await _teamService.CreateTeamAsync(team);
-
-            if (!result.IsSuccess) return Result<TeamDTO>.Failure(result.Message);
-
-            var teamDTO = _mapper.Map<TeamDTO>(result.Data!);
-
-            return Result<TeamDTO>.Success(teamDTO, result.Message);
-        }
-        catch
-        {
-            throw;
-        }
+        return result.IsSuccess 
+            ? Result<TeamDTO>.Success(_mapper.Map<TeamDTO>(result.Data!), result.Message)
+            : Result<TeamDTO>.Failure(result.Message);
     }
 
     public async Task<Result<List<TeamDTO>>> GetAllTeamsAsync()
     {
-        try
-        {
-            var result = await _teamService.GetAllTeamsAsync();
-            if (!result.IsSuccess) return Result<List<TeamDTO>>.Failure(result.Message);
+        var result = await _teamService.GetAllTeamsAsync();
 
-            var teams = _mapper.Map<List<TeamDTO>>(result.Data!);
-            return Result<List<TeamDTO>>.Success(teams, result.Message);
-
-        }
-        catch
-        {
-            throw;
-        }
+        return result.IsSuccess 
+            ? Result<List<TeamDTO>>.Success(_mapper.Map<List<TeamDTO>>(result.Data!), result.Message) 
+            : Result<List<TeamDTO>>.Failure(result.Message);
     }
 
     public async Task<Result<TeamDTO>> GetTeamByIdAsync(string teamId)
     {
         ArgumentException.ThrowIfNullOrEmpty(teamId);
 
-        try
-        {
-            var result = await _teamService.GetTeamByIdAsync(teamId);
+        var result = await _teamService.GetTeamByIdAsync(teamId);
 
-            if (!result.IsSuccess) return Result<TeamDTO>.Failure(result.Message);
-
-            TeamDTO teamDTO = _mapper.Map<TeamDTO>(result.Data!);
-
-            return Result<TeamDTO>.Success(teamDTO, result.Message);
-        }
-        catch
-        {
-            throw;
-        }
+        return result.IsSuccess 
+            ? Result<TeamDTO>.Success(_mapper.Map<TeamDTO>(result.Data!), result.Message) 
+            : Result<TeamDTO>.Failure(result.Message);
     }
 
     public async Task<Result<TeamDTO>> GetTeamByNameAsync(string teamName)
     {
         ArgumentException.ThrowIfNullOrEmpty(teamName);
 
-        try
-        {
-            var result = await _teamService.GetTeamByNameAsync(teamName);
+        var result = await _teamService.GetTeamByNameAsync(teamName);
 
-            if (!result.IsSuccess) return Result<TeamDTO>.Failure(result.Message);
-
-            var team = _mapper.Map<TeamDTO>(result.Data!);
-
-            return Result<TeamDTO>.Success(team, result.Message);
-        }
-        catch
-        {
-            throw;
-        }
+        return result.IsSuccess 
+            ? Result<TeamDTO>.Success(_mapper.Map<TeamDTO>(result.Data!), result.Message)
+            : Result<TeamDTO>.Failure(result.Message);
     }
 
     public async Task<Result<TeamDTO>> UpdateTeamAsync(UpdateTeamDTO updatedTeam)
     {
         ArgumentNullException.ThrowIfNull(updatedTeam);
 
-        try
-        {
-            var existingTeam = await _teamService.GetTeamByIdAsync(updatedTeam.TeamId);
+        var existingTeam = await _teamService.GetTeamByIdAsync(updatedTeam.TeamId);
+        if (existingTeam == null) return Result<TeamDTO>.Failure("Coulnd't find the specified team.");
 
-            if (existingTeam == null) return Result<TeamDTO>.Failure("Coulnd't find the specified team.");
+        updatedTeam.Adapt(existingTeam.Data!);
 
-            updatedTeam.Adapt(existingTeam.Data!);
+        var result = await _teamService.UpdateTeamAsync(existingTeam.Data!);
 
-            var result = await _teamService.UpdateTeamAsync(existingTeam.Data!);
-
-            if (!result.IsSuccess) return Result<TeamDTO>.Failure(result.Message);
-
-            var team = result.Data!.Adapt<TeamDTO>();
-
-            return Result<TeamDTO>.Success(team, result.Message);
-        }
-        catch
-        {
-            throw;
-        }
+        return result.IsSuccess 
+            ? Result<TeamDTO>.Success(result.Data!.Adapt<TeamDTO>(), result.Message)
+            : Result<TeamDTO>.Failure(result.Message);
     }
 
     public async Task<Result<TeamDTO>> DeleteTeamAsync(DeleteTeamDTO deleteTeamDTO)
     {
         ArgumentNullException.ThrowIfNull(deleteTeamDTO);
 
-        try
-        {
-            var result = await _teamService.DeleteTeamAsync(deleteTeamDTO.TeamId);
+        var result = await _teamService.DeleteTeamAsync(deleteTeamDTO.TeamId);
 
-            if (!result.IsSuccess) return Result<TeamDTO>.Failure(result.Message);
-
-            return Result<TeamDTO>.Success(null, result.Message);
-        }
-        catch
-        {
-            throw;
-        }
+        return result.IsSuccess ?
+            Result<TeamDTO>.Success(null, result.Message)
+            : Result<TeamDTO>.Failure(result.Message);
     }
 }

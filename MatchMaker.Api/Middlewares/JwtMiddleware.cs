@@ -22,7 +22,6 @@ public class JwtMiddleware(ILogger<JwtMiddleware> logger, RequestDelegate next, 
             try
             {
                 var token = authHeader.Substring(7);
-                //var principal = ValidateToken(token);
                 var principal = _tokenService.DecryptToken(token);
 
 

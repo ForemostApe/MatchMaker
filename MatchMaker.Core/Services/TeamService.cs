@@ -12,102 +12,64 @@ public class TeamService(ITeamRepo teamRepo) : ITeamService
     {
         ArgumentNullException.ThrowIfNull(newTeam);
 
-        try
-        {
-            var existingTeam = await _teamRepo.GetTeamByNameAsync(newTeam.TeamName);
-            if (existingTeam != null) return Result<Team>.Failure("Team already exists.");
+        var existingTeam = await _teamRepo.GetTeamByNameAsync(newTeam.TeamName);
+        if (existingTeam != null) return Result<Team>.Failure("Team already exists.");
 
-            var result = await _teamRepo.CreateTeamAsync(newTeam);
+        var result = await _teamRepo.CreateTeamAsync(newTeam);
 
-            return Result<Team>.Success(result, "Team successfully created.");
-        }
-        catch
-        {
-            throw;
-        }
+        return Result<Team>.Success(result, "Team successfully created.");
     }
 
     public async Task<Result<List<Team>>> GetAllTeamsAsync()
     {
-        try
-        {
-            var result = await _teamRepo.GetAllTeamsAsync();
-            if (result.Count == 0) return Result<List<Team>>.Failure("No teams found.");
+        var result = await _teamRepo.GetAllTeamsAsync();
 
-            return Result<List<Team>>.Success(result, "Teams successfully found.");
-        }
-        catch
-        {
-            throw;
-        }
+        return result.Count > 0 
+            ? Result<List<Team>>.Success(result, "Teams successfully found.")
+            : Result<List<Team>>.Failure("No teams found.");
     }
 
     public async Task<Result<Team>> GetTeamByIdAsync(string teamId)
     {
         ArgumentException.ThrowIfNullOrEmpty(teamId);
 
-        try
-        {
-            var existingTeam = await _teamRepo.GetTeamByIdAsync(teamId);
-            if (existingTeam == null) return Result<Team>.Failure("Coulnd't find the specified team.");
+        var existingTeam = await _teamRepo.GetTeamByIdAsync(teamId);
 
-            return Result<Team>.Success(existingTeam, "Team successfully found.");
-        }
-        catch
-        {
-            throw;
-        }
+        return existingTeam != null
+            ? Result<Team>.Success(existingTeam, "Team successfully found.")
+            : Result<Team>.Failure("Coulnd't find the specified team.");
     }
 
     public async Task<Result<Team>> GetTeamByNameAsync(string teamName)
     {
         ArgumentException.ThrowIfNullOrEmpty(teamName);
 
-        try
-        {
-            var existingTeam = await _teamRepo.GetTeamByNameAsync(teamName);
-            if (existingTeam == null) return Result<Team>.Failure("Coulnd't find the specified team.");
+        var existingTeam = await _teamRepo.GetTeamByNameAsync(teamName);
 
-            return Result<Team>.Success(existingTeam, "Team successfully found.");
-        }
-        catch
-        {
-            throw;
-        }
+        return existingTeam != null 
+            ? Result<Team>.Success(existingTeam, "Team successfully found.")
+            : Result<Team>.Failure("Coulnd't find the specified team.");
     }
 
     public async Task<Result<Team>> UpdateTeamAsync(Team updatedTeam)
     {
         ArgumentNullException.ThrowIfNull(updatedTeam);
 
-        try
-        {
-            var result = await _teamRepo.UpdateTeamAsync(updatedTeam);
-            if (result.ModifiedCount <= 0) return Result<Team>.Failure("An error occurred trying to update team.");
+        var result = await _teamRepo.UpdateTeamAsync(updatedTeam);
 
-            return Result<Team>.Success(updatedTeam, "Team successfully updated.");
-
-        }
-        catch
-        {
-            throw;
-        }
+        return result.ModifiedCount > 0
+            ? Result<Team>.Success(updatedTeam, "Team successfully updated.")
+            : Result<Team>.Failure("An error occurred trying to update team.");
     }
 
     public async Task<Result<Team>> DeleteTeamAsync(string teamId)
     {
         ArgumentException.ThrowIfNullOrEmpty(teamId);
 
-        try
-        {
-            var result = await _teamRepo.DeleteTeamAsync(teamId);
-            if (result.DeletedCount <= 0) return Result<Team>.Failure("Team not found.");
+        var result = await _teamRepo.DeleteTeamAsync(teamId);
 
-            return Result<Team>.Success(null, "Team successfully deleted.");
-        }
-        catch
-        {
-            throw;
-        }
+        return result.DeletedCount > 0
+            ? Result<Team>.Success(null, "Team successfully deleted.")
+            : Result<Team>.Failure("Team not found.");
     }
 }

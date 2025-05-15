@@ -2,7 +2,6 @@
 using MatchMaker.Domain.DTOs.Games;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace MatchMaker.Api.Controllers
 {
@@ -21,15 +20,25 @@ namespace MatchMaker.Api.Controllers
             try
             {
                 var result = await _gameServiceFacade.CreateGameAsync(newGame);
-                if (!result.IsSuccess) return BadRequest(new ProblemDetails()
+                if (!result.IsSuccess) return StatusCode(result.GetStatusCodeOrDefault(), new ProblemDetails()
                 {
-                    Title = "Couldn't create game.",
-                    Detail = result.Message ?? "Couldn't create game.",
-                    Status = StatusCodes.Status400BadRequest
+                    Title = result.Title,
+                    Detail = result.Message,
+                    Status = result.StatusCode
                 });
 
                 return CreatedAtRoute(nameof(GetGameByIdAsync), new { gameId = result.Data!.Id }, result.Data);
 
+            }
+            catch (ArgumentNullException ex)
+            {
+                _logger.LogError(ex, $"An unexpected error occurred while trying to create game {ex.Message}");
+                return StatusCode(500, new ProblemDetails
+                {
+                    Title = "Internal Server Error",
+                    Detail = $"{ex.Message} An unexpected error occured. Please try again later",
+                    Status = StatusCodes.Status500InternalServerError
+                });
             }
             catch (Exception ex)
             {
@@ -42,6 +51,7 @@ namespace MatchMaker.Api.Controllers
                 });
             }
         }
+
         [Authorize]
         [HttpGet(Name = nameof(GetAllGamesAsync))]
         public async Task<IActionResult> GetAllGamesAsync()
@@ -49,11 +59,11 @@ namespace MatchMaker.Api.Controllers
             try
             {
                 var result = await _gameServiceFacade.GetAllGamesAsync();
-                if (!result.IsSuccess) return NotFound(new ProblemDetails()
+                if (!result.IsSuccess) return StatusCode(result.GetStatusCodeOrDefault(), new ProblemDetails()
                 {
-                    Title = "Games not found.",
-                    Detail = result.Message ?? "No games were found.",
-                    Status = StatusCodes.Status404NotFound
+                    Title = result.Title,
+                    Detail = result.Message,
+                    Status = result.StatusCode
                 });
 
                 return Ok(result.Data);
@@ -78,11 +88,11 @@ namespace MatchMaker.Api.Controllers
             try
             {
                 var result = await _gameServiceFacade.GetGameByIdAsync(gameId);
-                if (!result.IsSuccess) return NotFound(new ProblemDetails
+                if (!result.IsSuccess) return StatusCode(result.GetStatusCodeOrDefault(), new ProblemDetails()
                 {
-                    Title = "Game not found",
-                    Detail = result.Message ?? "The specified team was not found.",
-                    Status = StatusCodes.Status404NotFound
+                    Title = result.Title,
+                    Detail = result.Message,
+                    Status = result.StatusCode
                 });
 
                 return Ok(result.Data);
@@ -107,16 +117,12 @@ namespace MatchMaker.Api.Controllers
             try
             {
                 var result = await _gameServiceFacade.UpdateGameAsync(updatedGame);
-
-                if (!result.IsSuccess)
+                if (!result.IsSuccess) return StatusCode(result.GetStatusCodeOrDefault(), new ProblemDetails()
                 {
-                    return NotFound(new ProblemDetails
-                    {
-                        Title = "Game not found",
-                        Detail = result.Message,
-                        Status = StatusCodes.Status404NotFound
-                    });
-                }
+                    Title = result.Title,
+                    Detail = result.Message,
+                    Status = result.StatusCode
+                });
 
                 return Ok(result.Data);
             }
@@ -140,12 +146,11 @@ namespace MatchMaker.Api.Controllers
             try
             {
                 var result = await _gameServiceFacade.DeleteGameAsync(gameId);
-
-                if (!result.IsSuccess) return NotFound(new ProblemDetails()
+                if (!result.IsSuccess) return StatusCode(result.GetStatusCodeOrDefault(), new ProblemDetails()
                 {
-                    Title = "Game not found",
+                    Title = result.Title,
                     Detail = result.Message,
-                    Status = StatusCodes.Status404NotFound
+                    Status = result.StatusCode
                 });
 
                 return NoContent();
@@ -171,14 +176,12 @@ namespace MatchMaker.Api.Controllers
             try
             {
                 var result = await _gameServiceFacade.HandleCoachResponseAsync(response);
-
-                if (!result.IsSuccess) return NotFound(new ProblemDetails()
+                if (!result.IsSuccess) return StatusCode(result.GetStatusCodeOrDefault(), new ProblemDetails()
                 {
-                    Title = "Game not found",
+                    Title = result.Title,
                     Detail = result.Message,
-                    Status = StatusCodes.Status404NotFound
+                    Status = result.StatusCode
                 });
-
                 return Ok(result.Data);
             }
             catch (Exception ex)
@@ -201,12 +204,11 @@ namespace MatchMaker.Api.Controllers
             try
             {
                 var result = await _gameServiceFacade.HandleRefereeResponseAsync(response);
-
-                if (!result.IsSuccess) return NotFound(new ProblemDetails()
+                if (!result.IsSuccess) return StatusCode(result.GetStatusCodeOrDefault(), new ProblemDetails()
                 {
-                    Title = "Game not found",
+                    Title = result.Title,
                     Detail = result.Message,
-                    Status = StatusCodes.Status404NotFound
+                    Status = result.StatusCode
                 });
 
                 return Ok(result.Data);

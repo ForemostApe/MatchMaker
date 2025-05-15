@@ -50,6 +50,7 @@ namespace MatchMaker.Core.Services
                 var tokenDescriptor = new SecurityTokenDescriptor
                 {
                     Subject = new ClaimsIdentity(claims),
+                    NotBefore = DateTime.UtcNow,
                     Expires = DateTime.UtcNow.Add(expiration),
                     Issuer = _jwtOptions.Issuer,
                     Audience = _jwtOptions.Audience,
