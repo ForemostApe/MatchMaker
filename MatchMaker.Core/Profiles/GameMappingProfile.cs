@@ -12,6 +12,7 @@ public class GameMappingProfile : IRegister
            .Map(dest => dest.StartTime, src => src.StartTime)
            .Map(dest => dest.GameType, src => src.GameType)
            .Map(dest => dest.Location, src => src.Location)
+           .Map(dest => dest.GameStatus, src => src.GameStatus)
            .Map(dest => dest.HomeTeamId, src => src.HomeTeamId)
            .Map(dest => dest.AwayTeamId, src => src.AwayTeamId)
            .Map(dest => dest.RefereeId, src => src.RefereeId)
