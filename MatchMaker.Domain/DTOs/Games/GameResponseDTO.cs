@@ -3,6 +3,5 @@
 public class GameResponseDTO
 {
     public string GameId { get; set; } = null!;
-    public string RefereeId { get; set; } = null!;
     public bool Accepted { get; set; }
 }

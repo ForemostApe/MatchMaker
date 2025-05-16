@@ -104,7 +104,7 @@ public class GameServiceFacade(IGameService gameService, IMapper mapper, IEmailS
                 );
         }
 
-        var game = result.Data!.Adapt<GameDTO>();
+        var game = _mapper.Map<GameDTO>(result.Data!);
         return Result<GameDTO>.Success(game, result.Message);
     }
 
@@ -201,7 +201,7 @@ public class GameServiceFacade(IGameService gameService, IMapper mapper, IEmailS
 
         if (!response.Accepted)
         {
-            game.GameStatus = GameStatus.Draft;
+            game.GameStatus = GameStatus.Signed;
             game.IsRefereeSigned = false;
 
             response.Adapt(game);

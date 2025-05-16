@@ -8,6 +8,7 @@ public class UpdateGameDTO
     public string Id { get; set; } = null!;
     public DateTime? StartTime { get; set; }
     public string? Location { get; set; }
+    public string? GameType { get; set; }
 
     [BsonRepresentation(BsonType.ObjectId)]
     public string? RefereeId { get; set; }
