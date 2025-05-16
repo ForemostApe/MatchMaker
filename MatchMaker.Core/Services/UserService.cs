@@ -54,6 +54,9 @@ public class UserService(ILogger<UserService> logger, IUserRepo userRepo) : IUse
         ArgumentNullException.ThrowIfNull(updatedUser);
 
         var result = await _userRepo.UpdateUserAsync(updatedUser);
+
+        if (result.MatchedCount > 0 && result.ModifiedCount == 0) return Result<User>.Success(updatedUser, "User already updated.");
+        
         return result.ModifiedCount > 0 
             ? Result<User>.Success(updatedUser, "User successully updated.") 
             : Result<User>.Failure("An error occurred trying to update user.");
