@@ -17,9 +17,9 @@ const Navbar = () => {
   const profileLink = user?.id ? `/profile/${user.id}` : '/profile';
 
   return (
-    <nav className="bg-gray-800 p-4">
+    <nav className="bg-gray-800 p-4 relative">
       <div className="container mx-auto flex justify-between items-center">
-        <div className="flex space-x-4">
+        <div className="hidden md:flex space-x-4">
           <Link to="/home" className="text-white">Hem</Link>
 
           {!isLoading && user?.userRole === 'Coach' && (
@@ -43,7 +43,7 @@ const Navbar = () => {
           )}
         </div>
 
-        <div className="md:hidden flex items-center">
+        <div className="md:hidden ml-auto items-center">
           <button onClick={toggleMenu} className="text-white">
             <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" fill="none"
                  viewBox="0 0 24 24" stroke="currentColor">
@@ -54,29 +54,29 @@ const Navbar = () => {
         </div>
       </div>
 
-      {isMenuOpen && (
-        <div className="flex flex-col space-y-2">
-          <Link to="/home" className="text-white">Hem</Link>
+{isMenuOpen && (
+  <div className="absolute left-0 w-full bg-gray-800 z-50 flex flex-col space-y-2 p-4 md:hidden items-end">
+    <Link to="/home" className="text-white">Hem</Link>
 
-          {!isLoading && user?.userRole === 'Coach' && (
-            <Link to="/game/create" className="text-white">Skapa match</Link>
-          )}
+    {!isLoading && user?.userRole === 'Coach' && (
+      <Link to="/game/create" className="text-white">Skapa match</Link>
+    )}
 
-          {!isLoading && user && (
-            <Link to={profileLink} className="text-white">Profil</Link>
-          )}
+    {!isLoading && user && (
+      <Link to={profileLink} className="text-white">Profil</Link>
+    )}
 
-          {!isLoading && user?.role === 'Admin' && (
-            <Link to="/admin" className="text-white">Admin</Link>
-          )}
+    {!isLoading && user?.userRole === 'Admin' && (
+      <Link to="/admin" className="text-white">Admin</Link>
+    )}
 
-          {!isLoading && user && (
-            <button className="text-white" onClick={handleLogoutClick}>
-              Logga ut
-            </button>
-          )}
-        </div>
-      )}
+    {!isLoading && user && (
+      <button className="text-white text-left" onClick={handleLogoutClick}>
+        Logga ut
+      </button>
+    )}
+  </div>
+)}
     </nav>
   );
 };
