@@ -6,6 +6,7 @@ import GameConditions from "./Components/GameConditions";
 import GameDetails from "./Components/GameDetails";
 import { useAuth } from "../../context/AuthContext/AuthContext";
 import gameService from "../../services/gameService";
+import GameResponse from "./Components/GameResponse";
 
 const GamePage = () => {
   const { id } = useParams();
@@ -71,7 +72,7 @@ const GamePage = () => {
   if (error || !formState) return <p>Error loading game data.</p>;
 
   return (
-    <div className="p-4 max-w-3xl mx-auto bg-white shadow rounded">
+    <div className="p-4 max-w-3xl mx-auto bg-gray-50 shadow rounded">
       <GameHeader homeTeam={homeTeam} awayTeam={awayTeam} game={game} />
 
       <GameDetails
@@ -117,6 +118,9 @@ const GamePage = () => {
           )}
         </div>
       )}
+
+      <GameResponse game={game} />
+      
     </div>
   );
 };

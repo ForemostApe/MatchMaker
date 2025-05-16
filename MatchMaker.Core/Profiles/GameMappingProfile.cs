@@ -28,6 +28,7 @@ public class GameMappingProfile : IRegister
         config.NewConfig<UpdateGameDTO, Game>()
            .Map(dest => dest.StartTime, src => src.StartTime)
            .Map(dest => dest.Location, src => src.Location)
+           .Map(dest => dest.GameType, src => src.GameType)
            .Map(dest => dest.RefereeId, src => src.RefereeId)
            .Map(dest => dest.Conditions, src => new Conditions
            {

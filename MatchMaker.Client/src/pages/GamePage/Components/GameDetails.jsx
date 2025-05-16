@@ -3,7 +3,7 @@ import userService from "../../../services/userService";
 import { useAuth } from "../../../context/AuthContext/AuthContext";
 
 const GameDetails = ({ editing, canEdit, formState, setFormState }) => {
-  const { user } = useAuth(); // <- Ensure you have access to current user
+  const { user } = useAuth();
   const [referees, setReferees] = useState([]);
 
   const handleChange = (field, value) => {
@@ -27,9 +27,8 @@ const GameDetails = ({ editing, canEdit, formState, setFormState }) => {
     <div className="max-w-md mx-auto p-6">
       <h2 className="text-2xl font-bold mb-4 text-gray-800">Matchdetaljer</h2>
 
-      {/* Starttid */}
       <div className="mb-4">
-        <label className="block text-gray-700 mb-2">Starttid</label>
+        <label className="block text-gray-700 mb-2 font-bold">Starttid</label>
         {editing ? (
           <input
             type="datetime-local"
@@ -46,9 +45,8 @@ const GameDetails = ({ editing, canEdit, formState, setFormState }) => {
         )}
       </div>
 
-      {/* Plats */}
       <div className="mb-4">
-        <label className="block text-gray-700 mb-2">Plats</label>
+        <label className="block text-gray-700 mb-2 font-bold">Plats</label>
         {editing ? (
           <input
             type="text"
@@ -61,9 +59,8 @@ const GameDetails = ({ editing, canEdit, formState, setFormState }) => {
         )}
       </div>
 
-      {/* Matchtyp */}
       <div className="mb-4">
-        <label className="block text-gray-700 mb-2">Matchtyp</label>
+        <label className="block text-gray-700 mb-2 font-bold">Matchtyp</label>
         {editing ? (
           <select
             value={formState.gameType}
@@ -79,9 +76,8 @@ const GameDetails = ({ editing, canEdit, formState, setFormState }) => {
         )}
       </div>
 
-      {/* Domare */}
       <div className="mb-4">
-        <label htmlFor="referee" className="block text-gray-700 mb-2">Domare</label>
+        <label htmlFor="referee" className="block text-gray-700 mb-2 font-bold">Domare</label>
         {editing ? (
           <select
             id="referee"

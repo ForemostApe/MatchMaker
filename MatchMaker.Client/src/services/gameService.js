@@ -75,19 +75,37 @@ const updateGame = async (gameData) => {
 
 const submitCoachResponse = async (gameId, accepted) => {
     try {
-        const response = await api.post(`/Game/${gameId}/coach-response`, { accepted });
+        const response = await api.post("Game/response/coach/", { gameId, accepted });
         return response.data;
     } catch (error) {
-        handleServiceError(error, 'Failed to submit coach response');
+        if (error.response) {
+            console.error('Error response: ', error.response.data);
+            throw new Error(error.response.data.title || 'Failed to update game');
+        } else if (error.request) {
+            console.error('No response: ', error.request);
+            throw new Error('No response from server');
+        } else {
+            console.error('Request error: ', error.message);
+            throw new Error('Failed to make request');
+        }
     }
 };
 
 const submitRefereeResponse = async (gameId, accepted) => {
     try {
-        const response = await api.post(`/Game/${gameId}/referee-response`, { accepted });
+        const response = await api.post("/Game/response/referee/", { gameId, accepted });
         return response.data;
     } catch (error) {
-        handleServiceError(error, 'Failed to submit referee response');
+        if (error.response) {
+            console.error('Error response: ', error.response.data);
+            throw new Error(error.response.data.title || 'Failed to update game');
+        } else if (error.request) {
+            console.error('No response: ', error.request);
+            throw new Error('No response from server');
+        } else {
+            console.error('Request error: ', error.message);
+            throw new Error('Failed to make request');
+        }
     }
 };
 
