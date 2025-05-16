@@ -7,9 +7,9 @@ const Calendar = ({ currentMonth, selectedDate, setSelectedDate, games, onGameCl
 
   const getGameStatusColor = (game) => {
     switch (game.gameStatus) {
-      case 3: return "#1bff00";
-      case 2: return "#f3ff00";
-      case 1: return "#ff0000";
+      case "Booked": return "#00b000";
+      case "Signed": return "#e6e600";
+      case "Cancelled": return "#ff0000";
       default: return "#9e9e9e";
     }
   };
@@ -45,13 +45,21 @@ const Calendar = ({ currentMonth, selectedDate, setSelectedDate, games, onGameCl
               }}
             >
               <div>{format(day, "d")}</div>
-              {gamesOnDay.map((game) => (
-                <span
-                  key={game.id}
-                  className="absolute bottom-2 left-2 w-2 h-2 rounded-full"
-                  style={{ backgroundColor: getGameStatusColor(game) }}
-                />
-              ))}
+                {gamesOnDay.length > 0 && (
+                  <div className="absolute bottom-2 left-2 right-2 flex flex-wrap gap-1">
+                    {gamesOnDay.slice(0, 5).map((game) => (
+                      <span
+                        key={game.id}
+                        className="w-3 h-3 rounded-full shadow"
+                        style={{ backgroundColor: getGameStatusColor(game) }}
+                        title={game.title || "Game"}
+                      />
+                    ))}
+                    {gamesOnDay.length > 5 && (
+                      <span className="text-[10px] text-gray-500 ml-1">+{gamesOnDay.length - 5}</span>
+                    )}
+                  </div>
+                )}
             </div>
           );
         })}

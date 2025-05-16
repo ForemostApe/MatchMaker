@@ -7,12 +7,14 @@ namespace MatchMaker.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class GameController(ILogger<GameController> logger, IGameServiceFacade gameServiceFacade) : ControllerBase
     {
         private readonly ILogger _logger = logger;
         private readonly IGameServiceFacade _gameServiceFacade = gameServiceFacade;
 
         [HttpPost]
+        [Authorize (Roles = "Coach")]
         public async Task<IActionResult> CreateGameAsync([FromBody] CreateGameDTO newGame)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
@@ -52,7 +54,6 @@ namespace MatchMaker.Api.Controllers
             }
         }
 
-        [Authorize]
         [HttpGet(Name = nameof(GetAllGamesAsync))]
         public async Task<IActionResult> GetAllGamesAsync()
         {
@@ -109,6 +110,7 @@ namespace MatchMaker.Api.Controllers
             }
         }
 
+        [Authorize (Roles = "Coach")]
         [HttpPatch(Name = nameof(UpdateGameAsync))]
         public async Task<IActionResult> UpdateGameAsync([FromBody] UpdateGameDTO updatedGame)
         {
@@ -169,6 +171,7 @@ namespace MatchMaker.Api.Controllers
 
 
         [HttpPost("response/coach", Name = nameof(HandleCoachResponseAsync))]
+        [Authorize (Roles = "Coach")]
         public async Task<IActionResult> HandleCoachResponseAsync([FromBody] GameResponseDTO response)
         {
             ArgumentNullException.ThrowIfNull(response);
@@ -197,6 +200,7 @@ namespace MatchMaker.Api.Controllers
         }
 
         [HttpPost("response/referee", Name = nameof(HandleRefereeResponseAsync))]
+        [Authorize(Roles = "Referee")]
         public async Task<IActionResult> HandleRefereeResponseAsync([FromBody] GameResponseDTO response)
         {
             ArgumentNullException.ThrowIfNull(response);

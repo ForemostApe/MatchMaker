@@ -7,14 +7,6 @@ const PendingGamesList = ({ games, teams, user, onGameClick }) => {
     const isPlanned = game.gameStatus === "Planned";
     const isSigned = game.gameStatus === "Signed";
 
-console.log({
-  gameId: game.id,
-  status: game.gameStatus,
-  referee: game.refereeId,
-  userId: user.id,
-  userRole: user.userRole
-});
-
     if (user.userRole === "Coach") {
       return (
         isPlanned &&
