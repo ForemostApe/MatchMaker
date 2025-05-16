@@ -14,7 +14,7 @@ const ProfilePage = () => {
     firstName: "",
     lastName: "",
     userRole: "",
-    teamAffiliation: "",
+    teamAffiliation: null,
   });
 
   const roleMapping = {
@@ -38,7 +38,7 @@ useEffect(() => {
           firstName: user.firstName,
           lastName: user.lastName,
           userRole: user.userRole,
-          teamAffiliation: user.teamAffiliation || "",
+          teamAffiliation: user.teamAffiliation || null,
         };
         setFormData(updatedFormData);
 
@@ -62,10 +62,14 @@ useEffect(() => {
   loadData();
 }, [user]);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
+const handleChange = (e) => {
+  const { name, value } = e.target;
+
+  setFormData(prev => ({
+    ...prev,
+    [name]: name === "teamAffiliation" && value === "" ? null : value,
+  }));
+};
 
   const handleSave = async () => {
     try {
@@ -84,7 +88,7 @@ useEffect(() => {
         firstName: user.firstName,
         lastName: user.lastName,
         userRole: user.userRole,
-        teamAffiliation: user.teamAffiliation || "",
+        teamAffiliation: user.teamAffiliation || null,
       });
     }
     setIsEditing(false);
@@ -164,7 +168,7 @@ useEffect(() => {
             {isEditing ? (
               <select
                 name="teamAffiliation"
-                value={formData.teamAffiliation}
+                value={formData.teamAffiliation ?? ""}
                 onChange={handleChange}
                 className="border rounded p-1 ml-2"
               >
