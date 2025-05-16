@@ -5,6 +5,15 @@ const PendingGamesList = ({ games, teams, user, onGameClick }) => {
 
   const pendingGames = games.filter((game) => {
     const isPlanned = game.gameStatus === "Planned";
+    const isSigned = game.gameStatus === "Signed";
+
+console.log({
+  gameId: game.id,
+  status: game.gameStatus,
+  referee: game.refereeId,
+  userId: user.id,
+  userRole: user.userRole
+});
 
     if (user.userRole === "Coach") {
       return (
@@ -15,8 +24,8 @@ const PendingGamesList = ({ games, teams, user, onGameClick }) => {
 
     if (user.userRole === "Referee") {
       return (
-        isPlanned &&
-        game.refereeId === user.userId
+        isSigned &&
+        game.refereeId === user.id
       );
     }
 
