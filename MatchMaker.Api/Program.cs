@@ -11,6 +11,16 @@ namespace MatchMaker.Api
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            builder.Configuration
+                .AddJsonFile("appsettings.json")
+                .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true)
+                .AddEnvironmentVariables();
+
+            if (builder.Environment.IsDevelopment())
+            {
+                builder.Configuration.AddUserSecrets<Program>();
+            }
+
             builder.Host.UseDefaultServiceProvider((context, options) =>
             {
                 options.ValidateOnBuild = context.HostingEnvironment.IsDevelopment();
