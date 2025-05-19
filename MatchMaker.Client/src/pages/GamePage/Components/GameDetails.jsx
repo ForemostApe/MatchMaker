@@ -2,15 +2,29 @@ import { useState, useEffect } from "react";
 import userService from "../../../services/userService";
 import { useAuth } from "../../../context/AuthContext/AuthContext";
 
+const formatDateLocal = (dateStr) => {
+  if (!dateStr) return "";
+  const date = new Date(dateStr);
+  const pad = (n) => n.toString().padStart(2, "0");
+
+  const year = date.getFullYear();
+  const month = pad(date.getMonth() + 1);
+  const day = pad(date.getDate());
+  const hours = pad(date.getHours());
+  const minutes = pad(date.getMinutes());
+
+  return `${year}-${month}-${day}T${hours}:${minutes}`;
+};
+
 const DetailItem = ({ title, value, editable, onChange, field, type = "text", options }) => {
   const renderInput = () => {
     switch (type) {
       case "datetime-local":
         return (
           <input
-            type={type}
-            value={new Date(value).toISOString().slice(0, 16)}
-            onChange={(e) => onChange(field, new Date(e.target.value).toISOString())}
+            type="datetime-local"
+            value={formatDateLocal(value)}
+            onChange={(e) => onChange(field, e.target.value)}
             className="w-full px-3 py-2 border rounded-md"
           />
         );
@@ -46,7 +60,7 @@ const DetailItem = ({ title, value, editable, onChange, field, type = "text", op
       return <p className="text-gray-900">{new Date(value).toLocaleString("sv-SE")}</p>;
     }
     if (field === "refereeId") {
-      const referee = options.find(r => r.value === value);
+      const referee = options.find((r) => r.value === value);
       return <p className="text-gray-900">{referee ? `${referee.label}` : "–"}</p>;
     }
     return <p className="text-gray-900">{value}</p>;
@@ -65,7 +79,7 @@ const GameDetails = ({ editing, canEdit, formState, setFormState }) => {
   const [referees, setReferees] = useState([]);
 
   const handleChange = (field, value) => {
-    setFormState(prev => ({ ...prev, [field]: value }));
+    setFormState((prev) => ({ ...prev, [field]: value }));
   };
 
   useEffect(() => {
@@ -89,7 +103,7 @@ const GameDetails = ({ editing, canEdit, formState, setFormState }) => {
 
   const refereeOptions = [
     { value: "", label: "Välj domare" },
-    ...referees.map(r => ({
+    ...referees.map((r) => ({
       value: r.id,
       label: `${r.firstName} ${r.lastName}`
     }))
