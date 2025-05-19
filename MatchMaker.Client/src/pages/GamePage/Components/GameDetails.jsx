@@ -2,6 +2,64 @@ import { useState, useEffect } from "react";
 import userService from "../../../services/userService";
 import { useAuth } from "../../../context/AuthContext/AuthContext";
 
+const DetailItem = ({ title, value, editable, onChange, field, type = "text", options }) => {
+  const renderInput = () => {
+    switch (type) {
+      case "datetime-local":
+        return (
+          <input
+            type={type}
+            value={new Date(value).toISOString().slice(0, 16)}
+            onChange={(e) => onChange(field, new Date(e.target.value).toISOString())}
+            className="w-full px-3 py-2 border rounded-md"
+          />
+        );
+      case "select":
+        return (
+          <select
+            value={value || ""}
+            onChange={(e) => onChange(field, e.target.value)}
+            className="w-full px-3 py-2 border rounded-md"
+          >
+            {options.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        );
+      case "text":
+      default:
+        return (
+          <input
+            type={type}
+            value={value}
+            onChange={(e) => onChange(field, e.target.value)}
+            className="w-full px-3 py-2 border rounded-md"
+          />
+        );
+    }
+  };
+
+  const renderDisplay = () => {
+    if (field === "startTime") {
+      return <p className="text-gray-900">{new Date(value).toLocaleString("sv-SE")}</p>;
+    }
+    if (field === "refereeId") {
+      const referee = options.find(r => r.value === value);
+      return <p className="text-gray-900">{referee ? `${referee.label}` : "–"}</p>;
+    }
+    return <p className="text-gray-900">{value}</p>;
+  };
+
+  return (
+    <div className="mb-4">
+      <label className="block text-gray-700 mb-2 font-bold">{title}</label>
+      {editable ? renderInput() : renderDisplay()}
+    </div>
+  );
+};
+
 const GameDetails = ({ editing, canEdit, formState, setFormState }) => {
   const { user } = useAuth();
   const [referees, setReferees] = useState([]);
@@ -23,82 +81,43 @@ const GameDetails = ({ editing, canEdit, formState, setFormState }) => {
     if (user) loadReferees();
   }, [user]);
 
+  const gameTypeOptions = [
+    { value: "7v7", label: "7v7" },
+    { value: "9v9", label: "9v9" },
+    { value: "11v11", label: "11v11" }
+  ];
+
+  const refereeOptions = [
+    { value: "", label: "Välj domare" },
+    ...referees.map(r => ({
+      value: r.id,
+      label: `${r.firstName} ${r.lastName}`
+    }))
+  ];
+
   return (
     <div className="max-w-md mx-auto p-6">
       <h2 className="text-2xl font-bold mb-4 text-gray-800">Matchdetaljer</h2>
 
-      <div className="mb-4">
-        <label className="block text-gray-700 mb-2 font-bold">Starttid</label>
-        {editing ? (
-          <input
-            type="datetime-local"
-            value={new Date(formState.startTime).toISOString().slice(0, 16)}
-            onChange={(e) =>
-              handleChange("startTime", new Date(e.target.value).toISOString())
-            }
-            className="w-full px-3 py-2 border rounded-md"
-          />
-        ) : (
-          <p className="text-gray-900">
-            {new Date(formState.startTime).toLocaleString("sv-SE")}
-          </p>
-        )}
-      </div>
+      <DetailItem
+        title="Matchtyp"
+        value={formState.gameType}
+        editable={canEdit && editing}
+        onChange={handleChange}
+        field="gameType"
+        type="select"
+        options={gameTypeOptions}
+      />
 
-      <div className="mb-4">
-        <label className="block text-gray-700 mb-2 font-bold">Plats</label>
-        {editing ? (
-          <input
-            type="text"
-            value={formState.location}
-            onChange={(e) => handleChange("location", e.target.value)}
-            className="w-full px-3 py-2 border rounded-md"
-          />
-        ) : (
-          <p className="text-gray-900">{formState.location}</p>
-        )}
-      </div>
-
-      <div className="mb-4">
-        <label className="block text-gray-700 mb-2 font-bold">Matchtyp</label>
-        {editing ? (
-          <select
-            value={formState.gameType}
-            onChange={(e) => handleChange("gameType", e.target.value)}
-            className="w-full px-3 py-2 border rounded-md"
-          >
-            <option value="7v7">7v7</option>
-            <option value="9v9">9v9</option>
-            <option value="11v11">11v11</option>
-          </select>
-        ) : (
-          <p className="text-gray-900">{formState.gameType}</p>
-        )}
-      </div>
-
-      <div className="mb-4">
-        <label htmlFor="referee" className="block text-gray-700 mb-2 font-bold">Domare</label>
-        {editing ? (
-          <select
-            id="referee"
-            value={formState.refereeId || ""}
-            onChange={(e) => handleChange("refereeId", e.target.value)}
-            className="w-full border rounded px-3 py-2"
-          >
-            <option value="">Välj domare</option>
-            {referees.map((r) => (
-              <option key={r.id} value={r.id}>
-                {r.firstName} {r.lastName}
-              </option>
-            ))}
-          </select>
-        ) : (
-          <p className="text-gray-900">
-            {referees.find(r => r.id === formState.refereeId)?.firstName || "–"}{" "}
-            {referees.find(r => r.id === formState.refereeId)?.lastName || ""}
-          </p>
-        )}
-      </div>
+      <DetailItem
+        title="Domare"
+        value={formState.refereeId}
+        editable={canEdit && editing}
+        onChange={handleChange}
+        field="refereeId"
+        type="select"
+        options={refereeOptions}
+      />
     </div>
   );
 };

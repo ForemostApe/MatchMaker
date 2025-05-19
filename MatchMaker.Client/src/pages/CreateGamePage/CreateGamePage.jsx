@@ -132,7 +132,9 @@ const CreateGame = () => {
         </div>
 
       <div className="mb-4">
-        <label htmlFor="startTime" className="block text-gray-700 mb-2 font-bold">Starttid</label>
+        <label htmlFor="startTime" className="block text-gray-700 mb-2 font-bold">
+            Starttid
+        </label>
         <input
           type="datetime-local"
           id="startTime"
@@ -152,6 +154,7 @@ const CreateGame = () => {
                 onChange={(e) => setGameType(e.target.value)}
                 className="w-full px-3 py-2 border rounded-md"
             >
+                <option value="">Välj matchtyp</option>
                 <option value="7v7">7v7</option>
                 <option value="9v9">9v9</option>
                 <option value="11v11">11v11</option>

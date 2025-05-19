@@ -64,6 +64,7 @@ public class GameRepo(ILogger<GameRepo> logger, IMongoDatabase database) : Repos
                 .Set(g => g.StartTime, updatedGame.StartTime)
                 .Set(g => g.Location, updatedGame.Location)
                 .Set(g => g.GameStatus, updatedGame.GameStatus)
+                .Set(g => g.GameType, updatedGame.GameType)
                 .Set(g => g.RefereeId, updatedGame.RefereeId)
                 .Set(g => g.IsCoachSigned, updatedGame.IsCoachSigned)
                 .Set(g => g.CoachSignedDate, updatedGame.CoachSignedDate)
