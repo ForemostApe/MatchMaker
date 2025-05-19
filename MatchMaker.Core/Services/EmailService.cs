@@ -24,10 +24,7 @@ public class EmailService(ILogger<EmailService> logger, SmtpSettings smtpSetting
 
     public async Task CreateEmailAsync(string email, EmailType mailType, string? token = null)
     {
-        if (string.IsNullOrWhiteSpace(email))
-        {
-            throw new ArgumentNullException(nameof(email), "Recipient email cannot be null or empty.");
-        }
+        ArgumentNullException.ThrowIfNull(email);
 
         try
         {
@@ -73,17 +70,18 @@ public class EmailService(ILogger<EmailService> logger, SmtpSettings smtpSetting
                 }.ToMessageBody()
             };
 
-            _logger.LogInformation("UserCreated email content successfully created.");
             await SendEmailAsync(mailMessage);
         }
         catch (Exception ex){
-            _logger.LogError(ex, "An unexpected error occurred while trying to send mail.");
-            throw new Exception($"An unexpected error occurred while trying to send mail. {ex.Message}");
+            _logger.LogError(ex, "An unexpected error occurred in EmailService while trying to send mail.");
+            throw;
         }
     }
 
     public async Task SendEmailAsync(MimeMessage mailMessage)
     {
+        ArgumentNullException.ThrowIfNull(mailMessage);
+
         using var smtpClient = new SmtpClient();
 
         try
@@ -102,8 +100,8 @@ public class EmailService(ILogger<EmailService> logger, SmtpSettings smtpSetting
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error while trying to send email to {userEmailAddress}.", mailMessage.To);
-            throw new ApplicationException("An unexpected error occurred while trying to send email. Please try again later.", ex);
+            _logger.LogError(ex, "An unexpected error occurred in EmailService while trying to send email to {userEmailAddress}.", mailMessage.To);
+            throw;
         }
         finally
         {
