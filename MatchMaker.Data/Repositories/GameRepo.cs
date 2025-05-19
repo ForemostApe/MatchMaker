@@ -7,7 +7,6 @@ namespace MatchMaker.Data.Repositories;
 
 public class GameRepo(ILogger<GameRepo> logger, IMongoDatabase database) : RepositoryBase<Game>(logger, database, "games"), IGameRepo
 {
-    public readonly ILogger<GameRepo> _logger = logger;
     public async Task<Game> CreateGameAsync(Game newGame)
     {
         ArgumentNullException.ThrowIfNull(newGame);

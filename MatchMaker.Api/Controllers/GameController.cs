@@ -32,16 +32,6 @@ namespace MatchMaker.Api.Controllers
                 return CreatedAtRoute(nameof(GetGameByIdAsync), new { gameId = result.Data!.Id }, result.Data);
 
             }
-            catch (ArgumentNullException ex)
-            {
-                _logger.LogError(ex, $"An unexpected error occurred while trying to create game {ex.Message}");
-                return StatusCode(500, new ProblemDetails
-                {
-                    Title = "Internal Server Error",
-                    Detail = $"{ex.Message} An unexpected error occured. Please try again later",
-                    Status = StatusCodes.Status500InternalServerError
-                });
-            }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"An unexpected error occurred while trying to create game {ex.Message}");
