@@ -15,7 +15,6 @@ public class UserServiceFacade(ILogger<UserServiceFacade> logger, IMapper mapper
     private readonly ILogger<UserServiceFacade> _logger = logger;
     private readonly IMapper _mapper = mapper;
     private readonly IUserService _userService = userService;
-    private readonly ILogger<UserServiceFacade> _logger = logger;
     private readonly IEmailService _emailService = emailService;
     private readonly ITokenService _tokenService = tokenService;
     private readonly IAuthService _authService = authService;
