@@ -100,6 +100,23 @@ const GameDetails = ({ editing, canEdit, formState, setFormState }) => {
       <h2 className="text-2xl font-bold mb-4 text-gray-800">Matchdetaljer</h2>
 
       <DetailItem
+        title="Starttid"
+        value={formState.startTime}
+        editable={canEdit && editing}
+        onChange={handleChange}
+        field="startTime"
+        type="datetime-local"
+      />
+
+      <DetailItem
+        title="Plats"
+        value={formState.location}
+        editable={canEdit && editing}
+        onChange={handleChange}
+        field="location"
+      />
+
+      <DetailItem
         title="Matchtyp"
         value={formState.gameType}
         editable={canEdit && editing}
