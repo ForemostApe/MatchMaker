@@ -3,9 +3,10 @@ using Microsoft.Extensions.Logging;
 
 namespace MatchMaker.Core.Services
 {
-    public class AuthService(Logger<AuthService> logger) : IAuthService
+    public class AuthService(ILogger<AuthService> logger) : IAuthService
     {
         private readonly ILogger<AuthService> _logger = logger;
+
         public string HashPassword(string password)
         {
             ArgumentException.ThrowIfNullOrEmpty(password);
