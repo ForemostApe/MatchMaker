@@ -1,17 +1,20 @@
 ﻿using MatchMaker.Core.Interfaces;
 using MatchMaker.Domain.DTOs.Teams;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MatchMaker.Api.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
+[Authorize]
 public class TeamController(ILogger<TeamController> logger, ITeamServiceFacade teamServiceFacade) : ControllerBase
 {
     private readonly ILogger _logger = logger;
     private readonly ITeamServiceFacade _teamServiceFacade = teamServiceFacade;
 
     [HttpPost]
+    [Authorize (Roles = "Admin")]
     public async Task<IActionResult> CreateTeamAsync([FromBody] CreateTeamDTO newTeam)
     {
         if (!ModelState.IsValid) return ValidationProblem(ModelState);
@@ -151,6 +154,7 @@ public class TeamController(ILogger<TeamController> logger, ITeamServiceFacade t
     }
 
     [HttpPatch(Name = nameof(UpdateTeamAsync))]
+    [Authorize (Roles = "Admin")]
     public async Task<IActionResult> UpdateTeamAsync([FromBody] UpdateTeamDTO updatedTeam)
     {
         if (!ModelState.IsValid) return ValidationProblem(ModelState);
@@ -184,6 +188,7 @@ public class TeamController(ILogger<TeamController> logger, ITeamServiceFacade t
     }
 
     [HttpDelete(Name = nameof(DeleteTeamAsync))]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> DeleteTeamAsync([FromBody] DeleteTeamDTO deleteTeamDTO)
     {
         if (!ModelState.IsValid) return ValidationProblem(ModelState);

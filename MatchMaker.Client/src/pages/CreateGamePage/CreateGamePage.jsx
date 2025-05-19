@@ -82,17 +82,17 @@ const CreateGame = () => {
 
     return (
         <form onSubmit={handleSubmit} className="max-w-md mx-auto p-6">
-            <h2 className="text-2xl font-bold mb-4 text-gray-800">Planera match</h2>
+            <h1 className="text-2xl font-bold mb-4 text-gray-800">Planera match</h1>
 
             <div className="mb-4">
-                <label className="block text-gray-700 mb-2">Hemmalag</label>
+                <label className="block text-gray-700 mb-2 font-bold">Hemmalag</label>
                 <span className="block font-medium text-gray-900">
                 {homeTeam ? homeTeam.teamName : "Laddar hemmalag..."}
                 </span>
             </div>
 
             <div className="mb-4">
-                <label htmlFor="awayTeam" className="block text-gray-700 mb-2">
+                <label htmlFor="awayTeam" className="block text-gray-700 mb-2 font-bold">
                     Bortalag
                 </label>
                 <select
@@ -114,7 +114,7 @@ const CreateGame = () => {
             </div>
 
             <div className="mb-4">
-            <label htmlFor="referee" className="block text-gray-700 mb-2">Domare</label>
+            <label htmlFor="referee" className="block text-gray-700 mb-2 font-bold">Domare</label>
             <select
             id="referee"
             value={refereeId}
@@ -132,7 +132,7 @@ const CreateGame = () => {
         </div>
 
       <div className="mb-4">
-        <label htmlFor="startTime" className="block text-gray-700 mb-2">Starttid</label>
+        <label htmlFor="startTime" className="block text-gray-700 mb-2 font-bold">Starttid</label>
         <input
           type="datetime-local"
           id="startTime"
@@ -144,7 +144,7 @@ const CreateGame = () => {
       </div>
 
         <div className="mb-4">
-            <label className="block text-gray-700 mb-2">
+            <label className="block text-gray-700 mb-2 font-bold">
                 Matchtyp
             </label>
             <select
@@ -159,7 +159,7 @@ const CreateGame = () => {
         </div>
 
         <div className="mb-4">
-            <label htmlFor="location" className="block text-gray-700 mb-2">
+            <label htmlFor="location" className="block text-gray-700 mb-2 font-bold">
                 Plats
             </label>
             <input
@@ -172,10 +172,10 @@ const CreateGame = () => {
             />
         </div>
           
-        <h3 className="text-lg font-semibold mt-6 mb-2 text-gray-700">Matchförhållanden</h3>
+        <h2 className="text-lg mt-6 mb-2 text-gray-700 font-bold">Matchförhållanden</h2>
 
         <div className="mb-4">
-        <label htmlFor="court" className="block text-gray-700 mb-2">
+        <label htmlFor="court" className="block text-gray-700 mb-2 font-bold">
             Plan
         </label>
         <input
@@ -188,7 +188,7 @@ const CreateGame = () => {
         </div>
 
         <div className="mb-4">
-            <label htmlFor="timing" className="block text-gray-700 mb-2">
+            <label htmlFor="timing" className="block text-gray-700 mb-2 font-bold">
                 Tidhållning
             </label>
             <input
@@ -201,7 +201,7 @@ const CreateGame = () => {
         </div>
 
         <div className="mb-4">
-        <label htmlFor="offensiveConditions" className="block text-gray-700 mb-2">
+        <label htmlFor="offensiveConditions" className="block text-gray-700 mb-2 font-bold">
             Offensiva förhållanden
         </label>
         <input
@@ -214,7 +214,7 @@ const CreateGame = () => {
         </div>
 
         <div className="mb-4">
-        <label htmlFor="defensiveConditions" className="block text-gray-700 mb-2">
+        <label htmlFor="defensiveConditions" className="block text-gray-700 mb-2 font-bold">
             Defensiva förhållanden
         </label>
         <input
@@ -227,7 +227,7 @@ const CreateGame = () => {
         </div>
 
         <div className="mb-4">
-        <label htmlFor="specialists" className="block text-gray-700 mb-2">Specialister</label>
+        <label htmlFor="specialists" className="block text-gray-700 mb-2 font-bold">Specialister</label>
         <input
             type="text"
             id="specialists"
@@ -238,7 +238,7 @@ const CreateGame = () => {
         </div>
 
         <div className="mb-4">
-        <label htmlFor="penalties" className="block text-gray-700 mb-2">Straff</label>
+        <label htmlFor="penalties" className="block text-gray-700 mb-2 font-bold">Straff</label>
         <input
             type="text"
             id="penalties"

@@ -1,17 +1,20 @@
 ﻿using MatchMaker.Core.Interfaces;
 using MatchMaker.Domain.DTOs.Users;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MatchMaker.Domain.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
+[Authorize]
 public class UserController(ILogger<UserController> logger, IUserServiceFacade userServiceFacade) : ControllerBase
 {
     private readonly ILogger<UserController> _logger = logger;
     private readonly IUserServiceFacade _userServiceFacade = userServiceFacade;
 
     [HttpPost]
+    [AllowAnonymous]
     public async Task<IActionResult> CreateUserAsync([FromBody] CreateUserDTO newUser)
     {
         try
