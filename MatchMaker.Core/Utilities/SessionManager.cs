@@ -12,6 +12,8 @@ namespace MatchMaker.Core.Utilities
 
         public void ClearSession(string tokenName)
         {
+            ArgumentException.ThrowIfNullOrWhiteSpace(tokenName);
+
             try
             {
                 var httpContext = _httpContextAccessor.HttpContext;
@@ -27,8 +29,9 @@ namespace MatchMaker.Core.Utilities
 
                 _cookieFactory.ExpireCookie(tokenName);
             }
-            catch
+            catch (Exception ex)
             {
+                _logger.LogError(ex, "An unexpected error occurred while trying to clear session.");
                 throw;
             }
         }

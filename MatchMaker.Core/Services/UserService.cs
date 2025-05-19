@@ -1,6 +1,6 @@
 ﻿using MatchMaker.Core.Interfaces;
+using MatchMaker.Core.Utilities;
 using MatchMaker.Data.Interfaces;
-using MatchMaker.Domain.DTOs;
 using MatchMaker.Domain.Entities;
 using Microsoft.Extensions.Logging;
 

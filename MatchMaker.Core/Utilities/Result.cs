@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 
-namespace MatchMaker.Domain.DTOs;
+namespace MatchMaker.Core.Utilities;
 public class Result<T>
 {
     public bool IsSuccess { get; set; }

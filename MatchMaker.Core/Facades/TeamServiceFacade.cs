@@ -1,7 +1,7 @@
 ﻿using Mapster;
 using MapsterMapper;
 using MatchMaker.Core.Interfaces;
-using MatchMaker.Domain.DTOs;
+using MatchMaker.Core.Utilities;
 using MatchMaker.Domain.DTOs.Teams;
 using MatchMaker.Domain.Entities;
 using Microsoft.Extensions.Logging;

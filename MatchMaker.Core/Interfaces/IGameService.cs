@@ -1,4 +1,4 @@
-﻿using MatchMaker.Domain.DTOs;
+﻿using MatchMaker.Core.Utilities;
 using MatchMaker.Domain.DTOs.Games;
 using MatchMaker.Domain.Entities;
 

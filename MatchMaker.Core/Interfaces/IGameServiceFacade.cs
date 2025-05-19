@@ -1,5 +1,5 @@
 ﻿using MatchMaker.Domain.DTOs.Games;
-using MatchMaker.Domain.DTOs;
+using MatchMaker.Core.Utilities;
 
 namespace MatchMaker.Core.Interfaces
 {
