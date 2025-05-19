@@ -1,5 +1,6 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 
 namespace MatchMaker.Domain.Entities;
@@ -71,22 +72,29 @@ public class Game : SchemaBase<Game>
 }
 
 public class Conditions
+
 {
     [BsonElement("court")]
+    [Required, MinLength(1)]
     public string Court { get; set; } = null!;
 
     [BsonElement("timing")]
+    [Required, MinLength(1)]
     public string Timing { get; set; } = null!;
 
     [BsonElement("offensiveConditions")]
+    [Required, MinLength(1)]
     public string OffensiveConditions { get; set; } = null!;
 
     [BsonElement("defensiveConditions")]
+    [Required, MinLength(1)]
     public string DefensiveConditions { get; set; } = null!;
 
     [BsonElement("specialists")]
+    [Required, MinLength(1)]
     public string Specialists { get; set; } = null!;
 
     [BsonElement("penalties")]
+    [Required, MinLength(1)]
     public string Penalties { get; set; } = null!;
 }
