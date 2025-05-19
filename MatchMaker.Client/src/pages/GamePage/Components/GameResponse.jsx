@@ -9,7 +9,7 @@ const GameResponse = ({ game }) => {
   const [saveError, setSaveError] = useState(null);
   const [submitted, setSubmitted] = useState(false);
 
-  const isCoach = user.userRole === "Coach" && user.teamAffiliation && game.gameStatus === "Planned";
+  const isCoach = user.userRole === "Coach" && user.teamAffiliation === game?.awayTeamId && game.gameStatus === "Planned";
   const isReferee = user.userRole === "Referee" && user.id === game.refereeId && game.gameStatus == "Signed";
 
   const handleSubmit = async (e) => {
