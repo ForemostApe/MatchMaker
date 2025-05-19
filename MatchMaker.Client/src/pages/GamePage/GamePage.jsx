@@ -1,4 +1,4 @@
-import { useParams, useLocation } from "react-router-dom";
+import { useParams, useLocation,useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import useGameData from "../../hooks/useGameData";
 import GameHeader from "./Components/GameHeader";
@@ -13,11 +13,13 @@ const GamePage = () => {
   const location = useLocation();
   const { game, homeTeam, awayTeam, loading, error } = useGameData(id, location);
   const { user } = useAuth();
-
   const [editing, setEditing] = useState(false);
   const [formState, setFormState] = useState(null);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState(null);
+  const [message, setMessage] = useState("");
+  const [messageType, setMessageType] = useState("");
+  const navigate = useNavigate();
 
   const canEdit = user.userRole === "Coach" && user.teamAffiliation === game?.homeTeamId;
 
@@ -32,6 +34,15 @@ const GamePage = () => {
       });
     }
   }, [game]);
+
+  useEffect(() => {
+  if (message) {
+    const timer = setTimeout(() => {
+      setMessage("");
+    }, 3000);
+    return () => clearTimeout(timer);
+  }
+}, [message]);
 
   const toggleEditing = () => {
     if (!editing) {
@@ -51,24 +62,33 @@ const GamePage = () => {
     toggleEditing();
   };
 
-  const handleSave = async () => {
-    setSaving(true);
-    setSaveError(null);
-    try {
-      await gameService.updateGame({
-        id: game.id,
-        startTime: formState.startTime,
-        location: formState.location,
-        gameType: formState.gameType,
-        conditions: formState.conditions
-      });
-      setEditing(false);
-    } catch (err) {
-      setSaveError(err.message);
-    } finally {
-      setSaving(false);
-    }
-  };
+const handleSave = async () => {
+  setSaving(true);
+  setSaveError(null);
+  try {
+    await gameService.updateGame({
+      id: game.id,
+      startTime: formState.startTime,
+      location: formState.location,
+      gameType: formState.gameType,
+      conditions: formState.conditions
+    });
+    setEditing(false);
+    setMessage("Matchen har uppdaterats!");
+    setMessageType("success");
+
+    setTimeout(() => {
+      setMessage("");
+      navigate("/");
+    }, 2000);
+  } catch (err) {
+    setSaveError(err.message);
+    setMessage("Misslyckades att spara matchen.");
+    setMessageType("error");
+  } finally {
+    setSaving(false);
+  }
+};
 
   if (loading) return <p>Loading...</p>;
   if (error || !formState) return <p>Error loading game data.</p>;
@@ -118,6 +138,16 @@ const GamePage = () => {
               {saveError && <p className="text-red-600">{saveError}</p>}
             </>
           )}
+        </div>
+      )}
+
+      {message && (
+        <div
+          className={`mt-4 p-4 rounded text-white text-center ${
+            messageType === "success" ? "bg-green-600" : "bg-red-600"
+          }`}
+        >
+          {message}
         </div>
       )}
 

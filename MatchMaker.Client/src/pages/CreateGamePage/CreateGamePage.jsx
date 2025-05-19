@@ -55,6 +55,13 @@ const CreateGame = () => {
         if (user) loadReferees();
     }, [user]);
 
+    useEffect(() => {
+    if (message) {
+        const timeout = setTimeout(() => setMessage(""), 3000);
+        return () => clearTimeout(timeout);
+    }
+    }, [message]);
+
     const handleSubmit = async (e) => {
     e.preventDefault();
 
