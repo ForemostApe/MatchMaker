@@ -1,14 +1,15 @@
 ﻿using MatchMaker.Domain.Configurations;
 using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.Extensions.Configuration;
 using System.Threading.RateLimiting;
 
 namespace MatchMaker.Api.Extensions
 {
     public static class RateLimitingServiceExtension
     {
-        public static IServiceCollection AddRateLimiting(this IServiceCollection services, IConfiguration config)
+        public static IServiceCollection AddRateLimiting(this IServiceCollection services, IConfiguration configuration)
         {
-            var settings = config.GetSection("RateLimiting").Get<RateLimitSettings>() ?? throw new ArgumentNullException("Can't bind settings for rate-limiting.");
+            var settings = configuration.GetSection("RateLimiting").Get<RateLimitSettings>() ?? throw new ArgumentNullException(nameof(configuration), "Can't bind settings for rate-limiting.");
 
             services.AddRateLimiter(options =>
             {

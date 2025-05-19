@@ -10,7 +10,12 @@ public static class AuthenticationServiceExtension
     {
         try
         {
-            var jwtSettings = configuration.GetSection("JwtSettings").Get<JwtSettings>()!;
+            var jwtSettings = configuration.GetSection("JwtSettings").Get<JwtSettings>();
+            if (jwtSettings == null)
+            {
+                throw new ArgumentNullException(nameof(configuration), "Couldn't get JwtSettings.");
+            }
+
             services.AddSingleton(jwtSettings);
 
             var jwtOptions = new JwtOptions(jwtSettings);
