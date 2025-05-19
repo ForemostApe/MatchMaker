@@ -1,5 +1,6 @@
 ﻿using MatchMaker.Core.Interfaces;
 using MatchMaker.Domain.DTOs.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 
@@ -74,6 +75,7 @@ namespace MatchMaker.Domain.Controllers
         }
 
         [HttpPost("logout")]
+        [Authorize]
         public IActionResult Logout()
         {
             try
