@@ -1,10 +1,12 @@
 ﻿using MatchMaker.Core.Interfaces;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 
 namespace MatchMaker.Core.Factories;
 
-public class CookieFactory(IHttpContextAccessor httpContextAccessor) : ICookieFactory
+public class CookieFactory(ILogger<CookieFactory> logger, IHttpContextAccessor httpContextAccessor) : ICookieFactory
 {
+    private readonly ILogger<CookieFactory> _logger = logger;
     private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
 
     public void CreateHttpOnlyCookie(string tokenName, string token)
@@ -23,8 +25,9 @@ public class CookieFactory(IHttpContextAccessor httpContextAccessor) : ICookieFa
 
             response.Cookies.Append(tokenName, token, cookieOptions);
         }
-        catch
+        catch (Exception ex)
         {
+            _logger.LogError(ex, "An unexpected error occurred in CookieFactory while trying to create HTTP-only cookie");
             throw;
         }
     }
@@ -45,8 +48,9 @@ public class CookieFactory(IHttpContextAccessor httpContextAccessor) : ICookieFa
 
             response.Cookies.Append(tokenName, string.Empty, cookieOptions);
         }
-        catch
+        catch (Exception ex)
         {
+            _logger.LogError(ex, "An unexpected error occurred in CookieFactory while trying to expire cookie");
             throw;
         }
     }
