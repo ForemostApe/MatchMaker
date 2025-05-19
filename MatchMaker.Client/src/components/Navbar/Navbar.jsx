@@ -37,7 +37,7 @@ const Navbar = () => {
 
         <div className="hidden md:block">
           {!isLoading && user && (
-            <button className="text-white" onClick={handleLogoutClick}>
+            <button className="text-white hover:cursor-pointer" onClick={handleLogoutClick}>
               Logga ut
             </button>
           )}
@@ -71,7 +71,7 @@ const Navbar = () => {
     )}
 
     {!isLoading && user && (
-      <button className="text-white text-left" onClick={handleLogoutClick}>
+      <button className="text-white text-left hover:cursor-pointer" onClick={handleLogoutClick}>
         Logga ut
       </button>
     )}

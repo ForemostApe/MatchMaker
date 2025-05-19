@@ -58,8 +58,8 @@ namespace MatchMaker.Core.Services
                     EncryptingCredentials = new EncryptingCredentials(_jwtOptions.EncryptionKey, SecurityAlgorithms.Aes256KW, SecurityAlgorithms.Aes256CbcHmacSha512)
                 };
 
-                var accessToken = tokenHandler.CreateToken(tokenDescriptor);
-                return tokenHandler.WriteToken(accessToken);
+                var token = tokenHandler.CreateToken(tokenDescriptor);
+                return tokenHandler.WriteToken(token);
             }
             catch (Exception ex)
             {
