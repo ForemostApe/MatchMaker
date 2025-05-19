@@ -10,8 +10,15 @@ public class LinkFactory(ILogger<LinkFactory> logger, string clientUrl) : ILinkF
 
     public string CreateVerificationLink(string token)
     {
-        _logger.LogInformation("Creating verification-link for mail.");
-        return $"{_clientUrl}/verify-email?verificationToken={token}";
+        try
+        {
+            return $"{_clientUrl}/verify-email?verificationToken={token}";
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An unexpected error occurred while trying to create a verification-link.");
+            throw;
+        }
     }
     public string CreateResetPasswordLink(string email)
     {

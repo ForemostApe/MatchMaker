@@ -15,7 +15,7 @@ public class JwtMiddleware(ILogger<JwtMiddleware> logger, RequestDelegate next, 
 
     public async Task Invoke(HttpContext context)
     {
-        var authHeader = context.Request.Headers["Authorization"].FirstOrDefault();
+        var authHeader = context.Request.Headers.Authorization.FirstOrDefault();
 
         if (!string.IsNullOrEmpty(authHeader) && authHeader.StartsWith("Bearer "))
         {
@@ -23,7 +23,6 @@ public class JwtMiddleware(ILogger<JwtMiddleware> logger, RequestDelegate next, 
             {
                 var token = authHeader.Substring(7);
                 var principal = _tokenService.DecryptToken(token);
-
 
                 if (principal != null)
                 {

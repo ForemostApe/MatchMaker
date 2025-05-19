@@ -2,7 +2,7 @@
 using MapsterMapper;
 using MatchMaker.Core.Interfaces;
 using MatchMaker.Core.Services;
-using MatchMaker.Domain.DTOs;
+using MatchMaker.Core.Utilities;
 using MatchMaker.Domain.DTOs.Users;
 using MatchMaker.Domain.Entities;
 using Microsoft.AspNetCore.Http;
@@ -12,6 +12,7 @@ namespace MatchMaker.Core.Facades;
 
 public class UserServiceFacade(ILogger<UserServiceFacade> logger, IMapper mapper, IUserService userService, IEmailService emailService, ITokenService tokenService, IAuthService authService) : IUserServiceFacade
 {
+    private readonly ILogger<UserServiceFacade> _logger = logger;
     private readonly IMapper _mapper = mapper;
     private readonly IUserService _userService = userService;
     private readonly ILogger<UserServiceFacade> _logger = logger;

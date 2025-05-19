@@ -8,12 +8,11 @@ public static class MongoDbServiceExtensions
 {
     public static IServiceCollection AddMongoDb(this IServiceCollection services, IConfiguration configuration)
     {
-        var mongoDbSettings = configuration.GetSection("MongoDbSettings").Get<MongoDbSettings>() ?? throw new Exception("MongoDbSettings configuration is missing.");
-
+        var mongoDbSettings = configuration.GetSection("MongoDbSettings").Get<MongoDbSettings>() ?? throw new InvalidOperationException("MongoDbSettings configuration is missing.");
 
         services.AddSingleton<IMongoClient>(serviceProvider =>
         {
-            MongoUrl mongoUrl = new MongoUrl(mongoDbSettings.ConnectionString) ?? throw new Exception("Connection-string missing.");
+            MongoUrl mongoUrl = new MongoUrl(mongoDbSettings.ConnectionString) ?? throw new ArgumentException("Connection-string missing.");
 
             return new MongoClient(mongoUrl);
         });
@@ -21,7 +20,7 @@ public static class MongoDbServiceExtensions
         services.AddSingleton(serviceProvider =>
         {
             var client = serviceProvider.GetRequiredService<IMongoClient>();
-            var database = client.GetDatabase(mongoDbSettings.DatabaseName) ?? throw new Exception("Database-name missing.");
+            var database = client.GetDatabase(mongoDbSettings.DatabaseName) ?? throw new ArgumentException("Database-name missing.");
 
             return database;
         });

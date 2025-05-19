@@ -2,9 +2,8 @@ using MatchMaker.Api.Extensions;
 using MatchMaker.Domain.Extensions;
 using MatchMaker.Domain.Middlewares;
 using Microsoft.IdentityModel.Logging;
-using System;
 
-namespace MatchMaker.Domain
+namespace MatchMaker.Api
 {
     public class Program
     {

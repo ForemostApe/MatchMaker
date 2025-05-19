@@ -15,13 +15,13 @@ public static class CoreServiceExtension
 {
     public static IServiceCollection AddCoreServices(this IServiceCollection services, IConfiguration configuration, IWebHostEnvironment env)
     {
-
         var config = TypeAdapterConfig.GlobalSettings;
         config.Scan(typeof(UserMappingProfile).Assembly);
         services.AddMapster();
 
         services.Configure<ClientSettings>(configuration.GetSection("FrontendClient"));
-        var clientSettings = configuration.GetSection("FrontendClient").Get<ClientSettings>() ?? throw new ArgumentNullException("Couldn't get BaseURL settings.");
+        var clientSettings = configuration.GetSection("FrontendClient").Get<ClientSettings>() ?? throw new ArgumentNullException(nameof(configuration), "Couldn't get BaseURL settings.");
+                
         services.AddSingleton(clientSettings);
 
         services.AddHttpContextAccessor();
@@ -54,12 +54,11 @@ public static class CoreServiceExtension
 
         services.AddSingleton(config);
 
-        services.AddDistributedMemoryCache(); //Check out how to use this properly later on.
-
         services.AddControllers();
 
         services.AddEndpointsApiExplorer();
 
+        services.AddDistributedMemoryCache(); 
         services.AddSession(options =>
         {
             options.Cookie.HttpOnly = true;
@@ -69,12 +68,12 @@ public static class CoreServiceExtension
 
         services.AddHealthChecks();
 
+        //Add additional logging-outputs other than console and debug here if needed.
         services.AddLogging(config =>
         {
             config.ClearProviders();
             config.AddConsole();
             config.AddDebug();
-            //Add additional logging-outputs other than console and debug here if needed.
         });
 
         return services;

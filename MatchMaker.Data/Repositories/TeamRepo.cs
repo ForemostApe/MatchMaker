@@ -9,39 +9,97 @@ public class TeamRepo(ILogger<TeamRepo> logger, IMongoDatabase database) : Repos
 {
     public async Task<Team> CreateTeamAsync(Team newTeam)
     {
-        return await InsertOneAsync(newTeam);
+        ArgumentNullException.ThrowIfNull(newTeam);
+
+        try
+        {
+            return await InsertOneAsync(newTeam);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An unexpected error occurred ín the TeamRepo while trying to create team.");
+            throw;
+        }
     }
 
     public async Task<List<Team>> GetAllTeamsAsync()
     {
-        return await FindAllAsync();
+        try
+        {
+            return await FindAllAsync();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An unexpected error occurred ín the TeamRepo while trying to get all teams.");
+            throw;
+        }
     }
 
     public async Task<Team?> GetTeamByIdAsync(string teamId)
     {
-        var filter = Builders<Team>.Filter.Eq(t => t.Id, teamId);
-        return await FindOneAsync(filter);
+        ArgumentException.ThrowIfNullOrEmpty(teamId);
+
+        try
+        {
+            var filter = Builders<Team>.Filter.Eq(t => t.Id, teamId);
+            return await FindOneAsync(filter);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An unexpected error occurred ín the TeamRepo while trying to get team by TeamId.");
+            throw;
+        }
     }
 
     public async Task<Team?> GetTeamByNameAsync(string teamName)
     {
-        var filter = Builders<Team>.Filter.Regex(t => t.TeamName, new MongoDB.Bson.BsonRegularExpression($"^{teamName}$", "i"));
-        return await FindOneAsync(filter);
+        ArgumentException.ThrowIfNullOrEmpty(teamName);
+
+        try
+        {
+            var filter = Builders<Team>.Filter.Regex(t => t.TeamName, new MongoDB.Bson.BsonRegularExpression($"^{teamName}$", "i"));
+            return await FindOneAsync(filter);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An unexpected error occurred ín the TeamRepo while trying to get team by TeamName.");
+            throw;
+        }
     }
 
     public async Task<UpdateResult> UpdateTeamAsync(Team updatedTeam)
     {
-        var filter = Builders<Team>.Filter.Eq(t => t.Id, updatedTeam.Id);
-        var update = Builders<Team>.Update
-            .Set(t => t.TeamName, updatedTeam.TeamName)
-            .Set(t => t.TeamLogo, updatedTeam.TeamLogo);
+        ArgumentNullException.ThrowIfNull(updatedTeam);
 
-        return await UpdateOneAsync(filter, update);
+        try
+        {
+            var filter = Builders<Team>.Filter.Eq(t => t.Id, updatedTeam.Id);
+            var update = Builders<Team>.Update
+                .Set(t => t.TeamName, updatedTeam.TeamName)
+                .Set(t => t.TeamLogo, updatedTeam.TeamLogo);
+
+            return await UpdateOneAsync(filter, update);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An unexpected error occurred ín the TeamRepo while trying to update team.");
+            throw;
+        }
     }
 
     public async Task<DeleteResult> DeleteTeamAsync(string teamId)
     {
-        var filter = Builders<Team>.Filter.Eq(t => t.Id, teamId);
-        return await DeleteOneAsync(filter);
+        ArgumentException.ThrowIfNullOrEmpty(teamId);
+
+        try
+        {
+            var filter = Builders<Team>.Filter.Eq(t => t.Id, teamId);
+            return await DeleteOneAsync(filter);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An unexpected error occurred ín the TeamRepo while trying to delete team.");
+            throw;
+        }
     }
 }

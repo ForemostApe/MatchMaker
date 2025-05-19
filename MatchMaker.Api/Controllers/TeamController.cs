@@ -37,7 +37,7 @@ public class TeamController(ILogger<TeamController> logger, ITeamServiceFacade t
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, $"An unexpected error occurred while trying to create team {ex.Message}");
+            _logger.LogError(ex, "An unexpected error occurred while trying to create team.");
             return StatusCode(500, new ProblemDetails
             {
                 Title = "Internal Server Error",
@@ -65,7 +65,7 @@ public class TeamController(ILogger<TeamController> logger, ITeamServiceFacade t
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, $"An unexpected error occurred while trying to get all teams. {ex.Message}");
+            _logger.LogError(ex, "An unexpected error occurred while trying to get all teams.");
             return StatusCode(500, new ProblemDetails
             {
                 Title = "Internal Server Error",
@@ -105,7 +105,7 @@ public class TeamController(ILogger<TeamController> logger, ITeamServiceFacade t
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, $"An unexpected error occurred while trying to get team by ID. {ex.Message}");
+            _logger.LogError(ex, "An unexpected error occurred while trying to get team by TeamId.");
             return StatusCode(500, new ProblemDetails
             {
                 Title = "Internal Server Error",
@@ -143,7 +143,7 @@ public class TeamController(ILogger<TeamController> logger, ITeamServiceFacade t
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, $"An unexpected error occurred while trying to get team by name. {ex.Message}");
+            _logger.LogError(ex, "An unexpected error occurred while trying to get team by name.");
             return StatusCode(500, new ProblemDetails
             {
                 Title = "Internal Server Error",
@@ -177,7 +177,7 @@ public class TeamController(ILogger<TeamController> logger, ITeamServiceFacade t
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, $"An unexpected error occurred while trying to update team. {ex.Message}");
+            _logger.LogError(ex, "An unexpected error occurred while trying to update team.");
             return StatusCode(500, new ProblemDetails
             {
                 Title = "Internal Server Error",
@@ -211,7 +211,7 @@ public class TeamController(ILogger<TeamController> logger, ITeamServiceFacade t
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, $"An unexpected error occurred while trying to delete team. {ex.Message}");
+            _logger.LogError(ex, "An unexpected error occurred while trying to delete team.");
             return StatusCode(500, new ProblemDetails
             {
                 Title = "Internal Server Error",

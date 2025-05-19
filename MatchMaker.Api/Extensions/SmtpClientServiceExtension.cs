@@ -9,8 +9,7 @@ public static class SmtpClientServiceExtension
         var smtpSettings = new SmtpSettings();
         configuration.GetSection("SmtpSettings").Bind(smtpSettings);
 
-        if (string.IsNullOrEmpty(smtpSettings.FromEmail))
-            throw new ArgumentNullException("SmtpFromEmail is missing in config");
+        if(string.IsNullOrWhiteSpace(smtpSettings.FromEmail)) throw new InvalidOperationException("SmtpFromEmail is missing in configuration.");
 
         services.AddSingleton(smtpSettings);
         return services;
