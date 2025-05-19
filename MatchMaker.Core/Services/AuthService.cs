@@ -3,11 +3,22 @@ using Microsoft.Extensions.Logging;
 
 namespace MatchMaker.Core.Services
 {
-    public class AuthService : IAuthService
+    public class AuthService(Logger<AuthService> logger) : IAuthService
     {
+        private readonly ILogger<AuthService> _logger = logger;
         public string HashPassword(string password)
         {
-            return BCrypt.Net.BCrypt.HashPassword(password);
+            ArgumentException.ThrowIfNullOrEmpty(password);
+
+            try
+            {
+                return BCrypt.Net.BCrypt.HashPassword(password);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected error occured while trying to hash password.");
+                throw;
+            }
         }
     }
 }
