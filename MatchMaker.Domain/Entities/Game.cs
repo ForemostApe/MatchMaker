@@ -32,6 +32,7 @@ public class Game : SchemaBase<Game>
     public DateTime StartTime { get; set; }
 
     [BsonElement("gameType")]
+    [BsonRepresentation(BsonType.String)]
     public string GameType { get; set; } = null!;
 
     [BsonElement("location")]

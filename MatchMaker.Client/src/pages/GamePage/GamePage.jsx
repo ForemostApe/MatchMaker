@@ -27,6 +27,7 @@ const GamePage = () => {
         startTime: game.startTime,
         location: game.location,
         gameType: game.gameType,
+        refereeId: game.refereeId,
         conditions: { ...game.conditions }
       });
     }
@@ -38,6 +39,7 @@ const GamePage = () => {
         startTime: game.startTime,
         location: game.location,
         gameType: game.gameType,
+        refereeId: game.refereeId,
         conditions: { ...game.conditions }
       });
     }
