@@ -62,8 +62,8 @@
 <body>
     <div class="container">
         <h1>En match har planerats!</h1>
-        <p>Vänligen logga in och granska den matchbokning som skickats till dig.</p>
-        <a href="{{ login_link }}" target="_blank">Klicka här för att öppna hemsidan.</a>
+        <p>VÃ¤nligen logga in och granska den matchbokning som skickats till dig.</p>
+        <a href="{{ login_link }}" target="_blank">Klicka hÃ¤r fÃ¶r att Ã¶ppna hemsidan.</a>
     </div>
 </body>
 </html>

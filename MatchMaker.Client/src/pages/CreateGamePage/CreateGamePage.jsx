@@ -276,10 +276,10 @@ const CreateGame = () => {
             </button>
 
             {message && (
-                <div className={`mb-4 p-4 rounded text-white ${messageType === "success" ? "bg-green-800" : "bg-red-500"}`}>
-                {message}
-            </div>
-        )}
+                <div className={`mt-4 p-4 rounded text-white ${messageType === "success" ? "bg-green-800" : "bg-red-500"}`}>
+                    {message}
+                </div>
+            )}
         </form>
     </div>
   );
