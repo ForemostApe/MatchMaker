@@ -71,6 +71,7 @@ const handleSave = async () => {
       startTime: formState.startTime,
       location: formState.location,
       gameType: formState.gameType,
+      refereeId: formState.refereeId,
       conditions: formState.conditions
     });
     setEditing(false);
