@@ -32,11 +32,18 @@ const GameConditions = ({ editing, canEdit, formState, setFormState }) => {
       <h2 className="text-2xl font-bold mb-4 text-gray-800">Matchvillkor</h2>
 
       <ConditionItem
-        title="Spelplan:"
+        title="Plan:"
         value={c.court}
         editable={canEdit && editing}
         onChange={handleChange}
         field="court"
+      />
+      <ConditionItem
+        title="Tidhållning:"
+        value={c.timing}
+        editable={canEdit && editing}
+        onChange={handleChange}
+        field="timing"
       />
       <ConditionItem
         title="Offensiva överenskommelser:"

@@ -131,7 +131,9 @@ const CreateGame = () => {
                 </div>
 
                 <div className="mb-4">
-                <label htmlFor="referee" className="block text-gray-700 mb-2 font-bold">Domare</label>
+                <label htmlFor="referee" className="block text-gray-700 mb-2 font-bold">
+                    Domare
+                </label>
                 <select
                 id="referee"
                 value={refereeId}
@@ -222,7 +224,7 @@ const CreateGame = () => {
 
             <div className="mb-4">
             <label htmlFor="offensiveConditions" className="block text-gray-700 mb-2 font-bold">
-                Offensiva förhållanden
+                Offensiva överenskommelser
             </label>
             <input
                 type="text"
@@ -235,7 +237,7 @@ const CreateGame = () => {
 
             <div className="mb-4">
             <label htmlFor="defensiveConditions" className="block text-gray-700 mb-2 font-bold">
-                Defensiva förhållanden
+                Defensiva överenskommelser
             </label>
             <input
                 type="text"
@@ -247,7 +249,9 @@ const CreateGame = () => {
             </div>
 
             <div className="mb-4">
-            <label htmlFor="specialists" className="block text-gray-700 mb-2 font-bold">Specialister</label>
+            <label htmlFor="specialists" className="block text-gray-700 mb-2 font-bold">
+                Specialister
+            </label>
             <input
                 type="text"
                 id="specialists"
@@ -258,7 +262,9 @@ const CreateGame = () => {
             </div>
 
             <div className="mb-4">
-            <label htmlFor="penalties" className="block text-gray-700 mb-2 font-bold">Straff</label>
+            <label htmlFor="penalties" className="block text-gray-700 mb-2 font-bold">
+                Bestraffningar
+            </label>
             <input
                 type="text"
                 id="penalties"
