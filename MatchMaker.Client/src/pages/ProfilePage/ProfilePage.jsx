@@ -17,6 +17,8 @@ const ProfilePage = () => {
     teamAffiliation: null,
   });
 
+  const [validationErrors, setValidationErrors] = useState({});
+
   const roleMapping = {
     Admin: "Administratör",
     Coach: "Tränare",
@@ -26,56 +28,86 @@ const ProfilePage = () => {
     Unspecified: "Ej angiven",
   };
 
-useEffect(() => {
-  const loadData = async () => {
-    try {
-      if (user) {
-        const allTeams = await teamService.getAllTeams();
-        setTeams(allTeams);
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        if (user) {
+          const allTeams = await teamService.getAllTeams();
+          setTeams(allTeams);
 
-        const updatedFormData = {
-          id: user.id,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          userRole: user.userRole,
-          teamAffiliation: user.teamAffiliation || null,
-        };
-        setFormData(updatedFormData);
+          const updatedFormData = {
+            id: user.id,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            userRole: user.userRole,
+            teamAffiliation: user.teamAffiliation || null,
+          };
+          setFormData(updatedFormData);
 
-      if (user.teamAffiliation) {
-        try {
-          const teamData = await teamService.getTeamById(user.teamAffiliation);
-          setTeam(teamData);
-        } catch (err) {
-          console.error("Kunde inte hämta laget:", err);
-          setTeam(null);
-        }
-      } else {
-        setTeam(null);
-      }
+          if (user.teamAffiliation) {
+            try {
+              const teamData = await teamService.getTeamById(user.teamAffiliation);
+              setTeam(teamData);
+            } catch (err) {
+              console.error("Kunde inte hämta laget:", err);
+              setTeam(null);
             }
-          } catch (error) {
-            console.error("Error loading profile data", error);
+          } else {
+            setTeam(null);
           }
-        };
+        }
+      } catch (error) {
+        console.error("Error loading profile data", error);
+      }
+    };
 
-  loadData();
-}, [user]);
+    loadData();
+  }, [user]);
 
-const handleChange = (e) => {
-  const { name, value } = e.target;
+  const handleChange = (e) => {
+    const { name, value } = e.target;
 
-  setFormData(prev => ({
-    ...prev,
-    [name]: name === "teamAffiliation" && value === "" ? null : value,
-  }));
-};
+    setFormData((prev) => ({
+      ...prev,
+      [name]: name === "teamAffiliation" && value === "" ? null : value,
+    }));
+
+    setValidationErrors((prev) => ({
+      ...prev,
+      [name]: undefined,
+    }));
+  };
+
+  const validate = () => {
+    const errors = {};
+
+    if (!formData.firstName.trim()) {
+      errors.firstName = "Förnamn krävs";
+    }
+
+    if (!formData.lastName.trim()) {
+      errors.lastName = "Efternamn krävs";
+    }
+
+    if (!formData.userRole) {
+      errors.userRole = "Roll krävs";
+    }
+
+    return errors;
+  };
 
   const handleSave = async () => {
+    const errors = validate();
+    if (Object.keys(errors).length > 0) {
+      setValidationErrors(errors);
+      return;
+    }
+
     try {
       await userService.updateUser(formData);
       setIsEditing(false);
       await refreshUser();
+      setValidationErrors({});
     } catch (error) {
       console.error("Failed to update profile", error);
     }
@@ -91,6 +123,7 @@ const handleChange = (e) => {
         teamAffiliation: user.teamAffiliation || null,
       });
     }
+    setValidationErrors({});
     setIsEditing(false);
   };
 
@@ -116,13 +149,18 @@ const handleChange = (e) => {
           <div>
             <span className="font-bold">Förnamn: </span>
             {isEditing ? (
-              <input
-                type="text"
-                name="firstName"
-                value={formData.firstName}
-                onChange={handleChange}
-                className="border rounded p-1 ml-2"
-              />
+              <>
+                <input
+                  type="text"
+                  name="firstName"
+                  value={formData.firstName}
+                  onChange={handleChange}
+                  className="border rounded p-1 ml-2"
+                />
+                {validationErrors.firstName && (
+                  <p className="text-red-500 text-sm mt-1">{validationErrors.firstName}</p>
+                )}
+              </>
             ) : (
               <span>{user.firstName}</span>
             )}
@@ -131,13 +169,18 @@ const handleChange = (e) => {
           <div>
             <span className="font-bold">Efternamn: </span>
             {isEditing ? (
-              <input
-                type="text"
-                name="lastName"
-                value={formData.lastName}
-                onChange={handleChange}
-                className="border rounded p-1 ml-2"
-              />
+              <>
+                <input
+                  type="text"
+                  name="lastName"
+                  value={formData.lastName}
+                  onChange={handleChange}
+                  className="border rounded p-1 ml-2"
+                />
+                {validationErrors.lastName && (
+                  <p className="text-red-500 text-sm mt-1">{validationErrors.lastName}</p>
+                )}
+              </>
             ) : (
               <span>{user.lastName}</span>
             )}
@@ -146,18 +189,20 @@ const handleChange = (e) => {
           <div>
             <span className="font-bold">Roll: </span>
             {isEditing ? (
-              <select
-                name="userRole"
-                value={formData.userRole}
-                onChange={handleChange}
-                className="border rounded p-1 ml-2"
-              >
-                <option value="">Välj roll</option>
-                <option value="Coach">Tränare</option>
-                <option value="Referee">Domare</option>
-                <option value="Functionary">Funktionär</option>
-                <option value="Guest">Gäst</option>
-              </select>
+              <>
+                <select
+                  name="userRole"
+                  value={formData.userRole}
+                  onChange={handleChange}
+                  className="border rounded p-1 ml-2"
+                >
+                  <option value="">Välj roll</option>
+                  <option value="Coach">Tränare</option>
+                  <option value="Referee">Domare</option>
+                  <option value="Functionary">Funktionär</option>
+                  <option value="Guest">Gäst</option>
+                </select>
+              </>
             ) : (
               <span>{roleMapping[user.userRole] || user.userRole}</span>
             )}
@@ -180,7 +225,13 @@ const handleChange = (e) => {
                 ))}
               </select>
             ) : (
-              <span>{!formData.teamAffiliation? "Inget tilldelat lag" : !team? "Laddar lag..." : team.teamName}</span>
+              <span>
+                {!formData.teamAffiliation
+                  ? "Inget tilldelat lag"
+                  : !team
+                  ? "Laddar lag..."
+                  : team.teamName}
+              </span>
             )}
           </div>
         </div>

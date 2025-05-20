@@ -1,6 +1,11 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import authService from "../../services/authService";
-import { setAccessToken, clearAccessToken } from "../../services/tokenStore";
+import { 
+  setAccessToken, 
+  clearAccessToken, 
+  getRefreshToken,
+  setRefreshToken
+} from "../../services/tokenStore";
 
 const AuthContext = createContext();
 
@@ -9,8 +14,14 @@ export const AuthProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   
-  const refresh = async () => {
+  const refresh = async (silent = false) => {
     try {
+      const existingRefreshToken = getRefreshToken();
+      if (!existingRefreshToken) {
+        if (!silent) setError("No session available");
+        return null;
+      }
+
       const response = await authService.refresh();
       const responseData = response?.data || response;
 
@@ -22,16 +33,23 @@ export const AuthProvider = ({ children }) => {
       }
 
       setAccessToken(responseData.accessToken);
+      if (responseData.refreshToken) {
+        setRefreshToken(responseData.refreshToken);
+      }
+      
       setUser({
         ...(responseData.user || {}),
         accessToken: responseData.accessToken,
       });
       setError(null);
     } catch (err) {
-      console.error("Refresh error:", err);
+      console.log(silent ? "Silent refresh failed" : "Refresh error:", err);
       setUser(null);
       clearAccessToken();
-      setError(err.response?.data?.message || "Session refresh failed");
+      if (!silent) {
+        setError(err.response?.data?.message || "Session refresh failed");
+      }
+      return null;
     }
   };
 
