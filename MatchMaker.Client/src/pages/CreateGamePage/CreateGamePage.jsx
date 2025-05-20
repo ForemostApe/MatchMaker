@@ -206,6 +206,7 @@ const CreateGame = () => {
                 value={court}
                 onChange={(e) => setCourt(e.target.value)}
                 className="w-full px-3 py-2 border rounded-md"
+                required
             />
             </div>
 
@@ -219,6 +220,7 @@ const CreateGame = () => {
                     value={timing}
                     onChange={(e) => setTiming(e.target.value)}
                     className="w-full px-3 py-2 border rounded-md"
+                    required
                 />
             </div>
 
@@ -232,6 +234,7 @@ const CreateGame = () => {
                 value={offensiveConditions}
                 onChange={(e) => setOffensiveConditions(e.target.value)}
                 className="w-full px-3 py-2 border rounded-md"
+                required
             />
             </div>
 
@@ -245,6 +248,7 @@ const CreateGame = () => {
                 value={defensiveConditions}
                 onChange={(e) => setDefensiveConditions(e.target.value)}
                 className="w-full px-3 py-2 border rounded-md"
+                required
             />
             </div>
 
@@ -258,6 +262,7 @@ const CreateGame = () => {
                 value={specialists}
                 onChange={(e) => setSpecialists(e.target.value)}
                 className="w-full px-3 py-2 border rounded-md"
+                required
             />
             </div>
 
@@ -271,6 +276,7 @@ const CreateGame = () => {
                 value={penalties}
                 onChange={(e) => setPenalties(e.target.value)}
                 className="w-full px-3 py-2 border rounded-md"
+                required
             />
             </div>
 
