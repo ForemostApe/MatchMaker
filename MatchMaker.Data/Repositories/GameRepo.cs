@@ -74,6 +74,7 @@ public class GameRepo(ILogger<GameRepo> logger, IMongoDatabase database) : Repos
             if (updatedGame.Conditions != null)
             {
                 update = update.Set(g => g.Conditions.Court, updatedGame.Conditions.Court)
+                    .Set(g => g.Conditions.Timing, updatedGame.Conditions.Timing)
                     .Set(g => g.Conditions.OffensiveConditions, updatedGame.Conditions.OffensiveConditions)
                     .Set(g => g.Conditions.DefensiveConditions, updatedGame.Conditions.DefensiveConditions)
                     .Set(g => g.Conditions.Specialists, updatedGame.Conditions.Specialists)
