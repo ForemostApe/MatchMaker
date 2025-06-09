@@ -3,6 +3,7 @@ using MatchMaker.Core.Interfaces;
 using MatchMaker.Core.Utilities;
 using MatchMaker.Domain.DTOs.Authentication;
 using MatchMaker.Domain.DTOs.Users;
+using MatchMaker.Domain.Entities;
 using Microsoft.Extensions.Logging;
 using System.Security.Claims;
 
@@ -17,50 +18,42 @@ namespace MatchMaker.Core.Facades
         private readonly ISessionManager _sessionManager = sessionManager;
         private readonly IMapper _mapper = mapper;
 
-        public async Task<Result<bool>> VerifyEmailAsync(string token)
+        public async Task<Result<bool>> VerifyEmailAsync(string verificationToken)
         {
             try
             {
-                if (string.IsNullOrWhiteSpace(token))
-                {
+                if (string.IsNullOrWhiteSpace(verificationToken))
                     return Result<bool>.Failure("Token får inte vara tom.");
-                }
 
-                var principal = _tokenService.DecryptToken(token);
+                var principal = _tokenService.DecryptToken(verificationToken);
                 if (principal == null)
-                {
                     return Result<bool>.Failure("Ogiltig eller utgången verifikationstoken");
+
+                var claims = CheckAndExtractClaims(principal);
+
+                if (claims.TokenUsage != "verification")
+                {
+                    _logger.LogError("Provided token was not of the correct type.");
+                    return Result<bool>.Failure("Ett oväntat fel uppstod. Vänligen försök igen senare.");
                 }
 
-                var userId = principal.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? throw new UnauthorizedAccessException($"User-Id claim saknas.");
-                var userEmail = principal.FindFirst(ClaimTypes.Email)?.Value ?? throw new UnauthorizedAccessException($"User-email claim saknas.");
-                var tokenUsage = principal.FindFirst("token_usage")?.Value ?? throw new UnauthorizedAccessException($"Token-claim is saknas.");
+                var getUserResult = await _userService.GetUserByIdAsync(claims.UserId);
+                if (!getUserResult.IsSuccess)
+                    return Result<bool>.Failure(getUserResult.Message);
 
-                if (tokenUsage != "verification")
+                var existingUser = getUserResult.Data!;
+
+                if (!existingUser.Email.Equals(claims.UserEmail, StringComparison.OrdinalIgnoreCase))
                 {
-                    return Result<bool>.Failure("Tillhandhahållen token är inte avsedd för email-verifikation.");
+                    _logger.LogError("User-email doesn't match the email provided in token.");
+                    return Result<bool>.Failure("Ett oväntat fel uppstod. Vänligen försök igen senare.");
                 }
 
-                var user = await _userService.GetUserByIdAsync(userId);
-                if (!user.IsSuccess)
-                {
-                    return Result<bool>.Failure(user.Message);
-                }
-
-                if (user.Data!.Email.ToLower() != userEmail.ToLower())
-                {
-                    return Result<bool>.Failure("Email-adressen matchar inte email-adressen i tillhandahållen token.");
-                }
-
-                if (user.Data!.IsVerified)
-                {
+                if (existingUser.IsVerified)
                     return Result<bool>.Success(true, "Email-adressen är redan verifierad.");
-                }
 
-                user.Data!.IsVerified = true;
-
-                var updateResult = await _userService.VerifyEmailAsync(user.Data!);
-
+                existingUser.IsVerified = true;
+                var updateResult = await _userService.VerifyEmailAsync(existingUser);
                 return Result<bool>.Success(true, "Email-adressen har verifierats.");
             }
             catch (Exception ex)
@@ -70,19 +63,41 @@ namespace MatchMaker.Core.Facades
             }
         }
 
+        private static TokenClaims CheckAndExtractClaims(ClaimsPrincipal principal)
+        {
+            var userId = principal.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                    ?? throw new UnauthorizedAccessException($"User-Id claim saknas.");
+
+            var userEmail = principal.FindFirst(ClaimTypes.Email)?.Value
+                ?? throw new UnauthorizedAccessException($"User-email claim saknas.");
+
+            var tokenUsage = principal.FindFirst("token_usage")?.Value
+                ?? throw new UnauthorizedAccessException($"Token-claim is saknas.");
+
+            return new TokenClaims
+            {
+                UserId = userId,
+                UserEmail = userEmail,
+                TokenUsage = tokenUsage
+            };
+        }
+
         public async Task<Result<AuthenticationDTO>> LoginAsync(LoginDTO loginDTO)
         {
             try
             {
                 var userResult = await _userService.GetUserByEmailAsync(loginDTO.Email);
 
-                if (!userResult.IsSuccess || userResult.Data == null) return Result<AuthenticationDTO>.Failure("Felaktig email-adress eller felaktigt lösenord.");
+                if (!userResult.IsSuccess || userResult.Data == null) 
+                    return Result<AuthenticationDTO>.Failure("Felaktig email-adress eller felaktigt lösenord.");
 
                 var user = userResult.Data;
 
-                if (!BCrypt.Net.BCrypt.Verify(loginDTO.Password, user.PasswordHash)) return Result<AuthenticationDTO>.Failure("Felaktig email-adress eller felaktigt lösenord.");
+                if (!BCrypt.Net.BCrypt.Verify(loginDTO.Password, user.PasswordHash)) 
+                    return Result<AuthenticationDTO>.Failure("Felaktig email-adress eller felaktigt lösenord.");
 
-                if (!user.IsVerified) return Result<AuthenticationDTO>.Failure("Vänligen verifiera din email-adress för att kunna logga in.");
+                if (!user.IsVerified) 
+                    return Result<AuthenticationDTO>.Failure("Vänligen verifiera din email-adress för att kunna logga in.");
 
                 _sessionManager.ClearSession("refreshToken");
 
