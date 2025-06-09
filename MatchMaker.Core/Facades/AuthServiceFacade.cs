@@ -1,4 +1,5 @@
 ﻿using MapsterMapper;
+using MatchMaker.Core.Helpers;
 using MatchMaker.Core.Interfaces;
 using MatchMaker.Core.Utilities;
 using MatchMaker.Domain.DTOs.Authentication;
@@ -29,7 +30,7 @@ namespace MatchMaker.Core.Facades
                 if (principal == null)
                     return Result<bool>.Failure("Ogiltig eller utgången verifikationstoken");
 
-                var claims = CheckAndExtractClaims(principal);
+                TokenClaims claims = TokenClaimHelper.CheckAndExtractClaims(principal);
 
                 if (claims.TokenUsage != "verification")
                 {
@@ -61,25 +62,6 @@ namespace MatchMaker.Core.Facades
                 _logger.LogError(ex, "Unexpected error during email-verification.");
                 throw new ApplicationException("Ett oväntat fel uppstod. Vänligen försök igen senare.");
             }
-        }
-
-        private static TokenClaims CheckAndExtractClaims(ClaimsPrincipal principal)
-        {
-            var userId = principal.FindFirst(ClaimTypes.NameIdentifier)?.Value
-                    ?? throw new UnauthorizedAccessException($"User-Id claim saknas.");
-
-            var userEmail = principal.FindFirst(ClaimTypes.Email)?.Value
-                ?? throw new UnauthorizedAccessException($"User-email claim saknas.");
-
-            var tokenUsage = principal.FindFirst("token_usage")?.Value
-                ?? throw new UnauthorizedAccessException($"Token-claim is saknas.");
-
-            return new TokenClaims
-            {
-                UserId = userId,
-                UserEmail = userEmail,
-                TokenUsage = tokenUsage
-            };
         }
 
         public async Task<Result<AuthenticationDTO>> LoginAsync(LoginDTO loginDTO)
