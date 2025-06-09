@@ -7,13 +7,11 @@ using MimeKit;
 
 namespace MatchMaker.Core.Services;
 
-public class EmailService(ILogger<EmailService> logger, SmtpSettings smtpSettings, ILinkFactory linkFactory, IEmailTemplateEngine emailTemplateEngine, ClientSettings clientSettings) : IEmailService
+public class EmailService(ILogger<EmailService> logger, SmtpSettings smtpSettings, IEmailComposer emailComposer, IEmailTemplateEngine emailTemplateEngine) : IEmailService
 {
     private readonly ILogger<EmailService> _logger = logger;
-    private readonly SmtpSettings _smtpSettings = smtpSettings;
-    private readonly ILinkFactory _linkFactory = linkFactory;
+    private readonly IEmailComposer _emailComposer = emailComposer;
     private readonly IEmailTemplateEngine _emailTemplateEngine = emailTemplateEngine;
-    private readonly ClientSettings _clientSettings = clientSettings;
 
     public enum EmailType
     {
@@ -28,39 +26,13 @@ public class EmailService(ILogger<EmailService> logger, SmtpSettings smtpSetting
 
         try
         {
-            string templateName;
-            string emailSubject;
-            object templateModel;
-
-            switch (mailType)
-            {
-                case EmailType.UserCreated:
-                    templateName = "UserCreatedTemplate";
-                    emailSubject = "Ditt MatchMaker-konto har skapats.";
-                    templateModel = new { verification_link = !string.IsNullOrEmpty(token) ? _linkFactory.CreateVerificationLink(token) : throw new ArgumentNullException("Token is null when trying to create verification-link.") };
-                    break;
-
-                case EmailType.PasswordReset:
-                    templateName = "PasswordResetTemplate";
-                    emailSubject = "Begäran att återställa MatchMaker-lösenord.";
-                    templateModel = new { resetPassword_link = !string.IsNullOrEmpty(email) ? _linkFactory.CreateResetPasswordLink(email!) : throw new ArgumentNullException("Email is null when trying create reset password-link.") };
-                    break;
-
-                case EmailType.GameNotification:
-                    templateName = "GameNotificationTemplate";
-                    emailSubject = "En planerad match inväntar bedömning.";
-                    templateModel = new { login_link = !string.IsNullOrEmpty(email) ? _clientSettings.BaseURL : throw new ArgumentNullException("Email is null when trying create reset password-link.") };
-                    break;
-
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(mailType));
-            }
+            var (templateName, emailSubject, templateModel) = _emailComposer.Compose(mailType, email, token);
 
             string mailBody = _emailTemplateEngine.RenderTemplate(templateName, templateModel);
 
             var mailMessage = new MimeMessage
             {
-                From = { new MailboxAddress("MatchMaker", _smtpSettings.FromEmail) },
+                From = { new MailboxAddress("MatchMaker", smtpSettings.FromEmail) },
                 To = { new MailboxAddress("User", email) },
                 Subject = emailSubject,
                 Body = new BodyBuilder
@@ -86,14 +58,14 @@ public class EmailService(ILogger<EmailService> logger, SmtpSettings smtpSetting
 
         try
         {
-            var socketOptions = _smtpSettings.UseTsl ? SecureSocketOptions.StartTls : SecureSocketOptions.None;
+            var socketOptions = smtpSettings.UseTsl ? SecureSocketOptions.StartTls : SecureSocketOptions.None;
 
-            await smtpClient.ConnectAsync(_smtpSettings.Host, _smtpSettings.Port, socketOptions);
+            await smtpClient.ConnectAsync(smtpSettings.Host, smtpSettings.Port, socketOptions);
 
-            if (!string.IsNullOrEmpty(_smtpSettings.Username))
+            if (!string.IsNullOrEmpty(smtpSettings.Username))
             {
 
-                await smtpClient.AuthenticateAsync(_smtpSettings.Username, _smtpSettings.Password);
+                await smtpClient.AuthenticateAsync(smtpSettings.Username, smtpSettings.Password);
             };
 
             await smtpClient.SendAsync(mailMessage);

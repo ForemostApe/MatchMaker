@@ -40,6 +40,7 @@ public static class CoreServiceExtension
         services.AddScoped<ISessionManager, SessionManager>();
 
         services.AddTransient<IEmailService, EmailService>();
+        services.AddScoped<IEmailComposer, EmailComposer>();
         services.AddSingleton<IEmailTemplateEngine, EmailTemplateEngine>();
         
         services.AddScoped<ILinkFactory>(_ => new LinkFactory(_.GetRequiredService<ILogger<LinkFactory>>(), clientSettings.BaseURL));
