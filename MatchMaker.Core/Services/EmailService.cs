@@ -2,23 +2,18 @@
 using MailKit.Security;
 using MatchMaker.Core.Interfaces;
 using MatchMaker.Domain.Configurations;
+using MatchMaker.Domain.Enums;
 using Microsoft.Extensions.Logging;
 using MimeKit;
 
 namespace MatchMaker.Core.Services;
 
-public class EmailService(ILogger<EmailService> logger, SmtpSettings smtpSettings, IEmailComposer emailComposer, IEmailTemplateEngine emailTemplateEngine) : IEmailService
+public class EmailService(ILogger<EmailService> logger, IEmailComposer emailComposer, IEmailTemplateEngine emailTemplateEngine, SmtpSettings smtpSettings) : IEmailService
 {
     private readonly ILogger<EmailService> _logger = logger;
     private readonly IEmailComposer _emailComposer = emailComposer;
     private readonly IEmailTemplateEngine _emailTemplateEngine = emailTemplateEngine;
-
-    public enum EmailType
-    {
-        UserCreated,
-        PasswordReset,
-        GameNotification
-    }
+    private readonly SmtpSettings _smtpSettings = smtpSettings;
 
     public async Task CreateEmailAsync(string email, EmailType mailType, string? token = null)
     {
@@ -26,18 +21,18 @@ public class EmailService(ILogger<EmailService> logger, SmtpSettings smtpSetting
 
         try
         {
-            var (templateName, emailSubject, templateModel) = _emailComposer.Compose(mailType, email, token);
+            var emailComposition = _emailComposer.Compose(mailType, email, token);
 
-            string mailBody = _emailTemplateEngine.RenderTemplate(templateName, templateModel);
+            string mailBody = _emailTemplateEngine.RenderTemplate(emailComposition.TemplateName, emailComposition.TemplateModel);
 
             var mailMessage = new MimeMessage
             {
-                From = { new MailboxAddress("MatchMaker", smtpSettings.FromEmail) },
+                From = { new MailboxAddress("MatchMaker", _smtpSettings.FromEmail) },
                 To = { new MailboxAddress("User", email) },
-                Subject = emailSubject,
+                Subject = emailComposition.Subject,
                 Body = new BodyBuilder
                 {
-                    HtmlBody = _emailTemplateEngine.RenderTemplate(templateName, templateModel),
+                    HtmlBody = _emailTemplateEngine.RenderTemplate(emailComposition.TemplateName, emailComposition.TemplateModel),
                     TextBody = "Please enable HTML to view this message."
                 }.ToMessageBody()
             };
@@ -58,14 +53,14 @@ public class EmailService(ILogger<EmailService> logger, SmtpSettings smtpSetting
 
         try
         {
-            var socketOptions = smtpSettings.UseTsl ? SecureSocketOptions.StartTls : SecureSocketOptions.None;
+            var socketOptions = _smtpSettings.UseTsl ? SecureSocketOptions.StartTls : SecureSocketOptions.None;
 
-            await smtpClient.ConnectAsync(smtpSettings.Host, smtpSettings.Port, socketOptions);
+            await smtpClient.ConnectAsync(_smtpSettings.Host, _smtpSettings.Port, socketOptions);
 
-            if (!string.IsNullOrEmpty(smtpSettings.Username))
+            if (!string.IsNullOrEmpty(_smtpSettings.Username))
             {
 
-                await smtpClient.AuthenticateAsync(smtpSettings.Username, smtpSettings.Password);
+                await smtpClient.AuthenticateAsync(_smtpSettings.Username, _smtpSettings.Password);
             };
 
             await smtpClient.SendAsync(mailMessage);

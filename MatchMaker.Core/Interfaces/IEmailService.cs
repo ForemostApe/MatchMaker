@@ -1,5 +1,5 @@
-﻿using MimeKit;
-using static MatchMaker.Core.Services.EmailService;
+﻿using MatchMaker.Domain.Enums;
+using MimeKit;
 
 namespace MatchMaker.Core.Interfaces;
 

@@ -1,47 +1,45 @@
 ﻿using MatchMaker.Core.Interfaces;
 using MatchMaker.Domain.Configurations;
-using static MatchMaker.Core.Services.EmailService;
+using MatchMaker.Domain.DTOs.Emails;
+using MatchMaker.Domain.Enums;
 
 namespace MatchMaker.Core.Services
 {
-    public class EmailComposer (ILinkFactory linkFactory, ClientSettings clientSettings) : IEmailComposer
+    public class EmailComposer(ILinkFactory linkFactory, ClientSettings clientSettings) : IEmailComposer
     {
         private readonly ILinkFactory _linkFactory = linkFactory;
+        private readonly ClientSettings _clientSettings = clientSettings;
 
-        public (string TemplateName, string Subject, object Model) Compose(EmailType mailType, string email, string? token)
+        public EmailCompositionDTO Compose(EmailType mailType, string email, string? token)
         {
+            if (string.IsNullOrEmpty(token)) throw new ArgumentNullException(nameof(token), "Token is null when trying to create link.");
+
             return mailType switch
             {
-                EmailType.UserCreated => (
+                EmailType.UserCreated => new EmailCompositionDTO (
                     "UserCreatedTemplate",
                     "Ditt MatchMaker-konto har skapats.",
                     new
                     {
-                        verification_link = !string.IsNullOrEmpty(token)
-                            ? _linkFactory.CreateVerificationLink(token)
-                            : throw new ArgumentNullException(nameof(token), "Token is null when trying to create verification-link.")
+                        verification_link = _linkFactory.CreateVerificationLink(token)
                     }
                 ),
 
-                EmailType.PasswordReset => (
+                EmailType.PasswordReset => new EmailCompositionDTO (
                     "PasswordResetTemplate",
                     "Begäran att återställa MatchMaker-lösenord.",
                     new
                     {
-                        resetPassword_link = !string.IsNullOrEmpty(email)
-                        ? _linkFactory.CreateResetPasswordLink(email!)
-                        : throw new ArgumentNullException(nameof(email), "Email is null when trying create reset password-link.")
+                        resetPassword_link = _linkFactory.CreateResetPasswordLink(email!)
                     }
                 ),
 
-                EmailType.GameNotification => (
+                EmailType.GameNotification => new EmailCompositionDTO (
                     "GameNotificationTemplate",
                     "En planerad match inväntar bedömning.",
                     new
                     {
-                        login_link = !string.IsNullOrEmpty(email)
-                        ? clientSettings.BaseURL
-                        : throw new ArgumentNullException(nameof(email), "Email is null when trying create reset password-link.")
+                        login_link = _clientSettings.BaseURL
                     }
                 ),
 

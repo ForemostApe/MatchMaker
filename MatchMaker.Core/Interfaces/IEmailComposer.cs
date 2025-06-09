@@ -1,9 +1,10 @@
-﻿using static MatchMaker.Core.Services.EmailService;
+﻿using MatchMaker.Domain.DTOs.Emails;
+using MatchMaker.Domain.Enums;
 
 namespace MatchMaker.Core.Interfaces
 {
     public interface IEmailComposer
     {
-        public (string TemplateName, string Subject, object Model) Compose(EmailType mailType, string email, string? token);
+        EmailCompositionDTO Compose(EmailType mailType, string email, string? token);
     }
 }
