@@ -19,7 +19,7 @@ namespace MatchMaker.Core.Services
                     {
                         verification_link = !string.IsNullOrEmpty(token)
                             ? _linkFactory.CreateVerificationLink(token)
-                            : throw new ArgumentNullException("Token is null when trying to create verification-link.")
+                            : throw new ArgumentNullException(nameof(token), "Token is null when trying to create verification-link.")
                     }
                 ),
 
@@ -30,7 +30,7 @@ namespace MatchMaker.Core.Services
                     {
                         resetPassword_link = !string.IsNullOrEmpty(email)
                         ? _linkFactory.CreateResetPasswordLink(email!)
-                        : throw new ArgumentNullException("Email is null when trying create reset password-link.")
+                        : throw new ArgumentNullException(nameof(email), "Email is null when trying create reset password-link.")
                     }
                 ),
 
@@ -41,7 +41,7 @@ namespace MatchMaker.Core.Services
                     {
                         login_link = !string.IsNullOrEmpty(email)
                         ? clientSettings.BaseURL
-                        : throw new ArgumentNullException("Email is null when trying create reset password-link.")
+                        : throw new ArgumentNullException(nameof(email), "Email is null when trying create reset password-link.")
                     }
                 ),
 
