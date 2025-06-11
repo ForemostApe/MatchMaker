@@ -15,7 +15,7 @@ public class TeamController(ILogger<TeamController> logger, ITeamServiceFacade t
 
     [HttpPost]
     [Authorize (Roles = "Admin")]
-    public async Task<IActionResult> CreateTeamAsync([FromBody] CreateTeamDTO newTeam)
+    public async Task<IActionResult> CreateTeamAsync([FromBody] CreateTeamDTO newTeam, IFormFile file)
     {
         if (!ModelState.IsValid) return ValidationProblem(ModelState);
 
