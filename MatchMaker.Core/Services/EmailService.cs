@@ -59,7 +59,6 @@ public class EmailService(ILogger<EmailService> logger, IEmailComposer emailComp
 
             if (!string.IsNullOrEmpty(_smtpSettings.Username))
             {
-
                 await smtpClient.AuthenticateAsync(_smtpSettings.Username, _smtpSettings.Password);
             };
 

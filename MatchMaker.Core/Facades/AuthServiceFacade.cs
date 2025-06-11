@@ -87,7 +87,7 @@ namespace MatchMaker.Core.Facades
                 var refreshToken = await _tokenService.GenerateRefreshToken(user);
                 _cookieFactory.CreateHttpOnlyCookie("refreshToken", refreshToken);
 
-                AuthenticationDTO result = new AuthenticationDTO()
+                AuthenticationDTO result = new ()
                 {
                     AccessToken = accessToken,
                     User = _mapper.Map<AuthenticatedUserDTO>(user)

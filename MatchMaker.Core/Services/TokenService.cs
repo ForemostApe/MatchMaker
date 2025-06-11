@@ -16,6 +16,24 @@ namespace MatchMaker.Core.Services
 
         private TokenValidationParameters TokenValidationParameters => _jwtOptions.GetTokenValidationParameters();
 
+        public async Task<string> GenerateVerificationToken(User user)
+        {
+            var expiration = TimeSpan.FromMinutes(_jwtOptions.VerificationTokenExpirationMinutes);
+            return await Task.FromResult(GenerateToken(user, expiration, "verification"));
+        }
+
+        public async Task<string> GenerateAccessToken(User user)
+        {
+            var expiration = TimeSpan.FromMinutes(_jwtOptions.AccessTokenExpirationMinutes);
+            return await Task.FromResult(GenerateToken(user, expiration, "access"));
+        }
+
+        public async Task<string> GenerateRefreshToken(User user)
+        {
+            var expiration = TimeSpan.FromDays(_jwtOptions.RefreshTokenExpirationDays);
+            return await Task.FromResult(GenerateToken(user, expiration, "refresh"));
+        }
+
         private string GenerateToken(User user, TimeSpan expiration, string tokenType)
         {
             try
@@ -66,24 +84,6 @@ namespace MatchMaker.Core.Services
                 _logger.LogError(ex, "Error generating access-token for user-ID {userId}", user.Id);
                 throw new Exception($"Error generating access-token for user-ID {user.Id}", ex);
             }
-        }
-
-        public async Task<string> GenerateVerificationToken(User user)
-        {
-            var expiration = TimeSpan.FromMinutes(_jwtOptions.VerificationTokenExpirationMinutes);
-            return await Task.FromResult(GenerateToken(user, expiration, "verification"));
-        }
-
-        public async Task<string> GenerateAccessToken(User user)
-        {
-            var expiration = TimeSpan.FromMinutes(_jwtOptions.AccessTokenExpirationMinutes);
-            return await Task.FromResult(GenerateToken(user, expiration, "access"));
-        }
-
-        public async Task<string> GenerateRefreshToken(User user)
-        {
-            var expiration = TimeSpan.FromDays(_jwtOptions.RefreshTokenExpirationDays);
-            return await Task.FromResult(GenerateToken(user, expiration, "refresh"));
         }
 
         public async Task<User> ValidateRefreshToken(string refreshToken)
