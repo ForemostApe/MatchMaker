@@ -30,9 +30,9 @@ public class EmailTemplateEngine : IEmailTemplateEngine
             throw new InvalidDataException($"Template '{resourcePath}' is empty");
 
         var template = Template.Parse(templateText);
-        if (template == null) throw new InvalidOperationException($"Failed to parse template '{resourcePath}'");
-
-        return template.Render(model, member => member.Name);
+        return template != null
+            ? template.Render(model, member => member.Name)
+            : throw new InvalidOperationException($"Failed to parse template '{resourcePath}'");
     }
 
     private void LogEmbeddedResources()

@@ -5,6 +5,7 @@ using MatchMaker.Core.Interfaces;
 using MatchMaker.Core.Utilities;
 using MatchMaker.Domain.DTOs.Games;
 using MatchMaker.Domain.Entities;
+using MatchMaker.Domain.Enums;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
@@ -44,7 +45,7 @@ public class GameServiceFacade(ILogger<GameServiceFacade> logger, IGameService g
                     StatusCodes.Status400BadRequest);
             }
 
-            await _emailService.CreateEmailAsync(awayTeamCoach.Data![0].Email, Services.EmailService.EmailType.GameNotification);
+            await _emailService.CreateEmailAsync(awayTeamCoach.Data![0].Email, EmailType.GameNotification);
 
             var createdGame = _mapper.Map<GameDTO>(result.Data!);
             return Result<GameDTO>.Success(createdGame, result.Message);

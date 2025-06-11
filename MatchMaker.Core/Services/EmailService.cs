@@ -2,25 +2,18 @@
 using MailKit.Security;
 using MatchMaker.Core.Interfaces;
 using MatchMaker.Domain.Configurations;
+using MatchMaker.Domain.Enums;
 using Microsoft.Extensions.Logging;
 using MimeKit;
 
 namespace MatchMaker.Core.Services;
 
-public class EmailService(ILogger<EmailService> logger, SmtpSettings smtpSettings, ILinkFactory linkFactory, IEmailTemplateEngine emailTemplateEngine, ClientSettings clientSettings) : IEmailService
+public class EmailService(ILogger<EmailService> logger, IEmailComposer emailComposer, IEmailTemplateEngine emailTemplateEngine, SmtpSettings smtpSettings) : IEmailService
 {
     private readonly ILogger<EmailService> _logger = logger;
-    private readonly SmtpSettings _smtpSettings = smtpSettings;
-    private readonly ILinkFactory _linkFactory = linkFactory;
+    private readonly IEmailComposer _emailComposer = emailComposer;
     private readonly IEmailTemplateEngine _emailTemplateEngine = emailTemplateEngine;
-    private readonly ClientSettings _clientSettings = clientSettings;
-
-    public enum EmailType
-    {
-        UserCreated,
-        PasswordReset,
-        GameNotification
-    }
+    private readonly SmtpSettings _smtpSettings = smtpSettings;
 
     public async Task CreateEmailAsync(string email, EmailType mailType, string? token = null)
     {
@@ -28,44 +21,18 @@ public class EmailService(ILogger<EmailService> logger, SmtpSettings smtpSetting
 
         try
         {
-            string templateName;
-            string emailSubject;
-            object templateModel;
+            var emailComposition = _emailComposer.Compose(mailType, email, token);
 
-            switch (mailType)
-            {
-                case EmailType.UserCreated:
-                    templateName = "UserCreatedTemplate";
-                    emailSubject = "Ditt MatchMaker-konto har skapats.";
-                    templateModel = new { verification_link = !string.IsNullOrEmpty(token) ? _linkFactory.CreateVerificationLink(token) : throw new ArgumentNullException("Token is null when trying to create verification-link.") };
-                    break;
-
-                case EmailType.PasswordReset:
-                    templateName = "PasswordResetTemplate";
-                    emailSubject = "Begäran att återställa MatchMaker-lösenord.";
-                    templateModel = new { resetPassword_link = !string.IsNullOrEmpty(email) ? _linkFactory.CreateResetPasswordLink(email!) : throw new ArgumentNullException("Email is null when trying create reset password-link.") };
-                    break;
-
-                case EmailType.GameNotification:
-                    templateName = "GameNotificationTemplate";
-                    emailSubject = "En planerad match inväntar bedömning.";
-                    templateModel = new { login_link = !string.IsNullOrEmpty(email) ? _clientSettings.BaseURL : throw new ArgumentNullException("Email is null when trying create reset password-link.") };
-                    break;
-
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(mailType));
-            }
-
-            string mailBody = _emailTemplateEngine.RenderTemplate(templateName, templateModel);
+            string mailBody = _emailTemplateEngine.RenderTemplate(emailComposition.TemplateName, emailComposition.TemplateModel);
 
             var mailMessage = new MimeMessage
             {
                 From = { new MailboxAddress("MatchMaker", _smtpSettings.FromEmail) },
                 To = { new MailboxAddress("User", email) },
-                Subject = emailSubject,
+                Subject = emailComposition.Subject,
                 Body = new BodyBuilder
                 {
-                    HtmlBody = _emailTemplateEngine.RenderTemplate(templateName, templateModel),
+                    HtmlBody = _emailTemplateEngine.RenderTemplate(emailComposition.TemplateName, emailComposition.TemplateModel),
                     TextBody = "Please enable HTML to view this message."
                 }.ToMessageBody()
             };
@@ -92,7 +59,6 @@ public class EmailService(ILogger<EmailService> logger, SmtpSettings smtpSetting
 
             if (!string.IsNullOrEmpty(_smtpSettings.Username))
             {
-
                 await smtpClient.AuthenticateAsync(_smtpSettings.Username, _smtpSettings.Password);
             };
 

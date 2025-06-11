@@ -1,10 +1,10 @@
 ﻿using Mapster;
 using MapsterMapper;
 using MatchMaker.Core.Interfaces;
-using MatchMaker.Core.Services;
 using MatchMaker.Core.Utilities;
 using MatchMaker.Domain.DTOs.Users;
 using MatchMaker.Domain.Entities;
+using MatchMaker.Domain.Enums;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
@@ -50,7 +50,7 @@ public class UserServiceFacade(ILogger<UserServiceFacade> logger, IMapper mapper
             }
 
             string verificationToken = await _tokenService.GenerateVerificationToken(result.Data!);
-            await _emailService.CreateEmailAsync(result.Data!.Email, EmailService.EmailType.UserCreated, verificationToken);
+            await _emailService.CreateEmailAsync(result.Data!.Email, EmailType.UserCreated, verificationToken);
 
             var createdUser = _mapper.Map<UserDTO>(result.Data);
 
