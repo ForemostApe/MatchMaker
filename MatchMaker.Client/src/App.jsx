@@ -11,6 +11,7 @@ import GamePage from './pages/GamePage/GamePage';
 import CreateGame from './pages/CreateGamePage/CreateGamePage';
 import ProfilePage from './pages/ProfilePage/ProfilePage';
 import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
+import AdminPage from './pages/AdminPage/AdminPage';
 
 const ProtectedRouteWrapper = ({ children, allowedRoles = [] }) => {
   const { user, isLoading } = useAuth();
@@ -69,6 +70,14 @@ const router = createBrowserRouter([
           </ProtectedRouteWrapper>
         ),
       },
+      {
+        path: 'admin',
+        element: (
+          <ProtectedRouteWrapper roles={['Admin']}>
+            <AdminPage />
+          </ProtectedRouteWrapper>
+        )
+      }
     ],
   },
 ]);
