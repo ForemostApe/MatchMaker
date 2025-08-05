@@ -60,8 +60,9 @@ public class FileStorageService(ILogger<FileStorageService> logger, string stora
     {
         try
         { 
-            var existingDirectory = Path.GetDirectoryName(fullPath) ?? throw new InvalidOperationException("Could not determine directory from path");
-            if (!Directory.Exists(fullPath)) Directory.CreateDirectory(fullPath);
+            var directory = Path.GetDirectoryName(fullPath) 
+                ?? throw new InvalidOperationException("Could not determine directory from path");
+            if (!Directory.Exists(directory)) Directory.CreateDirectory(directory);
         }
         catch (UnauthorizedAccessException ex)
         {
