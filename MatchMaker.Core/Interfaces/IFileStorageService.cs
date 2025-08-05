@@ -4,7 +4,8 @@ namespace MatchMaker.Core.Interfaces
 {
     public interface IFileStorageService
     {
-        bool CreateDirectory(string relativePath);
         Task<string> StoreFileAsync(IFormFile file, string subdirectory);
+        void CreateDirectory(string relativePath);
+        string GetFullPath(string relativePath);
     }
 }
