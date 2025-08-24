@@ -2,6 +2,7 @@
 using MatchMaker.Domain.DTOs.Games;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace MatchMaker.Api.Controllers
 {
@@ -159,52 +160,23 @@ namespace MatchMaker.Api.Controllers
             }
         }
 
-
-        [HttpPost("response/coach", Name = nameof(HandleCoachResponseAsync))]
-        [Authorize (Roles = "Coach")]
-        public async Task<IActionResult> HandleCoachResponseAsync([FromBody] GameResponseDTO response)
+        [HttpPost("userResponse", Name = nameof(HandleUserResponseAsync))]
+        [Authorize (Roles = "Coach, Referee")]
+        public async Task<IActionResult> HandleUserResponseAsync([FromBody] GameResponseDTO response)
         {
             ArgumentNullException.ThrowIfNull(response);
 
+            List<Claim> userClaims = User.Claims.ToList();
+
             try
             {
-                var result = await _gameServiceFacade.HandleCoachResponseAsync(response);
+                var result = await _gameServiceFacade.HandleUserResponseAsync(response, userClaims);
                 if (!result.IsSuccess) return StatusCode(result.GetStatusCodeOrDefault(), new ProblemDetails()
                 {
                     Title = result.Title,
                     Detail = result.Message,
                     Status = result.StatusCode
                 });
-                return Ok(result.Data);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "An unexpected error occurred while trying to respond to game.");
-                return StatusCode(500, new ProblemDetails
-                {
-                    Title = "Internal Server Error",
-                    Detail = "An unexpected error occured. Please try again later",
-                    Status = StatusCodes.Status500InternalServerError
-                });
-            }
-        }
-
-        [HttpPost("response/referee", Name = nameof(HandleRefereeResponseAsync))]
-        [Authorize(Roles = "Referee")]
-        public async Task<IActionResult> HandleRefereeResponseAsync([FromBody] GameResponseDTO response)
-        {
-            ArgumentNullException.ThrowIfNull(response);
-
-            try
-            {
-                var result = await _gameServiceFacade.HandleRefereeResponseAsync(response);
-                if (!result.IsSuccess) return StatusCode(result.GetStatusCodeOrDefault(), new ProblemDetails()
-                {
-                    Title = result.Title,
-                    Detail = result.Message,
-                    Status = result.StatusCode
-                });
-
                 return Ok(result.Data);
             }
             catch (Exception ex)
