@@ -1,5 +1,6 @@
 ﻿using MatchMaker.Domain.DTOs.Games;
 using MatchMaker.Core.Utilities;
+using System.Security.Claims;
 
 namespace MatchMaker.Core.Interfaces
 {
@@ -10,7 +11,6 @@ namespace MatchMaker.Core.Interfaces
         Task<Result<GameDTO>> GetGameByIdAsync(string gameId);
         Task<Result<GameDTO>> UpdateGameAsync(UpdateGameDTO updatedGame);
         Task<Result<GameDTO>> DeleteGameAsync(string gameId);
-        Task<Result<GameDTO>> HandleCoachResponseAsync(GameResponseDTO response);
-        Task<Result<GameDTO>> HandleRefereeResponseAsync(GameResponseDTO response);
+        Task<Result<GameDTO>> HandleUserResponseAsync(GameResponseDTO response, List<Claim> userClaims);
     }
 }
