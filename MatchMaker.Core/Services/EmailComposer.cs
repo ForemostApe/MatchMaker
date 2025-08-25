@@ -12,7 +12,8 @@ namespace MatchMaker.Core.Services
 
         public EmailCompositionDTO Compose(EmailType mailType, string email, string? token)
         {
-            if (string.IsNullOrEmpty(token)) throw new ArgumentNullException(nameof(token), "Token is null when trying to create link.");
+
+            //if (string.IsNullOrEmpty(token)) throw new ArgumentNullException(nameof(token), "Token is null when trying to create link.");
 
             return mailType switch
             {

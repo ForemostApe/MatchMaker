@@ -19,19 +19,29 @@ const GameResponse = ({ game }) => {
     setSaving(true);
     setSaveError(null);
 
-    try {
-      if (isCoach) {
-        await gameService.submitCoachResponse(game.id, accepted);
-      } else if (isReferee) {
-        await gameService.submitRefereeResponse(game.id, accepted);
+  //   try {
+  //     if (isCoach) {
+  //       await gameService.submitCoachResponse(game.id, accepted);
+  //     } else if (isReferee) {
+  //       await gameService.submitRefereeResponse(game.id, accepted);
+  //     }
+  //     setSubmitted(true);
+  //   } catch (err) {
+  //     setSaveError(err.message);
+  //   } finally {
+  //     setSaving(false);
+  //   }
+  // };
+
+      try {
+        await gameService.submitUserResponse(game.id, accepted);
+        setSubmitted(true);
+      } catch (err) {
+        setSaveError(err.message);
+      } finally {
+        setSaving(false);
       }
-      setSubmitted(true);
-    } catch (err) {
-      setSaveError(err.message);
-    } finally {
-      setSaving(false);
-    }
-  };
+    };
 
   if (!isCoach && !isReferee) return null;
   if (submitted) return <p className="text-green-600">Ditt svar har sparats.</p>;
