@@ -8,6 +8,7 @@ using MatchMaker.Domain.Entities;
 using MatchMaker.Domain.Enums;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using System.Security.Claims;
 
 namespace MatchMaker.Core.Facades;
 
@@ -169,12 +170,22 @@ public class GameServiceFacade(ILogger<GameServiceFacade> logger, IGameService g
         }
     }
 
-    public async Task<Result<GameDTO>> HandleCoachResponseAsync(GameResponseDTO response)
+    public async Task<Result<GameDTO>> HandleUserResponseAsync(GameResponseDTO response, List<Claim> userRole)
     {
         ArgumentNullException.ThrowIfNull(response);
 
         try
         {
+            var roleClaim = userRole.FirstOrDefault(c => c.Type == ClaimTypes.Role);
+            if (roleClaim == null)
+            {
+                return Result<GameDTO>.Failure(
+                    "Invalid user role.",
+                    "Role claim missing or invalid.",
+                    StatusCodes.Status400BadRequest
+                );
+            }
+
             var existingGame = await _gameService.GetGameByIdAsync(response.GameId);
             if (!existingGame.IsSuccess || existingGame.Data is null)
             {
@@ -184,96 +195,69 @@ public class GameServiceFacade(ILogger<GameServiceFacade> logger, IGameService g
                     StatusCodes.Status404NotFound
                 );
             }
-
+            
             Game game = existingGame.Data;
 
-            if (!response.Accepted)
+            if (roleClaim.Value == UserRole.Coach.ToString())
             {
-                game.GameStatus = GameStatus.Draft;
-                game.IsCoachSigned = false;
-
-                response.Adapt(game);
-
-                var declineResult = await _gameService.UpdateGameAsync(game);
-
-                if (!declineResult.IsSuccess)
+                if (!response.Accepted)
                 {
-                    return Result<GameDTO>.Failure(
-                        "Failed to register declined booking",
-                        declineResult.Message,
-                        StatusCodes.Status400BadRequest
+                    game.GameStatus = GameStatus.Draft;
+                    game.IsCoachSigned = false;
+                    response.Adapt(game);
+
+                    var declineResult = await _gameService.UpdateGameAsync(game);
+                    if (!declineResult.IsSuccess)
+                    {
+                        return Result<GameDTO>.Failure(
+                            "Failed to register declined booking",
+                            declineResult.Message,
+                            StatusCodes.Status400BadRequest
                         );
+                    }
+                    return Result<GameDTO>.Success(_mapper.Map<GameDTO>(game), "Coach declined the game.");
                 }
 
-                return Result<GameDTO>.Success(_mapper.Map<GameDTO>(game), "Coach declined the game.");
+                game.IsCoachSigned = true;
+                game.CoachSignedDate = DateTime.UtcNow;
+                game.GameStatus = game.IsRefereeSigned ? GameStatus.Booked : GameStatus.Signed;
             }
+            else if (roleClaim.Value == UserRole.Referee.ToString())
+            {
+                if (!response.Accepted)
+                {
+                    game.GameStatus = GameStatus.Signed;
+                    game.IsRefereeSigned = false;
+                    response.Adapt(game);
 
-            game.IsCoachSigned = true;
-            game.CoachSignedDate = DateTime.UtcNow;
-            game.GameStatus = game.IsRefereeSigned ? GameStatus.Booked : GameStatus.Signed;
+                    var declineResult = await _gameService.UpdateGameAsync(game);
+                    if (!declineResult.IsSuccess)
+                    {
+                        return Result<GameDTO>.Failure(
+                            "Failed to register declined booking",
+                            declineResult.Message,
+                            StatusCodes.Status400BadRequest
+                        );
+                    }
+                    return Result<GameDTO>.Success(_mapper.Map<GameDTO>(game), "Referee declined the game.");
+                }
 
-            var acceptedResult = await _gameService.UpdateGameAsync(game);
-            return acceptedResult.IsSuccess
-                ? Result<GameDTO>.Success(_mapper.Map<GameDTO>(game), "Coach successfully signed the game.")
-                : Result<GameDTO>.Failure(
-                    "Failed to update game.",
-                    acceptedResult.Message,
-                    StatusCodes.Status400BadRequest
-                );
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "An unexpected error occurred in GameServiceFacade while trying to handle coach-response.");
-            throw;
-        }
-    }
-
-    public async Task<Result<GameDTO>> HandleRefereeResponseAsync(GameResponseDTO response)
-    {
-        ArgumentNullException.ThrowIfNull(response);
-
-        try
-        {
-            var existingGame = await _gameService.GetGameByIdAsync(response.GameId);
-            if (!existingGame.IsSuccess || existingGame.Data is null)
+                game.IsRefereeSigned = true;
+                game.RefereeSignedDate = DateTime.UtcNow;
+                game.GameStatus = game.IsCoachSigned ? GameStatus.Booked : GameStatus.Signed;
+            }
+            else
             {
                 return Result<GameDTO>.Failure(
-                    "Game not found",
-                    existingGame.Message,
-                    StatusCodes.Status404NotFound
+                    "Invalid user role for response handling.",
+                    "Role not supported.",
+                    StatusCodes.Status400BadRequest
                 );
             }
 
-            Game game = existingGame.Data;
-
-            if (!response.Accepted)
-            {
-                game.GameStatus = GameStatus.Signed;
-                game.IsRefereeSigned = false;
-
-                response.Adapt(game);
-
-                var declineResult = await _gameService.UpdateGameAsync(game);
-
-                if (!declineResult.IsSuccess)
-                {
-                    return Result<GameDTO>.Failure(
-                        "Failed to register declined booking",
-                        declineResult.Message,
-                        StatusCodes.Status400BadRequest
-                        );
-                }
-
-                return Result<GameDTO>.Success(_mapper.Map<GameDTO>(game), "Referee declined the game.");
-            }
-
-            game.IsRefereeSigned = true;
-            game.RefereeSignedDate = DateTime.UtcNow;
-            game.GameStatus = game.IsCoachSigned ? GameStatus.Booked : GameStatus.Signed;
-
             var acceptedResult = await _gameService.UpdateGameAsync(game);
             return acceptedResult.IsSuccess
-                ? Result<GameDTO>.Success(_mapper.Map<GameDTO>(game), "Referee successfully signed the game.")
+                ? Result<GameDTO>.Success(_mapper.Map<GameDTO>(game), $"{userRole} successfully signed the game.")
                 : Result<GameDTO>.Failure(
                     "Failed to update game.",
                     acceptedResult.Message,
@@ -282,8 +266,8 @@ public class GameServiceFacade(ILogger<GameServiceFacade> logger, IGameService g
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "An unexpected error occurred in GameServiceFacade while trying to handle referee-response.");
+            _logger.LogError(ex, "An unexpected error occurred in GameServiceFacade while handling user response.");
             throw;
-        }
+        }   
     }
 }

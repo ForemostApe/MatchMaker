@@ -73,27 +73,9 @@ const updateGame = async (gameData) => {
     }
 };
 
-const submitCoachResponse = async (gameId, accepted) => {
-    try {
-        const response = await api.post("Game/response/coach/", { gameId, accepted });
-        return response.data;
-    } catch (error) {
-        if (error.response) {
-            console.error('Error response: ', error.response.data);
-            throw new Error(error.response.data.title || 'Failed to update game');
-        } else if (error.request) {
-            console.error('No response: ', error.request);
-            throw new Error('No response from server');
-        } else {
-            console.error('Request error: ', error.message);
-            throw new Error('Failed to make request');
-        }
-    }
-};
-
-const submitRefereeResponse = async (gameId, accepted) => {
-    try {
-        const response = await api.post("/Game/response/referee/", { gameId, accepted });
+const submitUserResponse = async (gameId, accepted) => {
+        try {
+        const response = await api.post("Game/userResponse", { gameId, accepted });
         return response.data;
     } catch (error) {
         if (error.response) {
@@ -114,6 +96,5 @@ export default {
     getAllGames,
     getGameById,
     updateGame,
-    submitCoachResponse,
-    submitRefereeResponse
+    submitUserResponse
 }
