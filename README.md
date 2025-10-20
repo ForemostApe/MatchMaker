@@ -2,7 +2,7 @@
 
 This application started out as the final assignment in vocational-school and is now an ongoing experiment with React, .NET and MongoDb.
 
-MatchMaker is a .NET 9 Web API that provides backend services for matchmaking and game management. It includes authentication (JWT), role-based authorization, Swagger API documentation, MongoDB persistence, Serilog logging, rate limiting, SMTP support for outgoing mail, and static file hosting (SPA fallback). The API exposes health checks and uses a JwtMiddleware for custom token handling.
+MatchMaker is a .NET 9 Web API that provides backend services for matchmaking and game management for little league-football. It includes authentication (JWT), role-based authorization, Swagger API documentation, MongoDB persistence, Serilog logging, rate limiting, SMTP support for outgoing mail, and static file hosting (SPA fallback). The API exposes health checks and uses a JwtMiddleware for custom token handling.
 
 ## Key features
 - .NET 9 Web API using minimal-host pattern
@@ -35,7 +35,7 @@ Example:
 ## Prerequisites
 - .NET 9 SDK
 - MongoDB instance (local, container, or managed)
-- Optional: SMTP server or credentials for outgoing mail
+- Optional: SMTP server or credentials for outgoing mail (Papercut SMTP-configuration used for local testing)
 - Optional: VS 2022 for debugging and the __https__ launch profile
 
 ## Configuration
@@ -54,11 +54,35 @@ Important configuration sections (examples — adapt to your environment):
 
 Example minimal appsettings snippet:
 
-{ "ConnectionStrings": { "MongoDb": "mongodb://localhost:27017/matchmaker" }, "Jwt": { "Issuer": "MatchMaker", "Key": "ReplaceWithStrongSecretKey", "ExpiresMinutes": 60 }, "Smtp": { "Host": "smtp.example.com", "Port": 587, "User": "user@example.com", "Password": "secret" }, "Cors": { "AllowedOrigins": [ "http://localhost:5173" ] } }
+{ 
+  "Smtp": { 
+  "Host": "smtp.example.com", 
+  "Port": 587, 
+  "User": "user@example.com", 
+  "Password": "secret" 
+  }, 
+  "Cors": { 
+  "AllowedOrigins": [ "http://localhost:5173" ] 
+  } 
+}
 
 Use user secrets for development:
 - dotnet user-secrets init
 - dotnet user-secrets set "Jwt:Key" "your-secret"
+
+User-secrets settings snippet:
+
+MongoDbSettings": {
+    "DatabaseName": "<DataBaseName>",
+    "ConnectionString": "<MongoDbConnectionString>"
+  },
+  "JwtSettings": {
+    "Issuer": "<Issuer>",
+    "Audience": "<Audience>",
+    "AccessTokenExpirationMinutes": 120,
+    "RefreshTokenExpirationDays": 2,
+    "SigningKey": "<Base64EncodedSigningKey>",
+    "EncryptionKey": "<Base64EncodedEncryptionKey>"
 
 ## Running locally
 
@@ -105,11 +129,6 @@ Errors are returned using ProblemDetails with appropriate HTTP status codes and 
 - Logs are emitted via Serilog.
 - Health checks route: /health
 - In Development, IdentityModelEventSource.ShowPII = true is enabled to ease debugging token issues.
-
-## Contributing
-- Fork the repository, create a branch for your feature or fix, and open a pull request.
-- Follow existing code style and include tests where appropriate.
-- Run the solution and verify Swagger / health endpoints work before submitting.
 
 ## License
 - Check the repository root for a LICENSE file. If none, contact the maintainers to confirm licensing.
