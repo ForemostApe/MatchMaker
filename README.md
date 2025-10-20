@@ -73,16 +73,16 @@ Use user secrets for development:
 User-secrets settings snippet:
 
 MongoDbSettings": {
-    "DatabaseName": "<DataBaseName>",
-    "ConnectionString": "<MongoDbConnectionString>"
+    "DatabaseName": "ExampleDataBaseName",
+    "ConnectionString": "ExampleMongoDbConnectionString"
   },
   "JwtSettings": {
-    "Issuer": "<Issuer>",
-    "Audience": "<Audience>",
+    "Issuer": "ExampleIssuer",
+    "Audience": "ExampleAudience",
     "AccessTokenExpirationMinutes": 120,
     "RefreshTokenExpirationDays": 2,
-    "SigningKey": "<Base64EncodedSigningKey>",
-    "EncryptionKey": "<Base64EncodedEncryptionKey>"
+    "SigningKey": "ExamleBase64EncodedSigningKey",
+    "EncryptionKey": "ExampleBase64EncodedEncryptionKey"
 
 ## Running locally
 
