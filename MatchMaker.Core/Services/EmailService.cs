@@ -8,7 +8,12 @@ using MimeKit;
 
 namespace MatchMaker.Core.Services;
 
-public class EmailService(ILogger<EmailService> logger, IEmailComposer emailComposer, IEmailTemplateEngine emailTemplateEngine, SmtpSettings smtpSettings) : IEmailService
+public class EmailService(
+    ILogger<EmailService> logger, 
+    IEmailComposer emailComposer, 
+    IEmailTemplateEngine emailTemplateEngine, 
+    SmtpSettings smtpSettings) 
+    : IEmailService
 {
     private readonly ILogger<EmailService> _logger = logger;
     private readonly IEmailComposer _emailComposer = emailComposer;

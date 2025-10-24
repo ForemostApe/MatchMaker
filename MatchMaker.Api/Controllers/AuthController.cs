@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 
-namespace MatchMaker.Domain.Controllers
+namespace MatchMaker.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]

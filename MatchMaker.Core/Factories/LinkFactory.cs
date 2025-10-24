@@ -6,7 +6,9 @@ namespace MatchMaker.Core.Factories;
 public class LinkFactory(ILogger<LinkFactory> logger, string clientUrl) : ILinkFactory
 {
     private readonly ILogger _logger = logger;
-    private readonly string _clientUrl = !string.IsNullOrWhiteSpace(clientUrl) ? clientUrl :  throw new ArgumentNullException(nameof(clientUrl));
+    private readonly string _clientUrl = !string.IsNullOrWhiteSpace(clientUrl) 
+        ? clientUrl 
+        :  throw new ArgumentNullException(nameof(clientUrl));
 
     public string CreateVerificationLink(string token)
     {
@@ -16,7 +18,7 @@ public class LinkFactory(ILogger<LinkFactory> logger, string clientUrl) : ILinkF
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "An unexpected error occurred while trying to create a verification-link.");
+            _logger.LogError(ex, "An unexpected error occurred wile trying to create a verification-link.");
             throw;
         }
     }

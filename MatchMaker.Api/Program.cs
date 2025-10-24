@@ -1,6 +1,6 @@
 using MatchMaker.Api.Extensions;
-using MatchMaker.Domain.Extensions;
-using MatchMaker.Domain.Middlewares;
+using MatchMaker.Api.Extensions;
+using MatchMaker.Api.Middlewares;
 using Microsoft.IdentityModel.Logging;
 
 namespace MatchMaker.Api
