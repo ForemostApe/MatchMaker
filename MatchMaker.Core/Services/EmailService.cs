@@ -58,7 +58,7 @@ public class EmailService(
 
         try
         {
-            var socketOptions = _smtpSettings.UseTsl ? SecureSocketOptions.StartTls : SecureSocketOptions.None;
+            var socketOptions = _smtpSettings.UseTls ? SecureSocketOptions.StartTls : SecureSocketOptions.None;
 
             await smtpClient.ConnectAsync(_smtpSettings.Host, _smtpSettings.Port, socketOptions);
 
