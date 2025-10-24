@@ -1,9 +1,8 @@
-﻿using MatchMaker.Domain.Configurations;
-using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
 using System.Text;
 
-namespace MatchMaker.Core.Services;
+namespace MatchMaker.Domain.Configurations;
 
 public class JwtOptions(JwtSettings settings)
 {

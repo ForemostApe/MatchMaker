@@ -4,12 +4,12 @@ using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using MatchMaker.Domain.Configurations;
 
 namespace MatchMaker.Core.Services
 { 
     public class TokenService(JwtOptions jwtOptions, ILogger<TokenService> logger, IUserService userService) : ITokenService
     {
-
         private readonly JwtOptions _jwtOptions = jwtOptions;
         private readonly ILogger<TokenService> _logger = logger;
         private readonly IUserService _userService = userService;
