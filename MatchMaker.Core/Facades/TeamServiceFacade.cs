@@ -4,11 +4,19 @@ using MatchMaker.Core.Interfaces;
 using MatchMaker.Core.Utilities;
 using MatchMaker.Domain.DTOs.Teams;
 using MatchMaker.Domain.Entities;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
 namespace MatchMaker.Core.Facades;
 
-public class TeamServiceFacade(ILogger<TeamServiceFacade> logger, IMapper mapper, ITeamService teamService) : ITeamServiceFacade
+public class TeamServiceFacade
+    (
+        ILogger<TeamServiceFacade> logger, 
+        IMapper mapper, 
+        ITeamService teamService, 
+        IFileValidationService fileValidationService
+    ) 
+    : ITeamServiceFacade
 {
     private readonly ILogger<TeamServiceFacade> _logger = logger;
     private readonly IMapper _mapper = mapper;
@@ -16,10 +24,17 @@ public class TeamServiceFacade(ILogger<TeamServiceFacade> logger, IMapper mapper
 
     public async Task<Result<TeamDTO>> CreateTeamAsync(CreateTeamDTO newTeam)
     {
-        ArgumentNullException.ThrowIfNull(newTeam);
+        ArgumentNullException.ThrowIfNull(newTeam.TeamName);
 
         try
         {
+            if (newTeam.TeamLogo != null)
+            {
+                //TODO
+                //Add proper result-handling from the service so the client knows why the file was rejected, a bool
+                //doesn't cut it.
+            }
+            
             var team = _mapper.Map<Team>(newTeam);
             var result = await _teamService.CreateTeamAsync(team);
 

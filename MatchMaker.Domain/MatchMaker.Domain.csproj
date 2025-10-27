@@ -11,4 +11,10 @@
     <PackageReference Include="MongoDB.Bson" Version="3.3.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="Microsoft.AspNetCore.Http.Features">
+      <HintPath>..\..\..\..\.dotnet\packs\Microsoft.AspNetCore.App.Ref\9.0.10\ref\net9.0\Microsoft.AspNetCore.Http.Features.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
 </Project>

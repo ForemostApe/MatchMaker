@@ -1,7 +1,9 @@
-﻿namespace MatchMaker.Domain.DTOs.Teams;
+﻿using Microsoft.AspNetCore.Http;
+
+namespace MatchMaker.Domain.DTOs.Teams;
 
 public class CreateTeamDTO
 {
     public string TeamName { get; set; } = null!;
-    public string? TeamLogo { get; set; }
+    public IFormFile? TeamLogo { get; set; }
 }

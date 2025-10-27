@@ -1,5 +1,6 @@
 ﻿using MatchMaker.Core.Utilities;
 using MatchMaker.Domain.DTOs.Teams;
+using Microsoft.AspNetCore.Http;
 
 namespace MatchMaker.Core.Interfaces;
 

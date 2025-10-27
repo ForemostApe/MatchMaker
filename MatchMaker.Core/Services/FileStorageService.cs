@@ -4,7 +4,14 @@ using Microsoft.Extensions.Logging;
 
 namespace MatchMaker.Core.Services;
 
-public class FileStorageService(ILogger<FileStorageService> logger, string storageRootPath, string baseUrl, string storagePath = "storage/uploads") : IFileStorageService
+public class FileStorageService
+    (
+        ILogger<FileStorageService> logger, 
+        string storageRootPath, 
+        string baseUrl, 
+        string storagePath = "storage/uploads"
+    ) 
+    : IFileStorageService
 {
     private readonly ILogger<FileStorageService> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     private readonly string _storageRootPath = storageRootPath ?? throw new ArgumentNullException(nameof(storageRootPath));
