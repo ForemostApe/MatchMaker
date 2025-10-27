@@ -15,13 +15,13 @@ public class TeamController(ILogger<TeamController> logger, ITeamServiceFacade t
 
     [HttpPost]
     [Authorize (Roles = "Admin")]
-    public async Task<IActionResult> CreateTeamAsync([FromBody] CreateTeamDTO newTeam, IFormFile file)
+    public async Task<IActionResult> CreateTeamAsync([FromBody] CreateTeamDTO newTeam, IFormFile teamLogo)
     {
         if (!ModelState.IsValid) return ValidationProblem(ModelState);
 
         try
         {
-            var result = await _teamServiceFacade.CreateTeamAsync(newTeam);
+            var result = await _teamServiceFacade.CreateTeamAsync(newTeam, teamLogo);
 
             if (!result.IsSuccess)
             {

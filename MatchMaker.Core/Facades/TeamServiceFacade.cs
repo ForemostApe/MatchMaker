@@ -4,6 +4,7 @@ using MatchMaker.Core.Interfaces;
 using MatchMaker.Core.Utilities;
 using MatchMaker.Domain.DTOs.Teams;
 using MatchMaker.Domain.Entities;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
 namespace MatchMaker.Core.Facades;
@@ -14,7 +15,7 @@ public class TeamServiceFacade(ILogger<TeamServiceFacade> logger, IMapper mapper
     private readonly IMapper _mapper = mapper;
     private readonly ITeamService _teamService = teamService;
 
-    public async Task<Result<TeamDTO>> CreateTeamAsync(CreateTeamDTO newTeam)
+    public async Task<Result<TeamDTO>> CreateTeamAsync(CreateTeamDTO newTeam, IFormFile teamLogo)
     {
         ArgumentNullException.ThrowIfNull(newTeam);
 

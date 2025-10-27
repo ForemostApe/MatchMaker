@@ -29,7 +29,7 @@ namespace MatchMaker.Api
 
             #if DEBUG
                 builder.WebHost.ConfigureKestrelServer();
-#endif
+            #endif
 
             builder.Host.UseSerilogLogging(builder.Configuration);
 
@@ -83,6 +83,7 @@ namespace MatchMaker.Api
 
             app.UseHttpsRedirection();
 
+            //TODO
             //Check what this actually does. Tied to Kestrel and security-headers.
             //if (app.Environment.IsDevelopment()) app.Use(async (context, next) =>
             //{
