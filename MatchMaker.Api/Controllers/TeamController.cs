@@ -15,7 +15,7 @@ public class TeamController(ILogger<TeamController> logger, ITeamServiceFacade t
 
     [HttpPost]
     [Authorize (Roles = "Admin")]
-    public async Task<IActionResult> CreateTeamAsync([FromBody] CreateTeamDTO newTeam)
+    public async Task<IActionResult> CreateTeamAsync([FromBody] CreateTeamDto newTeam)
     {
         if (!ModelState.IsValid) return ValidationProblem(ModelState);
 
@@ -155,7 +155,7 @@ public class TeamController(ILogger<TeamController> logger, ITeamServiceFacade t
 
     [HttpPatch(Name = nameof(UpdateTeamAsync))]
     [Authorize (Roles = "Admin")]
-    public async Task<IActionResult> UpdateTeamAsync([FromBody] UpdateTeamDTO updatedTeam)
+    public async Task<IActionResult> UpdateTeamAsync([FromBody] UpdateTeamDto updatedTeam)
     {
         if (!ModelState.IsValid) return ValidationProblem(ModelState);
 
@@ -189,13 +189,13 @@ public class TeamController(ILogger<TeamController> logger, ITeamServiceFacade t
 
     [HttpDelete(Name = nameof(DeleteTeamAsync))]
     [Authorize(Roles = "Admin")]
-    public async Task<IActionResult> DeleteTeamAsync([FromBody] DeleteTeamDTO deleteTeamDTO)
+    public async Task<IActionResult> DeleteTeamAsync([FromBody] DeleteTeamDto deleteTeamDto)
     {
         if (!ModelState.IsValid) return ValidationProblem(ModelState);
 
         try
         {
-            var result = await _teamServiceFacade.DeleteTeamAsync(deleteTeamDTO);
+            var result = await _teamServiceFacade.DeleteTeamAsync(deleteTeamDto);
 
             if (!result.IsSuccess)
             {

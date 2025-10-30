@@ -11,6 +11,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MatchMaker.Data", "MatchMak
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MatchMaker.Domain", "MatchMaker.Domain\MatchMaker.Domain.csproj", "{4D3BDF58-17E3-41C7-B5CB-27754F942AFA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MatchMaker.Core.Test", "MatchMaker.Core.Test\MatchMaker.Core.Test.csproj", "{C133A984-520E-48A7-AA7C-3471717DBFD0}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D3C3EFDE-E0A4-486C-A62E-BF7D3087ADC3} = {D3C3EFDE-E0A4-486C-A62E-BF7D3087ADC3}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +38,10 @@ Global
 		{4D3BDF58-17E3-41C7-B5CB-27754F942AFA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4D3BDF58-17E3-41C7-B5CB-27754F942AFA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4D3BDF58-17E3-41C7-B5CB-27754F942AFA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C133A984-520E-48A7-AA7C-3471717DBFD0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C133A984-520E-48A7-AA7C-3471717DBFD0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C133A984-520E-48A7-AA7C-3471717DBFD0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C133A984-520E-48A7-AA7C-3471717DBFD0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

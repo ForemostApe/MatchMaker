@@ -43,7 +43,7 @@ public static class CoreServiceExtension
         services.AddScoped<IEmailComposer, EmailComposer>();
         services.AddSingleton<IEmailTemplateEngine, EmailTemplateEngine>();
         
-        services.AddScoped<ILinkFactory>(_ => new LinkFactory(_.GetRequiredService<ILogger<LinkFactory>>(), clientSettings.BaseURL));
+        services.AddScoped<ILinkFactory>(_ => new LinkFactory(_.GetRequiredService<ILogger<LinkFactory>>(), clientSettings.BaseUrl));
 
         services.AddScoped<ITeamServiceFacade, TeamServiceFacade>();
         services.AddScoped<ITeamService, TeamService>();

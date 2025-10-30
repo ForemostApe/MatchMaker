@@ -19,7 +19,7 @@ public class UserServiceFacade(ILogger<UserServiceFacade> logger, IMapper mapper
     private readonly ITokenService _tokenService = tokenService;
     private readonly IAuthService _authService = authService;
 
-    public async Task<Result<UserDTO>> CreateUserAsync(CreateUserDTO newUser)
+    public async Task<Result<UserDto>> CreateUserAsync(CreateUserDto newUser)
     {
         ArgumentNullException.ThrowIfNull(newUser);
 
@@ -28,7 +28,7 @@ public class UserServiceFacade(ILogger<UserServiceFacade> logger, IMapper mapper
             var existingUser = await _userService.GetUserByEmailAsync(newUser.Email);
             if (existingUser.IsSuccess)
             {
-                return Result<UserDTO>.Failure(
+                return Result<UserDto>.Failure(
                     "User already exists.",
                     existingUser.Message,
                     StatusCodes.Status409Conflict
@@ -42,7 +42,7 @@ public class UserServiceFacade(ILogger<UserServiceFacade> logger, IMapper mapper
 
             if (!result.IsSuccess)
             {
-                return Result<UserDTO>.Failure(
+                return Result<UserDto>.Failure(
                     "User-creation failed.",
                     result.Message,
                     StatusCodes.Status500InternalServerError
@@ -52,9 +52,9 @@ public class UserServiceFacade(ILogger<UserServiceFacade> logger, IMapper mapper
             string verificationToken = await _tokenService.GenerateVerificationToken(result.Data!);
             await _emailService.CreateEmailAsync(result.Data!.Email, EmailType.UserCreated, verificationToken);
 
-            var createdUser = _mapper.Map<UserDTO>(result.Data);
+            var createdUser = _mapper.Map<UserDto>(result.Data);
 
-            return Result<UserDTO>.Success(createdUser, result.Message);
+            return Result<UserDto>.Success(createdUser, result.Message);
         }
         catch (Exception ex)
         {
@@ -63,18 +63,18 @@ public class UserServiceFacade(ILogger<UserServiceFacade> logger, IMapper mapper
         }
     }
 
-    public async Task<Result<UserDTO>> GetUserByEmailAsync(string email)
+    public async Task<Result<UserDto>> GetUserByEmailAsync(string email)
     {
         ArgumentException.ThrowIfNullOrEmpty(email);
 
         try
         {
             var user = await _userService.GetUserByEmailAsync(email);
-            if (!user.IsSuccess) return Result<UserDTO>.Failure(user.Message);
+            if (!user.IsSuccess) return Result<UserDto>.Failure(user.Message);
 
-            var existingUser = _mapper.Map<UserDTO>(user.Data!);
+            var existingUser = _mapper.Map<UserDto>(user.Data!);
 
-            return Result<UserDTO>.Success(existingUser, user.Message);
+            return Result<UserDto>.Success(existingUser, user.Message);
         }
         catch (Exception ex)
         {
@@ -83,18 +83,18 @@ public class UserServiceFacade(ILogger<UserServiceFacade> logger, IMapper mapper
         }
     }
 
-    public async Task<Result<UserDTO>> GetUserByIdAsync(string userId)
+    public async Task<Result<UserDto>> GetUserByIdAsync(string userId)
     {
         ArgumentException.ThrowIfNullOrEmpty(userId);
 
         try
         {
             var user = await _userService.GetUserByIdAsync(userId);
-            if (!user.IsSuccess) return Result<UserDTO>.Failure(user.Message);
+            if (!user.IsSuccess) return Result<UserDto>.Failure(user.Message);
 
-            var existingUser = _mapper.Map<UserDTO>(user.Data!);
+            var existingUser = _mapper.Map<UserDto>(user.Data!);
 
-            return Result<UserDTO>.Success(existingUser, user.Message);
+            return Result<UserDto>.Success(existingUser, user.Message);
         }
         catch (Exception ex)
         {
@@ -103,7 +103,7 @@ public class UserServiceFacade(ILogger<UserServiceFacade> logger, IMapper mapper
         }
     }
 
-    public async Task<Result<List<UserDTO>>> GetUsersByRole(string userRole, string? teamId = null)
+    public async Task<Result<List<UserDto>>> GetUsersByRole(string userRole, string? teamId = null)
     {
         ArgumentException.ThrowIfNullOrEmpty(userRole);
 
@@ -112,11 +112,11 @@ public class UserServiceFacade(ILogger<UserServiceFacade> logger, IMapper mapper
             if (!Enum.TryParse<UserRole>(userRole, true, out var parsedRole)) throw new ArgumentException($"Invalid user role: {userRole}");
 
             var result = await _userService.GetUsersByRoleAsync(parsedRole, teamId);
-            if (!result.IsSuccess) return Result<List<UserDTO>>.Failure(result.Message);
+            if (!result.IsSuccess) return Result<List<UserDto>>.Failure(result.Message);
 
-            var users = _mapper.Map<List<UserDTO>>(result.Data!);
+            var users = _mapper.Map<List<UserDto>>(result.Data!);
 
-            return Result<List<UserDTO>>.Success(users, result.Message);
+            return Result<List<UserDto>>.Success(users, result.Message);
         }
         catch (Exception ex)
         {
@@ -125,7 +125,7 @@ public class UserServiceFacade(ILogger<UserServiceFacade> logger, IMapper mapper
         }
     }
 
-    public async Task<Result<UserDTO>> UpdateUserAsync(UpdateUserDTO userUpdate)
+    public async Task<Result<UserDto>> UpdateUserAsync(UpdateUserDto userUpdate)
     {
         ArgumentNullException.ThrowIfNull(userUpdate);
 
@@ -135,7 +135,7 @@ public class UserServiceFacade(ILogger<UserServiceFacade> logger, IMapper mapper
 
             if (!existingUser.IsSuccess)
             {
-                return Result<UserDTO>.Failure(
+                return Result<UserDto>.Failure(
                     "User doesn't exist",
                     existingUser.Message,
                     StatusCodes.Status404NotFound
@@ -147,7 +147,7 @@ public class UserServiceFacade(ILogger<UserServiceFacade> logger, IMapper mapper
                 var existingEmailAddress = await _userService.GetUserByEmailAsync(userUpdate.Email);
                 if (existingEmailAddress.IsSuccess && existingEmailAddress.Data!.Id != userUpdate.Id)
                 {
-                    return Result<UserDTO>.Failure(
+                    return Result<UserDto>.Failure(
                         "Email already in use",
                         "Another user is already registered with this email address.",
                         StatusCodes.Status409Conflict
@@ -160,8 +160,8 @@ public class UserServiceFacade(ILogger<UserServiceFacade> logger, IMapper mapper
             var result = await _userService.UpdateUserAsync(existingUser.Data!);
 
             return result.IsSuccess
-                ? Result<UserDTO>.Success(result.Data!.Adapt<UserDTO>(), result.Message)
-                : Result<UserDTO>.Failure(
+                ? Result<UserDto>.Success(result.Data!.Adapt<UserDto>(), result.Message)
+                : Result<UserDto>.Failure(
                     "Update failed.",
                     result.Message,
                     StatusCodes.Status500InternalServerError
@@ -174,7 +174,7 @@ public class UserServiceFacade(ILogger<UserServiceFacade> logger, IMapper mapper
         }
     }
 
-    public async Task<Result<UserDTO>> DeleteUserAsync(string userId)
+    public async Task<Result<UserDto>> DeleteUserAsync(string userId)
     {
         ArgumentException.ThrowIfNullOrEmpty(userId);
 
@@ -182,8 +182,8 @@ public class UserServiceFacade(ILogger<UserServiceFacade> logger, IMapper mapper
         {
             var result = await _userService.DeleteUserAsync(userId);
             return result.IsSuccess
-                ? Result<UserDTO>.Success(_mapper.Map<UserDTO>(result.Data!), result.Message)
-                : Result<UserDTO>.Failure(
+                ? Result<UserDto>.Success(_mapper.Map<UserDto>(result.Data!), result.Message)
+                : Result<UserDto>.Failure(
                     "Deletion failed.",
                     result.Message,
                     StatusCodes.Status500InternalServerError

@@ -1,6 +1,6 @@
 ﻿namespace MatchMaker.Domain.DTOs.Teams
 {
-    public class TeamDTO
+    public class TeamDto
     {
         public string Id { get; set; } = null!;
         public string TeamName { get; set; } = null!;

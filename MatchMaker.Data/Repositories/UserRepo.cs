@@ -18,7 +18,7 @@ public class UserRepo(ILogger<UserRepo> logger, IMongoDatabase database) : Repos
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "An unexpected error occured in the repo-class trying to create user.");
+            Logger.LogError(ex, "An unexpected error occured in the repo-class trying to create user.");
             throw;
         }
     }
@@ -34,7 +34,7 @@ public class UserRepo(ILogger<UserRepo> logger, IMongoDatabase database) : Repos
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "An unexpected error occured in the repo-class trying to get user by email-address.");
+            Logger.LogError(ex, "An unexpected error occured in the repo-class trying to get user by email-address.");
             throw;
         }
     }
@@ -50,7 +50,7 @@ public class UserRepo(ILogger<UserRepo> logger, IMongoDatabase database) : Repos
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "An unexpected error occured in the repo-class trying to get user by UserId.");
+            Logger.LogError(ex, "An unexpected error occured in the repo-class trying to get user by UserId.");
             throw;
         }
     }
@@ -75,7 +75,7 @@ public class UserRepo(ILogger<UserRepo> logger, IMongoDatabase database) : Repos
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "An unexpected error occured in the repo-class trying to get user by UserRole");
+            Logger.LogError(ex, "An unexpected error occured in the repo-class trying to get user by UserRole");
             throw;
         }
     }
@@ -99,7 +99,7 @@ public class UserRepo(ILogger<UserRepo> logger, IMongoDatabase database) : Repos
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "An unexpected error occured in the repo-class trying to update user.");
+            Logger.LogError(ex, "An unexpected error occured in the repo-class trying to update user.");
             throw;
         }
     }
@@ -118,7 +118,7 @@ public class UserRepo(ILogger<UserRepo> logger, IMongoDatabase database) : Repos
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "An unexpected error occured in the repo-class trying to verify user-email.");
+            Logger.LogError(ex, "An unexpected error occured in the repo-class trying to verify user-email.");
             throw;
         }
     }
@@ -134,7 +134,7 @@ public class UserRepo(ILogger<UserRepo> logger, IMongoDatabase database) : Repos
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "An unexpected error occured in the repo-class trying to delete user.");
+            Logger.LogError(ex, "An unexpected error occured in the repo-class trying to delete user.");
             throw;
         }
     }

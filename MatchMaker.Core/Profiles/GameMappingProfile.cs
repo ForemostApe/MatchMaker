@@ -8,7 +8,7 @@ public class GameMappingProfile : IRegister
 {
     public void Register(TypeAdapterConfig config)
     {
-        config.NewConfig<CreateGameDTO, Game>()
+        config.NewConfig<CreateGameDto, Game>()
            .Map(dest => dest.StartTime, src => src.StartTime)
            .Map(dest => dest.GameType, src => src.GameType)
            .Map(dest => dest.Location, src => src.Location)
@@ -26,7 +26,7 @@ public class GameMappingProfile : IRegister
                Penalties = src.Conditions.Penalties
            });
 
-        config.NewConfig<UpdateGameDTO, Game>()
+        config.NewConfig<UpdateGameDto, Game>()
            .Map(dest => dest.StartTime, src => src.StartTime)
            .Map(dest => dest.Location, src => src.Location)
            .Map(dest => dest.GameType, src => src.GameType)
@@ -43,7 +43,7 @@ public class GameMappingProfile : IRegister
             .IgnoreNullValues(true)
             .IgnoreNonMapped(true);
 
-        config.NewConfig<Game, GameDTO>()
+        config.NewConfig<Game, GameDto>()
             .Map(dest => dest.GameStatus, src => src.GameStatus.ToString());
     }
 }

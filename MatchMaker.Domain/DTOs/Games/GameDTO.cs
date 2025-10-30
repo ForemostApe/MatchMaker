@@ -2,7 +2,7 @@
 
 namespace MatchMaker.Domain.DTOs.Games;
 
-public class GameDTO
+public class GameDto
 {
     public string Id { get; set; } = null!;
     public DateTime StartTime { get; set; }

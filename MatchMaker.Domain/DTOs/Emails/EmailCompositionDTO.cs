@@ -1,6 +1,6 @@
 ﻿namespace MatchMaker.Domain.DTOs.Emails
 {
-    public class EmailCompositionDTO(string templateName, string subject, object templateModel)
+    public class EmailCompositionDto(string templateName, string subject, object templateModel)
     {
         public string TemplateName { get; init; } = templateName;
         public string Subject { get; init; } = subject;

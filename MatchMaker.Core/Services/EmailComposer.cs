@@ -10,14 +10,14 @@ namespace MatchMaker.Core.Services
         private readonly ILinkFactory _linkFactory = linkFactory;
         private readonly ClientSettings _clientSettings = clientSettings;
 
-        public EmailCompositionDTO Compose(EmailType mailType, string email, string? token)
+        public EmailCompositionDto Compose(EmailType mailType, string email, string? token)
         {
 
             //if (string.IsNullOrEmpty(token)) throw new ArgumentNullException(nameof(token), "Token is null when trying to create link.");
 
             return mailType switch
             {
-                EmailType.UserCreated => new EmailCompositionDTO (
+                EmailType.UserCreated => new EmailCompositionDto (
                     "UserCreatedTemplate",
                     "Ditt MatchMaker-konto har skapats.",
                     new
@@ -26,7 +26,7 @@ namespace MatchMaker.Core.Services
                     }
                 ),
 
-                EmailType.PasswordReset => new EmailCompositionDTO (
+                EmailType.PasswordReset => new EmailCompositionDto (
                     "PasswordResetTemplate",
                     "Begäran att återställa MatchMaker-lösenord.",
                     new
@@ -35,12 +35,12 @@ namespace MatchMaker.Core.Services
                     }
                 ),
 
-                EmailType.GameNotification => new EmailCompositionDTO (
+                EmailType.GameNotification => new EmailCompositionDto (
                     "GameNotificationTemplate",
                     "En planerad match inväntar bedömning.",
                     new
                     {
-                        login_link = _clientSettings.BaseURL
+                        login_link = _clientSettings.BaseUrl
                     }
                 ),
 

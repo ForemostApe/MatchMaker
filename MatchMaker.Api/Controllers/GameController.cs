@@ -16,7 +16,7 @@ namespace MatchMaker.Api.Controllers
 
         [HttpPost]
         [Authorize (Roles = "Coach")]
-        public async Task<IActionResult> CreateGameAsync([FromBody] CreateGameDTO newGame)
+        public async Task<IActionResult> CreateGameAsync([FromBody] CreateGameDto newGame)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
@@ -103,7 +103,7 @@ namespace MatchMaker.Api.Controllers
 
         [Authorize (Roles = "Coach")]
         [HttpPatch(Name = nameof(UpdateGameAsync))]
-        public async Task<IActionResult> UpdateGameAsync([FromBody] UpdateGameDTO updatedGame)
+        public async Task<IActionResult> UpdateGameAsync([FromBody] UpdateGameDto updatedGame)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
@@ -162,7 +162,7 @@ namespace MatchMaker.Api.Controllers
 
         [HttpPost("userResponse", Name = nameof(HandleUserResponseAsync))]
         [Authorize (Roles = "Coach, Referee")]
-        public async Task<IActionResult> HandleUserResponseAsync([FromBody] GameResponseDTO response)
+        public async Task<IActionResult> HandleUserResponseAsync([FromBody] GameResponseDto response)
         {
             ArgumentNullException.ThrowIfNull(response);
 

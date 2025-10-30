@@ -6,13 +6,9 @@ using Microsoft.Extensions.Options;
 
 namespace MatchMaker.Core.Services;
 
-public class FileValidationService 
-    (
-        ILogger<FileValidationService> logger, 
-        IOptions<FileValidationOptions> fileValidationOptions
-    ) 
-    : IFileValidationService
+public class FileValidationService(ILogger<FileValidationService> logger, IOptions<FileValidationOptions> fileValidationOptions) : IFileValidationService
 {
+    private readonly ILogger<FileValidationService> _logger = logger;
     private readonly FileValidationOptions _fileValidationOptions = fileValidationOptions.Value;
     
     //TODO
@@ -61,7 +57,7 @@ public class FileValidationService
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Failed to validate file signature.");
+            _logger.LogError(ex, "Failed to validate file signature.");
             throw;
         }
     }

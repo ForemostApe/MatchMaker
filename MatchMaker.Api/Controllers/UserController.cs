@@ -15,7 +15,7 @@ public class UserController(ILogger<UserController> logger, IUserServiceFacade u
 
     [HttpPost]
     [AllowAnonymous]
-    public async Task<IActionResult> CreateUserAsync([FromBody] CreateUserDTO newUser)
+    public async Task<IActionResult> CreateUserAsync([FromBody] CreateUserDto newUser)
     {
         try
         {
@@ -143,7 +143,7 @@ public class UserController(ILogger<UserController> logger, IUserServiceFacade u
     }
 
     [HttpPatch]
-    public async Task<IActionResult> UpdateUserAsync([FromBody] UpdateUserDTO updatedUser)
+    public async Task<IActionResult> UpdateUserAsync([FromBody] UpdateUserDto updatedUser)
     {
         try
         {

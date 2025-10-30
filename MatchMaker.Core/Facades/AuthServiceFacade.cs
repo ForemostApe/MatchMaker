@@ -64,22 +64,22 @@ namespace MatchMaker.Core.Facades
             }
         }
 
-        public async Task<Result<AuthenticationDTO>> LoginAsync(LoginDTO loginDTO)
+        public async Task<Result<AuthenticationDto>> LoginAsync(LoginDto loginDto)
         {
             try
             {
-                var userResult = await _userService.GetUserByEmailAsync(loginDTO.Email);
+                var userResult = await _userService.GetUserByEmailAsync(loginDto.Email);
 
                 if (!userResult.IsSuccess || userResult.Data == null) 
-                    return Result<AuthenticationDTO>.Failure("Felaktig email-adress eller felaktigt lösenord.");
+                    return Result<AuthenticationDto>.Failure("Felaktig email-adress eller felaktigt lösenord.");
 
                 var user = userResult.Data;
 
-                if (!BCrypt.Net.BCrypt.Verify(loginDTO.Password, user.PasswordHash)) 
-                    return Result<AuthenticationDTO>.Failure("Felaktig email-adress eller felaktigt lösenord.");
+                if (!BCrypt.Net.BCrypt.Verify(loginDto.Password, user.PasswordHash)) 
+                    return Result<AuthenticationDto>.Failure("Felaktig email-adress eller felaktigt lösenord.");
 
                 if (!user.IsVerified) 
-                    return Result<AuthenticationDTO>.Failure("Vänligen verifiera din email-adress för att kunna logga in.");
+                    return Result<AuthenticationDto>.Failure("Vänligen verifiera din email-adress för att kunna logga in.");
 
                 _sessionManager.ClearSession("refreshToken");
 
@@ -87,13 +87,13 @@ namespace MatchMaker.Core.Facades
                 var refreshToken = await _tokenService.GenerateRefreshToken(user);
                 _cookieFactory.CreateHttpOnlyCookie("refreshToken", refreshToken);
 
-                AuthenticationDTO result = new ()
+                AuthenticationDto result = new ()
                 {
                     AccessToken = accessToken,
-                    User = _mapper.Map<AuthenticatedUserDTO>(user)
+                    User = _mapper.Map<AuthenticatedUserDto>(user)
                 };
 
-                return Result<AuthenticationDTO>.Success(result, "Du är nu inloggad.");
+                return Result<AuthenticationDto>.Success(result, "Du är nu inloggad.");
             }
             catch (Exception ex)
             {
@@ -102,7 +102,7 @@ namespace MatchMaker.Core.Facades
             }
         }
 
-        public async Task<Result<AuthenticationDTO>> GenerateRefreshTokenAsync(string refreshToken)
+        public async Task<Result<AuthenticationDto>> GenerateRefreshTokenAsync(string refreshToken)
         {
             try
             {
@@ -112,13 +112,13 @@ namespace MatchMaker.Core.Facades
                 var newRefreshToken = await _tokenService.GenerateRefreshToken(user);
                 _cookieFactory.CreateHttpOnlyCookie("refreshToken", newRefreshToken);
 
-                AuthenticationDTO result = new AuthenticationDTO()
+                AuthenticationDto result = new AuthenticationDto()
                 {
                     AccessToken = newAccessToken,
-                    User = _mapper.Map<AuthenticatedUserDTO>(user)
+                    User = _mapper.Map<AuthenticatedUserDto>(user)
                 };
 
-                return Result<AuthenticationDTO>.Success(result, "Token förnyades och användaren är åter autentiserad.");
+                return Result<AuthenticationDto>.Success(result, "Token förnyades och användaren är åter autentiserad.");
 
             }
             catch (Exception ex)

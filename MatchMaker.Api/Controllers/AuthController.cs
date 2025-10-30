@@ -46,13 +46,13 @@ namespace MatchMaker.Domain.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> LoginAsync(LoginDTO loginDTO)
+        public async Task<IActionResult> LoginAsync(LoginDto loginDto)
         {
             try
             {
                 if (!ModelState.IsValid) return ValidationProblem(ModelState);
 
-                var result = await _authServiceFacade.LoginAsync(loginDTO);
+                var result = await _authServiceFacade.LoginAsync(loginDto);
                 if (result.Data == null)
                 {
                     return Unauthorized(result);
