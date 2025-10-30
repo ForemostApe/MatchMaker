@@ -1,5 +1,5 @@
 ﻿namespace MatchMaker.Domain.DTOs.Users;
-public class UpdateUserDTO
+public class UpdateUserDto
 {
     public string Id { get; set; } = null!;
     public string? Email { get; set; }

@@ -1,6 +1,5 @@
 import api from "./axiosConfig";
 
-
 const createGame = async(gameData) => {
     try {
         const response = await api.post("/Game/", gameData);

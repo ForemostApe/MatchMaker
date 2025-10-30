@@ -4,28 +4,42 @@ using MatchMaker.Core.Interfaces;
 using MatchMaker.Core.Utilities;
 using MatchMaker.Domain.DTOs.Teams;
 using MatchMaker.Domain.Entities;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
 namespace MatchMaker.Core.Facades;
 
-public class TeamServiceFacade(ILogger<TeamServiceFacade> logger, IMapper mapper, ITeamService teamService) : ITeamServiceFacade
+public class TeamServiceFacade
+    (
+        ILogger<TeamServiceFacade> logger, 
+        IMapper mapper, 
+        ITeamService teamService
+    ) 
+    : ITeamServiceFacade
 {
     private readonly ILogger<TeamServiceFacade> _logger = logger;
     private readonly IMapper _mapper = mapper;
     private readonly ITeamService _teamService = teamService;
 
-    public async Task<Result<TeamDTO>> CreateTeamAsync(CreateTeamDTO newTeam)
+    public async Task<Result<TeamDto>> CreateTeamAsync(CreateTeamDto newTeam)
     {
-        ArgumentNullException.ThrowIfNull(newTeam);
+        ArgumentNullException.ThrowIfNull(newTeam.TeamName);
 
         try
         {
+            if (newTeam.TeamLogo != null)
+            {
+                //TODO
+                //Add proper result-handling from the service so the client knows why the file was rejected, a bool
+                //doesn't cut it.
+            }
+            
             var team = _mapper.Map<Team>(newTeam);
             var result = await _teamService.CreateTeamAsync(team);
 
             return result.IsSuccess
-                ? Result<TeamDTO>.Success(_mapper.Map<TeamDTO>(result.Data!), result.Message)
-                : Result<TeamDTO>.Failure(result.Message);
+                ? Result<TeamDto>.Success(_mapper.Map<TeamDto>(result.Data!), result.Message)
+                : Result<TeamDto>.Failure(result.Message);
         }
         catch (Exception ex)
         {
@@ -34,15 +48,15 @@ public class TeamServiceFacade(ILogger<TeamServiceFacade> logger, IMapper mapper
         }
     }
 
-    public async Task<Result<List<TeamDTO>>> GetAllTeamsAsync()
+    public async Task<Result<List<TeamDto>>> GetAllTeamsAsync()
     {
         try
         {
             var result = await _teamService.GetAllTeamsAsync();
 
             return result.IsSuccess
-                ? Result<List<TeamDTO>>.Success(_mapper.Map<List<TeamDTO>>(result.Data!), result.Message)
-                : Result<List<TeamDTO>>.Failure(result.Message);
+                ? Result<List<TeamDto>>.Success(_mapper.Map<List<TeamDto>>(result.Data!), result.Message)
+                : Result<List<TeamDto>>.Failure(result.Message);
         }
         catch (Exception ex)
         {
@@ -51,7 +65,7 @@ public class TeamServiceFacade(ILogger<TeamServiceFacade> logger, IMapper mapper
         }
     }
 
-    public async Task<Result<TeamDTO>> GetTeamByIdAsync(string teamId)
+    public async Task<Result<TeamDto>> GetTeamByIdAsync(string teamId)
     {
         ArgumentException.ThrowIfNullOrEmpty(teamId);
 
@@ -60,8 +74,8 @@ public class TeamServiceFacade(ILogger<TeamServiceFacade> logger, IMapper mapper
             var result = await _teamService.GetTeamByIdAsync(teamId);
 
             return result.IsSuccess
-                ? Result<TeamDTO>.Success(_mapper.Map<TeamDTO>(result.Data!), result.Message)
-                : Result<TeamDTO>.Failure(result.Message);
+                ? Result<TeamDto>.Success(_mapper.Map<TeamDto>(result.Data!), result.Message)
+                : Result<TeamDto>.Failure(result.Message);
         }
         catch (Exception ex)
         {
@@ -70,7 +84,7 @@ public class TeamServiceFacade(ILogger<TeamServiceFacade> logger, IMapper mapper
         }
     }
 
-    public async Task<Result<TeamDTO>> GetTeamByNameAsync(string teamName)
+    public async Task<Result<TeamDto>> GetTeamByNameAsync(string teamName)
     {
         ArgumentException.ThrowIfNullOrEmpty(teamName);
 
@@ -79,8 +93,8 @@ public class TeamServiceFacade(ILogger<TeamServiceFacade> logger, IMapper mapper
             var result = await _teamService.GetTeamByNameAsync(teamName);
 
             return result.IsSuccess
-                ? Result<TeamDTO>.Success(_mapper.Map<TeamDTO>(result.Data!), result.Message)
-                : Result<TeamDTO>.Failure(result.Message);
+                ? Result<TeamDto>.Success(_mapper.Map<TeamDto>(result.Data!), result.Message)
+                : Result<TeamDto>.Failure(result.Message);
         }
         catch (Exception ex)
         {
@@ -89,22 +103,22 @@ public class TeamServiceFacade(ILogger<TeamServiceFacade> logger, IMapper mapper
         }
     }
 
-    public async Task<Result<TeamDTO>> UpdateTeamAsync(UpdateTeamDTO updatedTeam)
+    public async Task<Result<TeamDto>> UpdateTeamAsync(UpdateTeamDto updatedTeam)
     {
         ArgumentNullException.ThrowIfNull(updatedTeam);
 
         try
         {
             var existingTeam = await _teamService.GetTeamByIdAsync(updatedTeam.TeamId);
-            if (existingTeam == null) return Result<TeamDTO>.Failure("Coulnd't find the specified team.");
+            if (existingTeam == null) return Result<TeamDto>.Failure("Coulnd't find the specified team.");
 
             updatedTeam.Adapt(existingTeam.Data!);
 
             var result = await _teamService.UpdateTeamAsync(existingTeam.Data!);
 
             return result.IsSuccess
-                ? Result<TeamDTO>.Success(result.Data!.Adapt<TeamDTO>(), result.Message)
-                : Result<TeamDTO>.Failure(result.Message);
+                ? Result<TeamDto>.Success(result.Data!.Adapt<TeamDto>(), result.Message)
+                : Result<TeamDto>.Failure(result.Message);
         }
         catch (Exception ex)
         {
@@ -113,17 +127,17 @@ public class TeamServiceFacade(ILogger<TeamServiceFacade> logger, IMapper mapper
         }
     }
 
-    public async Task<Result<TeamDTO>> DeleteTeamAsync(DeleteTeamDTO deleteTeamDTO)
+    public async Task<Result<TeamDto>> DeleteTeamAsync(DeleteTeamDto deleteTeamDto)
     {
-        ArgumentNullException.ThrowIfNull(deleteTeamDTO);
+        ArgumentNullException.ThrowIfNull(deleteTeamDto);
 
         try
         {
-            var result = await _teamService.DeleteTeamAsync(deleteTeamDTO.TeamId);
+            var result = await _teamService.DeleteTeamAsync(deleteTeamDto.TeamId);
 
             return result.IsSuccess ?
-                Result<TeamDTO>.Success(null, result.Message)
-                : Result<TeamDTO>.Failure(result.Message);
+                Result<TeamDto>.Success(null, result.Message)
+                : Result<TeamDto>.Failure(result.Message);
         }
         catch (Exception ex)
         {

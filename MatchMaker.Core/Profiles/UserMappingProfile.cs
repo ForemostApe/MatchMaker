@@ -8,12 +8,12 @@ public class UserMappingProfile : IRegister
 {
     public void Register(TypeAdapterConfig config)
     {
-        config.NewConfig<CreateUserDTO, User>()
+        config.NewConfig<CreateUserDto, User>()
             .Map(dest => dest.PasswordHash, src => src.Password)
             .Map(dest => dest.CreatedDate, src => DateTime.UtcNow)
             .Map(dest => dest.UserRole, src => UserRole.Unspecified);
 
-        config.NewConfig<UpdateUserDTO, User>()
+        config.NewConfig<UpdateUserDto, User>()
             .Map(dest => dest.Id, src => src.Id)
             .Map(dest => dest.Email, src => src.Email)
             .Map(dest => dest.FirstName, src => src.FirstName)
@@ -25,7 +25,7 @@ public class UserMappingProfile : IRegister
             .IgnoreNonMapped(true)
             .IgnoreNullValues(true);
 
-        config.NewConfig<User, UpdateUserDTO>()
+        config.NewConfig<User, UpdateUserDto>()
             .Map(dest => dest.Id, src => src.Id)
             .Map(dest => dest.Email, src => src.Email)
             .Map(dest => dest.FirstName, src => src.FirstName)
@@ -35,7 +35,7 @@ public class UserMappingProfile : IRegister
             .IgnoreNonMapped(true)
             .IgnoreNullValues(true);
 
-        config.NewConfig<User, UserDTO>()
+        config.NewConfig<User, UserDto>()
             .Map(dest => dest.Id, src => src.Id)
             .Map(dest => dest.Email, src => src.Email)
             .Map(dest => dest.FirstName, src => src.FirstName)
@@ -46,7 +46,7 @@ public class UserMappingProfile : IRegister
             .IgnoreNonMapped(true)
             .IgnoreNullValues(true);
 
-        config.NewConfig<User, AuthenticatedUserDTO>()
+        config.NewConfig<User, AuthenticatedUserDto>()
             .Map(dest => dest.Id, src => src.Id)
             .Map(dest => dest.Email, src => src.Email)
             .Map(dest => dest.FirstName, src => src.FirstName)

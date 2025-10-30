@@ -20,7 +20,7 @@ public class GameServiceFacade(ILogger<GameServiceFacade> logger, IGameService g
     private readonly IEmailService _emailService = emailService;
     private readonly IUserService _userService = userService;
 
-    public async Task<Result<GameDTO>> CreateGameAsync(CreateGameDTO newGame)
+    public async Task<Result<GameDto>> CreateGameAsync(CreateGameDto newGame)
     {
         ArgumentNullException.ThrowIfNull(newGame);
 
@@ -31,7 +31,7 @@ public class GameServiceFacade(ILogger<GameServiceFacade> logger, IGameService g
             var awayTeamCoach = await _userService.GetUsersByRoleAsync(UserRole.Coach, newGame.AwayTeamId);
             if (!awayTeamCoach.IsSuccess)
             {
-                return Result<GameDTO>.Failure(
+                return Result<GameDto>.Failure(
                     "Coach not found",
                     awayTeamCoach.Message,
                     StatusCodes.Status404NotFound);
@@ -40,7 +40,7 @@ public class GameServiceFacade(ILogger<GameServiceFacade> logger, IGameService g
             var result = await _gameService.CreateGameAsync(game);
             if (!result.IsSuccess)
             {
-                return Result<GameDTO>.Failure(
+                return Result<GameDto>.Failure(
                     "Creation unsuccessful",
                     result.Message,
                     StatusCodes.Status400BadRequest);
@@ -48,8 +48,8 @@ public class GameServiceFacade(ILogger<GameServiceFacade> logger, IGameService g
 
             await _emailService.CreateEmailAsync(awayTeamCoach.Data![0].Email, EmailType.GameNotification);
 
-            var createdGame = _mapper.Map<GameDTO>(result.Data!);
-            return Result<GameDTO>.Success(createdGame, result.Message);
+            var createdGame = _mapper.Map<GameDto>(result.Data!);
+            return Result<GameDto>.Success(createdGame, result.Message);
         }
         catch (Exception ex)
         {
@@ -58,21 +58,21 @@ public class GameServiceFacade(ILogger<GameServiceFacade> logger, IGameService g
         }
 }
 
-    public async Task<Result<List<GameDTO>>> GetAllGamesAsync()
+    public async Task<Result<List<GameDto>>> GetAllGamesAsync()
     {
         try
         {
             var result = await _gameService.GetAllGamesAsync();
             if (!result.IsSuccess)
             {
-                return Result<List<GameDTO>>.Failure(
+                return Result<List<GameDto>>.Failure(
                     "Game not found",
                     result.Message,
                     StatusCodes.Status404NotFound);
             }
 
-            var games = _mapper.Map<List<GameDTO>>(result.Data!);
-            return Result<List<GameDTO>>.Success(games, result.Message);
+            var games = _mapper.Map<List<GameDto>>(result.Data!);
+            return Result<List<GameDto>>.Success(games, result.Message);
         }
         catch (Exception ex)
         {
@@ -81,7 +81,7 @@ public class GameServiceFacade(ILogger<GameServiceFacade> logger, IGameService g
         }
     }
 
-    public async Task<Result<GameDTO>> GetGameByIdAsync(string gameId)
+    public async Task<Result<GameDto>> GetGameByIdAsync(string gameId)
     {
         ArgumentException.ThrowIfNullOrEmpty(gameId);
 
@@ -90,15 +90,15 @@ public class GameServiceFacade(ILogger<GameServiceFacade> logger, IGameService g
             var result = await _gameService.GetGameByIdAsync(gameId);
             if (!result.IsSuccess)
             {
-                return Result<GameDTO>.Failure(
+                return Result<GameDto>.Failure(
                     "Game not found",
                     result.Message,
                     StatusCodes.Status404NotFound
                     );
             }
 
-            var game = _mapper.Map<GameDTO>(result.Data!);
-            return Result<GameDTO>.Success(game, result.Message);
+            var game = _mapper.Map<GameDto>(result.Data!);
+            return Result<GameDto>.Success(game, result.Message);
         }
         catch (Exception ex)
         {
@@ -107,7 +107,7 @@ public class GameServiceFacade(ILogger<GameServiceFacade> logger, IGameService g
         }
     }
 
-    public async Task<Result<GameDTO>> UpdateGameAsync(UpdateGameDTO updatedGame)
+    public async Task<Result<GameDto>> UpdateGameAsync(UpdateGameDto updatedGame)
     {
         ArgumentNullException.ThrowIfNull(updatedGame);
 
@@ -116,7 +116,7 @@ public class GameServiceFacade(ILogger<GameServiceFacade> logger, IGameService g
             var existingGame = await _gameService.GetGameByIdAsync(updatedGame.Id);
             if (!existingGame.IsSuccess)
             {
-                return Result<GameDTO>.Failure(
+                return Result<GameDto>.Failure(
                     "Game not found",
                     existingGame.Message,
                     StatusCodes.Status404NotFound
@@ -128,15 +128,15 @@ public class GameServiceFacade(ILogger<GameServiceFacade> logger, IGameService g
             var result = await _gameService.UpdateGameAsync(existingGame.Data!);
             if (!result.IsSuccess)
             {
-                return Result<GameDTO>.Failure(
+                return Result<GameDto>.Failure(
                     "No change made.",
                     result.Message,
                     StatusCodes.Status200OK
                     );
             }
 
-            var game = _mapper.Map<GameDTO>(result.Data!);
-            return Result<GameDTO>.Success(game, result.Message);
+            var game = _mapper.Map<GameDto>(result.Data!);
+            return Result<GameDto>.Success(game, result.Message);
         }
         catch (Exception ex)
         {
@@ -145,7 +145,7 @@ public class GameServiceFacade(ILogger<GameServiceFacade> logger, IGameService g
         }
     }
 
-    public async Task<Result<GameDTO>> DeleteGameAsync(string gameId)
+    public async Task<Result<GameDto>> DeleteGameAsync(string gameId)
     {
         ArgumentException.ThrowIfNullOrEmpty(gameId);
 
@@ -154,14 +154,14 @@ public class GameServiceFacade(ILogger<GameServiceFacade> logger, IGameService g
             var result = await _gameService.DeleteGameAsync(gameId);
             if (!result.IsSuccess)
             {
-                return Result<GameDTO>.Failure(
+                return Result<GameDto>.Failure(
                     "Deletion unsuccessful.",
                     result.Message,
                     StatusCodes.Status404NotFound
                 );
             }
 
-            return Result<GameDTO>.Success(null, result.Message);
+            return Result<GameDto>.Success(null, result.Message);
         }
         catch (Exception ex)
         {
@@ -170,7 +170,7 @@ public class GameServiceFacade(ILogger<GameServiceFacade> logger, IGameService g
         }
     }
 
-    public async Task<Result<GameDTO>> HandleUserResponseAsync(GameResponseDTO response, List<Claim> userRole)
+    public async Task<Result<GameDto>> HandleUserResponseAsync(GameResponseDto response, List<Claim> userRole)
     {
         ArgumentNullException.ThrowIfNull(response);
 
@@ -179,7 +179,7 @@ public class GameServiceFacade(ILogger<GameServiceFacade> logger, IGameService g
             var roleClaim = userRole.FirstOrDefault(c => c.Type == ClaimTypes.Role);
             if (roleClaim == null)
             {
-                return Result<GameDTO>.Failure(
+                return Result<GameDto>.Failure(
                     "Invalid user role.",
                     "Role claim missing or invalid.",
                     StatusCodes.Status400BadRequest
@@ -189,7 +189,7 @@ public class GameServiceFacade(ILogger<GameServiceFacade> logger, IGameService g
             var existingGame = await _gameService.GetGameByIdAsync(response.GameId);
             if (!existingGame.IsSuccess || existingGame.Data is null)
             {
-                return Result<GameDTO>.Failure(
+                return Result<GameDto>.Failure(
                     "Game not found",
                     existingGame.Message,
                     StatusCodes.Status404NotFound
@@ -209,13 +209,13 @@ public class GameServiceFacade(ILogger<GameServiceFacade> logger, IGameService g
                     var declineResult = await _gameService.UpdateGameAsync(game);
                     if (!declineResult.IsSuccess)
                     {
-                        return Result<GameDTO>.Failure(
+                        return Result<GameDto>.Failure(
                             "Failed to register declined booking",
                             declineResult.Message,
                             StatusCodes.Status400BadRequest
                         );
                     }
-                    return Result<GameDTO>.Success(_mapper.Map<GameDTO>(game), "Coach declined the game.");
+                    return Result<GameDto>.Success(_mapper.Map<GameDto>(game), "Coach declined the game.");
                 }
 
                 game.IsCoachSigned = true;
@@ -233,13 +233,13 @@ public class GameServiceFacade(ILogger<GameServiceFacade> logger, IGameService g
                     var declineResult = await _gameService.UpdateGameAsync(game);
                     if (!declineResult.IsSuccess)
                     {
-                        return Result<GameDTO>.Failure(
+                        return Result<GameDto>.Failure(
                             "Failed to register declined booking",
                             declineResult.Message,
                             StatusCodes.Status400BadRequest
                         );
                     }
-                    return Result<GameDTO>.Success(_mapper.Map<GameDTO>(game), "Referee declined the game.");
+                    return Result<GameDto>.Success(_mapper.Map<GameDto>(game), "Referee declined the game.");
                 }
 
                 game.IsRefereeSigned = true;
@@ -248,7 +248,7 @@ public class GameServiceFacade(ILogger<GameServiceFacade> logger, IGameService g
             }
             else
             {
-                return Result<GameDTO>.Failure(
+                return Result<GameDto>.Failure(
                     "Invalid user role for response handling.",
                     "Role not supported.",
                     StatusCodes.Status400BadRequest
@@ -257,8 +257,8 @@ public class GameServiceFacade(ILogger<GameServiceFacade> logger, IGameService g
 
             var acceptedResult = await _gameService.UpdateGameAsync(game);
             return acceptedResult.IsSuccess
-                ? Result<GameDTO>.Success(_mapper.Map<GameDTO>(game), $"{userRole} successfully signed the game.")
-                : Result<GameDTO>.Failure(
+                ? Result<GameDto>.Success(_mapper.Map<GameDto>(game), $"{userRole} successfully signed the game.")
+                : Result<GameDto>.Failure(
                     "Failed to update game.",
                     acceptedResult.Message,
                     StatusCodes.Status400BadRequest

@@ -17,7 +17,7 @@ public class TeamRepo(ILogger<TeamRepo> logger, IMongoDatabase database) : Repos
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "An unexpected error occurred ín the TeamRepo while trying to create team.");
+            Logger.LogError(ex, "An unexpected error occurred ín the TeamRepo while trying to create team.");
             throw;
         }
     }
@@ -30,7 +30,7 @@ public class TeamRepo(ILogger<TeamRepo> logger, IMongoDatabase database) : Repos
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "An unexpected error occurred ín the TeamRepo while trying to get all teams.");
+            Logger.LogError(ex, "An unexpected error occurred ín the TeamRepo while trying to get all teams.");
             throw;
         }
     }
@@ -46,7 +46,7 @@ public class TeamRepo(ILogger<TeamRepo> logger, IMongoDatabase database) : Repos
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "An unexpected error occurred ín the TeamRepo while trying to get team by TeamId.");
+            Logger.LogError(ex, "An unexpected error occurred ín the TeamRepo while trying to get team by TeamId.");
             throw;
         }
     }
@@ -62,7 +62,7 @@ public class TeamRepo(ILogger<TeamRepo> logger, IMongoDatabase database) : Repos
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "An unexpected error occurred ín the TeamRepo while trying to get team by TeamName.");
+            Logger.LogError(ex, "An unexpected error occurred ín the TeamRepo while trying to get team by TeamName.");
             throw;
         }
     }
@@ -82,7 +82,7 @@ public class TeamRepo(ILogger<TeamRepo> logger, IMongoDatabase database) : Repos
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "An unexpected error occurred ín the TeamRepo while trying to update team.");
+            Logger.LogError(ex, "An unexpected error occurred ín the TeamRepo while trying to update team.");
             throw;
         }
     }
@@ -98,7 +98,7 @@ public class TeamRepo(ILogger<TeamRepo> logger, IMongoDatabase database) : Repos
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "An unexpected error occurred ín the TeamRepo while trying to delete team.");
+            Logger.LogError(ex, "An unexpected error occurred ín the TeamRepo while trying to delete team.");
             throw;
         }
     }

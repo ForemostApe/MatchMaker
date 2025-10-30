@@ -2,7 +2,7 @@
 using MongoDB.Bson.Serialization.Attributes;
 
 namespace MatchMaker.Domain.DTOs.Games;
-public class UpdateGameDTO
+public class UpdateGameDto
 {
     [BsonRepresentation(BsonType.ObjectId)]
     public string Id { get; set; } = null!;
@@ -12,10 +12,10 @@ public class UpdateGameDTO
 
     [BsonRepresentation(BsonType.ObjectId)]
     public string? RefereeId { get; set; }
-    public UpdateConditionsDTO? Conditions { get; set; }
+    public UpdateConditionsDto? Conditions { get; set; }
 }
 
-public class UpdateConditionsDTO
+public class UpdateConditionsDto
 {
     public string? Court { get; set; }
     public string? Timing { get; set; }

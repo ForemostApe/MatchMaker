@@ -11,4 +11,8 @@
     <PackageReference Include="MongoDB.Bson" Version="3.3.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+    
 </Project>

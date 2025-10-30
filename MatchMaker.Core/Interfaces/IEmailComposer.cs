@@ -5,6 +5,6 @@ namespace MatchMaker.Core.Interfaces
 {
     public interface IEmailComposer
     {
-        EmailCompositionDTO Compose(EmailType mailType, string email, string? token);
+        EmailCompositionDto Compose(EmailType mailType, string email, string? token);
     }
 }

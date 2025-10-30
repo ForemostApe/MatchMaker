@@ -1,6 +1,6 @@
 ﻿namespace MatchMaker.Domain.DTOs.Users;
 
-public class CreateUserDTO
+public class CreateUserDto
 {
     public string Password { get; set; } = null!;
     public string Email { get; set; } = null!;

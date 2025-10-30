@@ -17,7 +17,7 @@ public class GameRepo(ILogger<GameRepo> logger, IMongoDatabase database) : Repos
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "An unexpected error occurred in the GameRepo while trying to create a game.");
+            Logger.LogError(ex, "An unexpected error occurred in the GameRepo while trying to create a game.");
             throw;
         }
     }
@@ -30,7 +30,7 @@ public class GameRepo(ILogger<GameRepo> logger, IMongoDatabase database) : Repos
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "An unexpected error occurred in the GameRepo while trying to get all games.");
+            Logger.LogError(ex, "An unexpected error occurred in the GameRepo while trying to get all games.");
             throw;
         }
     }
@@ -46,7 +46,7 @@ public class GameRepo(ILogger<GameRepo> logger, IMongoDatabase database) : Repos
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "An unexpected error occurred in the GameRepo while trying to get a game by GameId.");
+            Logger.LogError(ex, "An unexpected error occurred in the GameRepo while trying to get a game by GameId.");
             throw;
         }
     }
@@ -85,7 +85,7 @@ public class GameRepo(ILogger<GameRepo> logger, IMongoDatabase database) : Repos
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "An unexpected error occurred in the GameRepo while trying to update game.");
+            Logger.LogError(ex, "An unexpected error occurred in the GameRepo while trying to update game.");
             throw;
         }
     }
@@ -101,7 +101,7 @@ public class GameRepo(ILogger<GameRepo> logger, IMongoDatabase database) : Repos
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "An unexpected error occurred in the GameRepo while trying to delete game.");
+            Logger.LogError(ex, "An unexpected error occurred in the GameRepo while trying to delete game.");
             throw;
         }
     }

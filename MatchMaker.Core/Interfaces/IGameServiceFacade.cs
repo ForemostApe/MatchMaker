@@ -6,11 +6,11 @@ namespace MatchMaker.Core.Interfaces
 {
     public interface IGameServiceFacade
     {
-        Task<Result<GameDTO>> CreateGameAsync(CreateGameDTO newGame);
-        Task<Result<List<GameDTO>>> GetAllGamesAsync();
-        Task<Result<GameDTO>> GetGameByIdAsync(string gameId);
-        Task<Result<GameDTO>> UpdateGameAsync(UpdateGameDTO updatedGame);
-        Task<Result<GameDTO>> DeleteGameAsync(string gameId);
-        Task<Result<GameDTO>> HandleUserResponseAsync(GameResponseDTO response, List<Claim> userClaims);
+        Task<Result<GameDto>> CreateGameAsync(CreateGameDto newGame);
+        Task<Result<List<GameDto>>> GetAllGamesAsync();
+        Task<Result<GameDto>> GetGameByIdAsync(string gameId);
+        Task<Result<GameDto>> UpdateGameAsync(UpdateGameDto updatedGame);
+        Task<Result<GameDto>> DeleteGameAsync(string gameId);
+        Task<Result<GameDto>> HandleUserResponseAsync(GameResponseDto response, List<Claim> userClaims);
     }
 }

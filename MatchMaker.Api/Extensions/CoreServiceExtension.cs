@@ -21,7 +21,7 @@ public static class CoreServiceExtension
 
         services.Configure<ClientSettings>(configuration.GetSection("FrontendClient"));
         var clientSettings = configuration.GetSection("FrontendClient").Get<ClientSettings>() ?? throw new ArgumentNullException(nameof(configuration), "Couldn't get BaseURL settings.");
-                
+        
         services.AddSingleton(clientSettings);
 
         services.AddHttpContextAccessor();
@@ -48,11 +48,11 @@ public static class CoreServiceExtension
         services.AddScoped<ITeamServiceFacade, TeamServiceFacade>();
         services.AddScoped<ITeamService, TeamService>();
         services.AddScoped<ITeamRepo, TeamRepo>();
-
+        
         services.AddScoped<IGameServiceFacade, GameServiceFacade>();
         services.AddScoped<IGameService, GameService>();
         services.AddScoped<IGameRepo, GameRepo>();
-
+        
         services.AddSingleton(config);
 
         services.AddControllers();
