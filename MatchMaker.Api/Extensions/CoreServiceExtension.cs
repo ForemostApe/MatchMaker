@@ -10,7 +10,6 @@ using MatchMaker.Data.Repositories;
 using MatchMaker.Domain.Configurations;
 
 namespace MatchMaker.Api.Extensions;
-
 public static class CoreServiceExtension
 {
     public static IServiceCollection AddCoreServices(this IServiceCollection services, IConfiguration configuration, IWebHostEnvironment env)

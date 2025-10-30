@@ -1,5 +1,4 @@
 using MatchMaker.Api.Extensions;
-using MatchMaker.Api.Extensions;
 using MatchMaker.Api.Middlewares;
 using Microsoft.IdentityModel.Logging;
 
@@ -29,7 +28,7 @@ namespace MatchMaker.Api
 
             #if DEBUG
                 builder.WebHost.ConfigureKestrelServer();
-#endif
+            #endif
 
             builder.Host.UseSerilogLogging(builder.Configuration);
 
@@ -39,6 +38,7 @@ namespace MatchMaker.Api
             builder.Services.AddSmtpServices(builder.Configuration);
             builder.Services.AddSwagger();
             builder.Services.AddRateLimiting(builder.Configuration);
+            builder.Services.AddFileManagement(builder.Configuration);
 
             var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ??
                                  ["http://localhost:5173"];

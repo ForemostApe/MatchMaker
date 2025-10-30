@@ -4,7 +4,6 @@ using MatchMaker.Core.Interfaces;
 using MatchMaker.Core.Utilities;
 using MatchMaker.Domain.DTOs.Teams;
 using MatchMaker.Domain.Entities;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
 namespace MatchMaker.Core.Facades;
@@ -13,13 +12,17 @@ public class TeamServiceFacade
     (
         ILogger<TeamServiceFacade> logger, 
         IMapper mapper, 
-        ITeamService teamService
+        ITeamService teamService,
+        IFileValidationService fileValidationService,
+        IFileStorageService fileStorageService
     ) 
     : ITeamServiceFacade
 {
     private readonly ILogger<TeamServiceFacade> _logger = logger;
     private readonly IMapper _mapper = mapper;
     private readonly ITeamService _teamService = teamService;
+    private readonly IFileValidationService _fileValidationService = fileValidationService;
+    private readonly IFileStorageService _fileStorageService = fileStorageService;
 
     public async Task<Result<TeamDto>> CreateTeamAsync(CreateTeamDto newTeam)
     {
@@ -27,8 +30,13 @@ public class TeamServiceFacade
 
         try
         {
+            const string storagePath = "\teamLogos";
+            
             if (newTeam.TeamLogo != null)
             {
+                bool isLogoValid = _fileValidationService.ValidateTeamLogoFile(newTeam.TeamLogo);
+                if (isLogoValid) await _fileStorageService.StoreFileAsync(newTeam.TeamLogo, storagePath);
+                
                 //TODO
                 //Add proper result-handling from the service so the client knows why the file was rejected, a bool
                 //doesn't cut it.

@@ -2,21 +2,18 @@ using MatchMaker.Core.Interfaces;
 using MatchMaker.Core.Services;
 using MatchMaker.Core.Utilities;
 
-namespace MatchMaker.Api.Extensions;
-
-public class FileManagementExtension
+namespace MatchMaker.Api.Extensions
 {
-    public static IServiceCollection AddCoreServices
-    (
-        IServiceCollection services, 
-        IConfiguration configuration
-    )
-
+    public static class FileManagementExtension
     {
-        services.Configure<FileValidationOptions>(configuration.GetSection("LogoUploadRestrictions"));
+        public static IServiceCollection AddFileManagement(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.Configure<FileValidationOptions>(configuration.GetSection("LogoUploadRestrictions"));
 
-        services.AddScoped<IFileValidationService, FileValidationService>();
-        
-        return services;
+            services.AddScoped<IFileValidationService, FileValidationService>();
+            services.AddScoped<IFileStorageService, FileStorageService>();
+
+            return services;        
+        }
     }
 }
