@@ -23,7 +23,7 @@ public class FileValidationService(ILogger<FileValidationService> logger, IOptio
         if (!ValidateFileSize(teamLogo.Length)) 
             return false;
         
-        if (!ValidateFileFormat(Path.GetExtension(teamLogo.FileName))) 
+        if (!ValidateFileExtension(Path.GetExtension(teamLogo.FileName))) 
             return false;
         
         if (!ValidateFileSignature(teamLogo)) 
@@ -32,7 +32,7 @@ public class FileValidationService(ILogger<FileValidationService> logger, IOptio
         return true;
     }
 
-    private bool ValidateFileFormat(string fileExtension)
+    private bool ValidateFileExtension(string fileExtension)
         => _fileValidationOptions.ValidFileExtensions.Contains(fileExtension, StringComparer.OrdinalIgnoreCase);
 
     private bool ValidateFileSignature(IFormFile file)
