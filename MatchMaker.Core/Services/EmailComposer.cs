@@ -40,7 +40,7 @@ namespace MatchMaker.Core.Services
                     "En planerad match inväntar bedömning.",
                     new
                     {
-                        login_link = _clientSettings.BaseUrl
+                        login_link = _clientSettings.BaseUri
                     }
                 ),
 

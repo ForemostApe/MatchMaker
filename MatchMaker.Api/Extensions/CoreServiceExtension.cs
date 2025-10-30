@@ -43,7 +43,7 @@ public static class CoreServiceExtension
         services.AddScoped<IEmailComposer, EmailComposer>();
         services.AddSingleton<IEmailTemplateEngine, EmailTemplateEngine>();
         
-        services.AddScoped<ILinkFactory>(_ => new LinkFactory(_.GetRequiredService<ILogger<LinkFactory>>(), clientSettings.BaseUrl));
+        services.AddScoped<ILinkFactory>(_ => new LinkFactory(_.GetRequiredService<ILogger<LinkFactory>>(), clientSettings.BaseUri));
 
         services.AddScoped<ITeamServiceFacade, TeamServiceFacade>();
         services.AddScoped<ITeamService, TeamService>();
@@ -70,11 +70,11 @@ public static class CoreServiceExtension
         services.AddHealthChecks();
 
         //Add additional logging-outputs other than console and debug here if needed.
-        services.AddLogging(config =>
+        services.AddLogging(loggingConfig =>
         {
-            config.ClearProviders();
-            config.AddConsole();
-            config.AddDebug();
+            loggingConfig.ClearProviders();
+            loggingConfig.AddConsole();
+            loggingConfig.AddDebug();
         });
 
         return services;

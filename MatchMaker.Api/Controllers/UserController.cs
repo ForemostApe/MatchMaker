@@ -3,7 +3,7 @@ using MatchMaker.Domain.DTOs.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace MatchMaker.Domain.Controllers;
+namespace MatchMaker.Api.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]

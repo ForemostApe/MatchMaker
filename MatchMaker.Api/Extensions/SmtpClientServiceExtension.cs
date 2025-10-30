@@ -1,6 +1,6 @@
 ﻿using MatchMaker.Domain.Configurations;
 
-namespace MatchMaker.Domain.Extensions;
+namespace MatchMaker.Api.Extensions;
 
 public static class SmtpClientServiceExtension
 {

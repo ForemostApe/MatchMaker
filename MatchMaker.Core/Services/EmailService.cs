@@ -8,7 +8,12 @@ using MimeKit;
 
 namespace MatchMaker.Core.Services;
 
-public class EmailService(ILogger<EmailService> logger, IEmailComposer emailComposer, IEmailTemplateEngine emailTemplateEngine, SmtpSettings smtpSettings) : IEmailService
+public class EmailService(
+    ILogger<EmailService> logger, 
+    IEmailComposer emailComposer, 
+    IEmailTemplateEngine emailTemplateEngine, 
+    SmtpSettings smtpSettings) 
+    : IEmailService
 {
     private readonly ILogger<EmailService> _logger = logger;
     private readonly IEmailComposer _emailComposer = emailComposer;
@@ -53,7 +58,7 @@ public class EmailService(ILogger<EmailService> logger, IEmailComposer emailComp
 
         try
         {
-            var socketOptions = _smtpSettings.UseTsl ? SecureSocketOptions.StartTls : SecureSocketOptions.None;
+            var socketOptions = _smtpSettings.UseTls ? SecureSocketOptions.StartTls : SecureSocketOptions.None;
 
             await smtpClient.ConnectAsync(_smtpSettings.Host, _smtpSettings.Port, socketOptions);
 

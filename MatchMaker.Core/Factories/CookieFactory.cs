@@ -13,7 +13,8 @@ public class CookieFactory(ILogger<CookieFactory> logger, IHttpContextAccessor h
     {
         try
         {
-            var response = _httpContextAccessor.HttpContext?.Response ?? throw new InvalidOperationException("HTTP response is not available.");
+            var response = _httpContextAccessor.HttpContext?.Response 
+                           ?? throw new InvalidOperationException("HTTP response is not available.");
 
             var cookieOptions = new CookieOptions
             {
@@ -27,7 +28,10 @@ public class CookieFactory(ILogger<CookieFactory> logger, IHttpContextAccessor h
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "An unexpected error occurred in CookieFactory while trying to create HTTP-only cookie");
+            _logger.LogError(
+                ex, 
+                "An unexpected error occurred in CookieFactory while trying to create HTTP-only cookie"
+            );
             throw;
         }
     }
@@ -36,7 +40,8 @@ public class CookieFactory(ILogger<CookieFactory> logger, IHttpContextAccessor h
     {
         try
         {
-            var response = _httpContextAccessor.HttpContext?.Response ?? throw new InvalidOperationException("HTTP response is not available.");
+            var response = _httpContextAccessor.HttpContext?.Response 
+                           ?? throw new InvalidOperationException("HTTP response is not available.");
 
             var cookieOptions = new CookieOptions()
             {

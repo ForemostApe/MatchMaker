@@ -2,5 +2,5 @@
 
 public class ClientSettings
 {
-    public string BaseUrl { get; set; } = null!;
+    public string BaseUri { get; set; } = null!;
 }

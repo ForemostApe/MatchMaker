@@ -2,7 +2,7 @@
 using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
 
-namespace MatchMaker.Domain.Extensions;
+namespace MatchMaker.Api.Extensions;
 
 public static class MongoDbServiceExtensions
 {
